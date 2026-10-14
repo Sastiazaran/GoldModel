@@ -1,0 +1,23 @@
+metric,value,unit,as_of,source_url
+spot_gold_close,4131.02,USD/oz,2026-10-05 ~11:04 CT (17:04 UTC),https://goldtickerlive.live/2026/10/05/evening
+spot_gold_prev_close,4139.24,USD/oz,2026-10-02,https://goldtickerlive.live/2026/10/05/evening
+spot_gold_1d_change,-0.20,%,2026-10-05,https://goldtickerlive.live/2026/10/05/evening
+usdmxn_spot_close,18.0899,MXN/USD,2026-10-05,https://www.jornada.com.mx/noticia/2026/10/05/economia/peso-mexicano-y-bolsas-de-america-latina-suben-impulsados-por-mercados-de-brasil
+usdmxn_banxico_fix_dof,18.1903,MXN/USD,FIX determined 2026-10-02 published DOF 2026-10-05,http://www.apta.com.mx/apta2008/ce/dof/descargapdf/2026/10Octubre/20261005/bm26100510-3.pdf
+gold_mxn_per_oz,74730,MXN/oz,derived 4131.02*18.0899,derived
+gold_mxn_per_gram,2402.6,MXN/g,derived /31.1035,derived
+gold_close_fri_2026-09-25,4286.14,USD/oz,(labelled 26 Sep on site),https://globalgoldrate.com/en/gold/usa/2026-09/
+gold_close_fri_2026-09-04,4428.95,USD/oz,(labelled 5 Sep on site),https://globalgoldrate.com/en/gold/usa/2026-09/
+gold_1w_change,-3.62,%,derived vs Fri Sep 25,derived
+gold_1m_change,-6.73,%,derived vs Fri Sep 4,derived
+gold_2025_close,4318.55,USD/oz,2025-12-31,https://metalflowapi.com/historical-gold-price/2026
+gold_ytd_change,-4.34,%,derived from 2025 close,derived
+gold_2026_high_daily,5529.90,USD/oz,2026-01-28,https://metalflowapi.com/historical-gold-price/2026
+gold_2026_low_daily,3981.55,USD/oz,2026-07-16,https://metalflowapi.com/historical-gold-price/2026
+gold_ath_intraday_approx,5590,USD/oz,2026-01-28,https://metalcharts.org/guides/gold-price-forecast
+comex_front_week_change,-3.59,%,week to 2026-10-02,https://www.morningstar.com/news/dow-jones/202610025159/comex-gold-ends-the-week-359-lower-at-413370-data-talk
+comex_front_ytd,-4.44,%,2026-10-02,https://www.morningstar.com/news/dow-jones/202610025159/comex-gold-ends-the-week-359-lower-at-413370-data-talk
+comex_2026_settle_high,5318.40,USD/oz,2026-01-29,https://www.morningstar.com/news/dow-jones/202610025159/comex-gold-ends-the-week-359-lower-at-413370-data-talk
+comex_2026_settle_low,3985.60,USD/oz,2026-07-16,https://www.morningstar.com/news/dow-jones/202610025159/comex-gold-ends-the-week-359-lower-at-413370-data-talk
+dxy,102.12,index,2026-10-05 close,https://mx.investing.com/news/forex-news/caida-del-precio-del-dolar-hoy-peso-mexicano-se-aprecio-tras-elecciones-en-brasil-3787182
+us10y_yield,~5.30,%,2026-10-05,https://www.fxstreet.com/news/gold-struggles-as-dovish-fed-repricing-meets-stronger-us-dollar-elevated-yields-202610051050

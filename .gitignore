@@ -1,0 +1,14 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mplconfig/
+*.egg-info/
+.DS_Store
+data/raw/
+data/panel_diario.csv
+outputs/*.csv
+outputs/informe.txt
+informe.txt
+run.err

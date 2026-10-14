@@ -1,0 +1,93 @@
+{
+  "fuentes": {
+    "oro_usd": {
+      "etiqueta": "Yahoo Finance GC=F (futuro COMEX)",
+      "url": "https://finance.yahoo.com/quote/GC=F"
+    },
+    "gld": {
+      "etiqueta": "Yahoo Finance GLD",
+      "url": "https://finance.yahoo.com/quote/GLD"
+    },
+    "dolar_index": {
+      "etiqueta": "Yahoo Finance DX-Y.NYB (índice dólar ICE)",
+      "url": "https://finance.yahoo.com/quote/DX-Y.NYB"
+    },
+    "dolar_amplio": {
+      "etiqueta": "FRED DTWEXBGS",
+      "url": "https://fred.stlouisfed.org/series/DTWEXBGS"
+    },
+    "rendimiento_real_10": {
+      "etiqueta": "FRED DFII10",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/"
+    },
+    "rendimiento_nominal_10": {
+      "etiqueta": "FRED DGS10",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/"
+    },
+    "rendimiento_nominal_2": {
+      "etiqueta": "FRED DGS2",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/"
+    },
+    "breakeven_10": {
+      "etiqueta": "FRED T10YIE",
+      "url": "https://fred.stlouisfed.org/series/T10YIE"
+    },
+    "fed_funds": {
+      "etiqueta": "FRED DFF",
+      "url": "https://www.newyorkfed.org/markets/reference-rates/effr"
+    },
+    "vix": {
+      "etiqueta": "FRED VIXCLS",
+      "url": "https://www.cboe.com/tradable_products/vix/"
+    },
+    "brent": {
+      "etiqueta": "FRED DCOILBRENTEU (Brent spot)",
+      "url": "https://fred.stlouisfed.org/series/DCOILBRENTEU"
+    },
+    "sp500": {
+      "etiqueta": "Yahoo Finance ^GSPC",
+      "url": "https://finance.yahoo.com/quote/%5EGSPC"
+    },
+    "plata": {
+      "etiqueta": "Yahoo Finance SI=F",
+      "url": "https://finance.yahoo.com/quote/SI=F"
+    },
+    "usd_mxn": {
+      "etiqueta": "Yahoo Finance MXN=X (pesos por dólar)",
+      "url": "https://finance.yahoo.com/quote/MXN=X"
+    },
+    "usd_mxn_fred": {
+      "etiqueta": "FRED DEXMXUS",
+      "url": "https://fred.stlouisfed.org/series/DEXMXUS"
+    },
+    "tnx_yahoo": {
+      "etiqueta": "Yahoo Finance ^TNX (chequeo de la tasa a 10 años)",
+      "url": "https://finance.yahoo.com/quote/%5ETNX"
+    },
+    "cpi": {
+      "etiqueta": "FRED CPIAUCSL",
+      "url": "https://fred.stlouisfed.org/series/CPIAUCSL"
+    }
+  },
+  "fechas": {
+    "oro_usd": "2026-10-14",
+    "gld": "2026-10-14",
+    "dolar_index": "2026-10-14",
+    "dolar_amplio": "2026-10-09",
+    "rendimiento_real_10": "2026-10-09",
+    "rendimiento_nominal_10": "2026-10-09",
+    "rendimiento_nominal_2": "2026-10-09",
+    "breakeven_10": "2026-10-13",
+    "fed_funds": "2026-10-12",
+    "vix": "2026-10-13",
+    "brent": "2026-10-06",
+    "sp500": "2026-10-14",
+    "plata": "2026-10-14",
+    "usd_mxn": "2026-10-14",
+    "usd_mxn_fred": "2026-10-09",
+    "tnx_yahoo": "2026-10-14",
+    "cpi_mes": "2026-09-01",
+    "cpi_fecha_publicacion": "2026-10-15"
+  },
+  "avisos": []
+}
