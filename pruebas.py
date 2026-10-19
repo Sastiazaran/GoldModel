@@ -16,6 +16,7 @@ import pandas as pd
 from datos import (
     extraer_cierre,
     fecha_publicacion_cpi,
+    filas_desde_puntos_bls,
     pegar_cpi_sin_adelanto,
     rellenar_hacia_adelante,
     tabla_publicacion_cpi,
@@ -213,6 +214,22 @@ def probar_pipeline_corto_no_inventa_habilidad() -> None:
     assert bloque["n"] > 10
     assert math.isfinite(bloque["r2_cero"])
     assert math.isfinite(pronostico["por_horizonte"][5]["pred_ultimo"])
+
+
+def probar_cpi_bls_ignora_mes_sin_publicar() -> None:
+    # El BLS manda "-" (o vacío) en el mes que todavía no publicó.
+    puntos = [
+        {"year": "2026", "period": "M09", "value": "324.368"},
+        {"year": "2026", "period": "M10", "value": "-"},
+        {"year": "2026", "period": "M11", "value": ""},
+        {"year": "2026", "period": "M13", "value": "300.0"},
+        {"year": "2026", "period": "M08", "value": "323.976"},
+    ]
+    filas = filas_desde_puntos_bls(puntos)
+    assert filas == [
+        (pd.Timestamp("2026-09-01"), 324.368),
+        (pd.Timestamp("2026-08-01"), 323.976),
+    ]
 
 
 def probar_extraer_cierre_de_yfinance() -> None:
