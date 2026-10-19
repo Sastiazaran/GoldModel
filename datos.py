@@ -393,6 +393,32 @@ def descargar_tesoro(
     return serie.loc[inicio:fin]
 
 
+def filas_desde_puntos_bls(puntos: list[dict]) -> list[tuple[pd.Timestamp, float]]:
+    """Lee los meses del IPC que el BLS ya publicó.
+
+    El mes que todavía no sale llega con ``value`` igual a ``"-"`` (a veces
+    vacío). No es un fallo de la descarga: se salta y se queda el resto.
+    ``M13`` es el promedio anual y no entra al índice mensual.
+    """
+    filas: list[tuple[pd.Timestamp, float]] = []
+    for punto in puntos:
+        periodo = str(punto.get("period", ""))
+        if not periodo.startswith("M") or periodo == "M13":
+            continue
+        try:
+            mes = int(periodo[1:])
+            anio = int(punto["year"])
+        except (TypeError, ValueError, KeyError):
+            continue
+        if not 1 <= mes <= 12:
+            continue
+        valor = pd.to_numeric(str(punto.get("value", "")).strip(), errors="coerce")
+        if pd.isna(valor) or float(valor) <= 0:
+            continue
+        filas.append((pd.Timestamp(year=anio, month=mes, day=1), float(valor)))
+    return filas
+
+
 def descargar_cpi_bls(sesion: requests.Session, avisos: list[str]) -> pd.Series:
     """IPC de Estados Unidos, ajustado por estacionalidad.
 
@@ -424,20 +450,10 @@ def descargar_cpi_bls(sesion: requests.Session, avisos: list[str]) -> pd.Series:
             cuerpo = respuesta.json()
             if cuerpo.get("status") != "REQUEST_SUCCEEDED":
                 raise RuntimeError(cuerpo.get("message"))
-            for punto in cuerpo["Results"]["series"][0]["data"]:
-                periodo = str(punto.get("period", ""))
-                if not periodo.startswith("M") or periodo == "M13":
-                    continue
-                mes = int(periodo[1:])
-                if not 1 <= mes <= 12:
-                    continue
-                filas.append(
-                    (
-                        pd.Timestamp(year=int(punto["year"]), month=mes, day=1),
-                        float(punto["value"]),
-                    )
-                )
+            filas.extend(filas_desde_puntos_bls(cuerpo["Results"]["series"][0]["data"]))
             time.sleep(0.2)
+        if not filas:
+            raise RuntimeError("El BLS respondió, pero ningún mes traía un IPC numérico.")
     except Exception as error:  # noqa: BLE001
         cache = _leer_serie_cache("cpi_bls", solo_positivos=True)
         if cache is None:
