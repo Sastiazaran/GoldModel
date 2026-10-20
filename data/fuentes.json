@@ -64,30 +64,52 @@
       "etiqueta": "Yahoo Finance ^TNX (chequeo de la tasa a 10 años)",
       "url": "https://finance.yahoo.com/quote/%5ETNX"
     },
+    "gpr": {
+      "etiqueta": "GPR diario de Caldara-Iacoviello (GPRD), usable el mismo día",
+      "url": "https://www.matteoiacoviello.com/gpr.htm"
+    },
+    "gld_toneladas": {
+      "etiqueta": "SPDR Gold Shares, archivo histórico (toneladas en el fideicomiso), usable al día hábil siguiente",
+      "url": "https://www.spdrgoldshares.com/usa/historical-data/"
+    },
+    "cot_neto": {
+      "etiqueta": "CFTC COT legacy, futuros de oro COMEX (código 088691), neto no comercial, usable el viernes posterior al martes de corte",
+      "url": "https://publicreporting.cftc.gov/resource/6dca-aqww.json"
+    },
+    "compras_bc_ton": {
+      "etiqueta": "World Gold Council, suma de reservas oficiales en toneladas (API pública del tablero; el Excel de la página respondió 403), cambio trimestral solo entre países que reportaron los dos cortes, usable a fin del mes siguiente",
+      "url": "https://fsapi.gold.org/api/cbd/v11/charts/getPage"
+    },
     "cpi": {
       "etiqueta": "FRED CPIAUCSL",
       "url": "https://fred.stlouisfed.org/series/CPIAUCSL"
     }
   },
   "fechas": {
-    "oro_usd": "2026-10-14",
-    "gld": "2026-10-14",
-    "dolar_index": "2026-10-14",
-    "dolar_amplio": "2026-10-09",
-    "rendimiento_real_10": "2026-10-09",
-    "rendimiento_nominal_10": "2026-10-09",
-    "rendimiento_nominal_2": "2026-10-09",
-    "breakeven_10": "2026-10-13",
-    "fed_funds": "2026-10-12",
-    "vix": "2026-10-13",
-    "brent": "2026-10-06",
-    "sp500": "2026-10-14",
-    "plata": "2026-10-14",
-    "usd_mxn": "2026-10-14",
-    "usd_mxn_fred": "2026-10-09",
-    "tnx_yahoo": "2026-10-14",
+    "oro_usd": "2026-10-19",
+    "gld": "2026-10-16",
+    "dolar_index": "2026-10-19",
+    "dolar_amplio": "2026-10-16",
+    "rendimiento_real_10": "2026-10-16",
+    "rendimiento_nominal_10": "2026-10-16",
+    "rendimiento_nominal_2": "2026-10-16",
+    "breakeven_10": "2026-10-19",
+    "fed_funds": "2026-10-16",
+    "vix": "2026-10-16",
+    "brent": "2026-10-14",
+    "sp500": "2026-10-19",
+    "plata": "2026-10-19",
+    "usd_mxn": "2026-10-20",
+    "usd_mxn_fred": "2026-10-16",
+    "tnx_yahoo": "2026-10-19",
     "cpi_mes": "2026-09-01",
-    "cpi_fecha_publicacion": "2026-10-15"
+    "cpi_fecha_publicacion": "2026-10-15",
+    "gpr": "2026-10-19",
+    "gld_toneladas": "2026-10-19",
+    "cot_neto": "2026-10-16",
+    "compras_bc_ton": "2026-07-31"
   },
-  "avisos": []
+  "avisos": [
+    "El Excel trimestral del World Gold Council no se pudo bajar (respuesta 403). Uso la API pública del mismo sitio."
+  ]
 }

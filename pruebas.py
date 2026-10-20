@@ -15,9 +15,12 @@ import pandas as pd
 
 from datos import (
     extraer_cierre,
+    fecha_publicacion_compras_bc,
+    fecha_publicacion_cot,
     fecha_publicacion_cpi,
-    filas_desde_puntos_bls,
+    fecha_publicacion_gld,
     pegar_cpi_sin_adelanto,
+    pegar_publicado,
     rellenar_hacia_adelante,
     tabla_publicacion_cpi,
     variacion_anual_ipc,
@@ -25,6 +28,8 @@ from datos import (
 from modelos import (
     ajustar_pronosticos,
     ajustar_valor_justo,
+    columnas_pronostico,
+    evaluar_cointegracion,
     indices_de_entrenamiento,
     metricas_pronostico,
     onza_a_mxn_por_gramo,
@@ -32,6 +37,8 @@ from modelos import (
     pronostico_walk_forward,
     retorno_log_adelante,
     retorno_log_pasado,
+    valor_justo_ventana,
+    vida_media,
 )
 
 
@@ -216,20 +223,185 @@ def probar_pipeline_corto_no_inventa_habilidad() -> None:
     assert math.isfinite(pronostico["por_horizonte"][5]["pred_ultimo"])
 
 
-def probar_cpi_bls_ignora_mes_sin_publicar() -> None:
-    # El BLS manda "-" (o vacío) en el mes que todavía no publicó.
-    puntos = [
-        {"year": "2026", "period": "M09", "value": "324.368"},
-        {"year": "2026", "period": "M10", "value": "-"},
-        {"year": "2026", "period": "M11", "value": ""},
-        {"year": "2026", "period": "M13", "value": "300.0"},
-        {"year": "2026", "period": "M08", "value": "323.976"},
-    ]
-    filas = filas_desde_puntos_bls(puntos)
-    assert filas == [
-        (pd.Timestamp("2026-09-01"), 324.368),
-        (pd.Timestamp("2026-08-01"), 323.976),
-    ]
+def probar_cot_no_se_usa_antes_del_viernes() -> None:
+    # 13 de octubre de 2026 fue martes. El COT de ese corte sale el viernes 16.
+    assert fecha_publicacion_cot(pd.Timestamp("2026-10-13")) == pd.Timestamp("2026-10-16")
+    # Un corte que no es martes (jueves 15) cae tres días después, y el domingo pasa al lunes.
+    assert fecha_publicacion_cot(pd.Timestamp("2026-10-15")) == pd.Timestamp("2026-10-19")
+    tabla = pd.DataFrame(
+        {"fecha_disponible": [pd.Timestamp("2026-10-16")], "cot_neto": [100.0]}
+    )
+    fechas = pd.to_datetime(["2026-10-15", "2026-10-16"])
+    pegado = pegar_publicado(fechas, tabla, ["cot_neto"])
+    assert math.isnan(pegado.loc[0, "cot_neto"])
+    assert pegado.loc[1, "cot_neto"] == 100.0
+
+
+def probar_gld_entra_al_dia_habil_siguiente() -> None:
+    # Viernes 16 de octubre de 2026: el archivo sale el lunes 19.
+    assert fecha_publicacion_gld(pd.Timestamp("2026-10-16")) == pd.Timestamp("2026-10-19")
+    # Lunes 12: sale el martes 13. No el mismo lunes.
+    assert fecha_publicacion_gld(pd.Timestamp("2026-10-12")) == pd.Timestamp("2026-10-13")
+
+
+def probar_un_pais_sin_dato_no_cuenta_como_venta() -> None:
+    """Una celda vacía no es una venta de todo el oro de ese país."""
+    from datos import _sumar_toneladas_wgc
+
+    metrica = {
+        "headers": [[{"val": "Country"}, {"val": "Q1 20"}, {"val": "Q2 20"}]],
+        "rows": [
+            [{"iso3": "AAA", "val": "Uno"}, {"val": "100"}, {"val": "110"}],
+            [{"iso3": "BBB", "val": "Dos"}, {"val": "50"}, {"val": ""}],
+        ],
+    }
+    # Con un solo país pareado la función pide al menos 20, así que se replica.
+    metrica["rows"] = metrica["rows"][:1] * 20 + [metrica["rows"][1]]
+    tabla = _sumar_toneladas_wgc(metrica)
+    assert len(tabla) == 1
+    assert abs(float(tabla["compras_bc_ton"].iloc[0]) - 200.0) < 1e-6
+
+
+def probar_compras_de_bancos_entran_al_mes_siguiente() -> None:
+    # Segundo trimestre de 2026 cierra el 30 de junio y se usa desde el 31 de julio.
+    assert fecha_publicacion_compras_bc(pd.Timestamp("2026-06-30")) == pd.Timestamp("2026-07-31")
+    assert fecha_publicacion_compras_bc(pd.Timestamp("2025-12-31")) == pd.Timestamp("2026-01-31")
+    tabla = pd.DataFrame(
+        {
+            "fecha_disponible": [pd.Timestamp("2026-07-31")],
+            "compras_bc_ton": [50.0],
+        }
+    )
+    fechas = pd.to_datetime(["2026-07-30", "2026-07-31"])
+    pegado = pegar_publicado(fechas, tabla, ["compras_bc_ton"])
+    assert math.isnan(pegado.loc[0, "compras_bc_ton"])
+    assert pegado.loc[1, "compras_bc_ton"] == 50.0
+
+
+def probar_vida_media_solo_si_la_brecha_se_encoge() -> None:
+    # alpha = -0.5 multiplica la brecha por 0.5 cada periodo: vida media = 1.
+    assert abs(vida_media(-0.5) - 1.0) < 1e-9
+    assert vida_media(0.0) is None
+    assert vida_media(-1.0) is None
+    assert vida_media(0.2) is None
+    assert vida_media(float("nan")) is None
+
+
+def probar_ventana_movil_no_mira_el_futuro() -> None:
+    n = 800
+    indice = pd.bdate_range("2018-01-02", periods=n)
+    x1 = np.linspace(-1.0, 1.0, n)
+    y = 0.2 + 0.5 * x1
+    y_shock = y.copy()
+    y_shock[-100:] += 40.0
+    marco = pd.DataFrame({"constante": 1.0, "x1": x1}, index=indice)
+    objetivo = pd.Series(y, index=indice)
+    objetivo_shock = pd.Series(y_shock, index=indice)
+    limpio = valor_justo_ventana(marco, objetivo, ventana=200, paso=40)
+    sucio = valor_justo_ventana(marco, objetivo_shock, ventana=200, paso=40)
+    # En la fila 600 la ventana es [400, 600). El shock vive en [700, 800).
+    assert abs(limpio["log_valor"].iloc[600] - sucio["log_valor"].iloc[600]) < 1e-8
+    assert abs(limpio["x1"].iloc[600] - sucio["x1"].iloc[600]) < 1e-8
+    # Antes de completar la ventana no hay valor.
+    assert math.isnan(limpio["log_valor"].iloc[199])
+    assert math.isfinite(limpio["log_valor"].iloc[200])
+
+
+def probar_variables_nuevas_no_rompen_el_valor_justo() -> None:
+    n = 900
+    indice = pd.bdate_range("2016-01-04", periods=n)
+    azar = np.random.default_rng(4)
+    real = azar.normal(1.0, 0.3, n)
+    dolar = np.full(n, 100.0) + azar.normal(0, 0.2, n).cumsum()
+    brent = np.clip(60 + azar.normal(0, 0.4, n).cumsum(), 20, None)
+    vix = np.clip(azar.normal(18, 2, n), 10, 50)
+    log_oro = 7.2 - 0.04 * real - 0.2 * np.log(dolar) + azar.normal(0, 0.01, n)
+    panel = pd.DataFrame(
+        {
+            "oro_usd": np.exp(log_oro),
+            "rendimiento_real_10": real,
+            "dolar_index": dolar,
+            "brent": brent,
+            "vix": vix,
+            "cpi_anual": 2.0 + 0.4 * np.sin(np.linspace(0, 8, n)),
+            "sp500": np.linspace(2000, 4000, n),
+            "usd_mxn": np.full(n, 18.0),
+            "gpr": 100 + azar.normal(0, 5, n).cumsum() * 0.05,
+            "gld_toneladas": np.linspace(400, 900, n),
+            "compras_bc_ton": azar.normal(20, 30, n),
+        },
+        index=indice,
+    )
+    valor = ajustar_valor_justo(preparar_muestra(panel))
+    ext = valor["extendido"]
+    assert ext["disponible"]
+    assert {"gpr", "log_gld_ton", "compras_bc_ton"} <= set(ext["variables"])
+    assert math.isfinite(ext["brecha_vf_pct"])
+    assert ext["cierre_abs_pp"] is not None and math.isfinite(ext["cierre_abs_pp"])
+    assert math.isfinite(valor["movil"]["ventanas"]["3a"]["brecha_pct"])
+    assert valor["cointegracion"]["n"] > 50
+
+
+def probar_cointegracion_encuentra_una_relacion_obvia() -> None:
+    azar = np.random.default_rng(5)
+    n = 2200
+    indice = pd.bdate_range("2012-01-02", periods=n)
+    caminata = np.cumsum(azar.normal(0, 0.01, n))
+    error = np.zeros(n)
+    # Persistente también de una semana a la otra. Si se apaga en unos días,
+    # el dato semanal ya no ve la corrección.
+    for t in range(1, n):
+        error[t] = 0.98 * error[t - 1] + azar.normal(0, 0.001)
+    log_oro = 7.0 + 1.2 * caminata + error
+    df = pd.DataFrame(
+        {
+            "oro_usd": np.exp(log_oro),
+            "dolar_index": np.exp(4.6 + caminata),
+            "brent": 60 + azar.normal(0, 0.4, n),
+            "rendimiento_real_10": azar.normal(1.0, 0.05, n),
+            "vix": azar.normal(18, 1, n),
+        },
+        index=indice,
+    )
+    resultado = evaluar_cointegracion(df)
+    assert resultado["hay_relacion"]
+    assert resultado["vida_media_semanas"] is not None
+    assert resultado["vida_media_semanas"] > 0
+
+
+def probar_pronostico_usa_cot_y_boosting() -> None:
+    azar = np.random.default_rng(6)
+    n = 420
+    indice = pd.bdate_range("2020-01-02", periods=n)
+    df = pd.DataFrame(index=indice)
+    for columna in (
+        "ret_5",
+        "ret_20",
+        "ret_60",
+        "d_real_20",
+        "d_dolar_20",
+        "d_brent_20",
+        "d_vix_5",
+        "d_spx_20",
+        "rendimiento_real_10",
+        "vix",
+        "cpi_anual",
+        "residuo_vf",
+        "cot_neto_oi",
+        "rendimiento_nominal_2",
+        "d_nominal2_20",
+        "y_5",
+        "y_20",
+    ):
+        df[columna] = azar.normal(0, 0.01, n)
+    assert "cot_neto_oi" in columnas_pronostico(df)
+    assert "rendimiento_nominal_2" in columnas_pronostico(df)
+    salida = ajustar_pronosticos(df, min_entrenamiento=120)
+    bloque = salida["por_horizonte"][5]
+    assert "cot_neto_oi" in salida["columnas"]
+    assert math.isfinite(bloque["metricas_boosting"]["sin_solapar"]["r2_cero"])
+    assert math.isfinite(bloque["pred_ultimo_boosting"])
+    assert math.isfinite(bloque["metricas"]["sin_solapar"]["r2_media"])
 
 
 def probar_extraer_cierre_de_yfinance() -> None:

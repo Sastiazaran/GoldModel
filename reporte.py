@@ -33,6 +33,18 @@ COLOR_CARO = "#A33B20"
 COLOR_BARATO = "#2E6B4F"
 COLOR_TEXTO = "#243042"
 
+ETIQUETA_CORTA = {
+    "rendimiento_real_10": "Tasa real",
+    "log_dolar": "Dólar",
+    "log_brent": "Petróleo",
+    "vix": "VIX",
+    "cpi_anual": "Inflación",
+    "gpr": "GPR",
+    "log_gld_ton": "GLD",
+    "compras_bc_ton": "Bancos centrales",
+    "log_usd_mxn": "Tipo de cambio",
+}
+
 
 def _sufijo_fuente(datos: dict, clave: str, fecha_modelo) -> str:
     """Avisa cuando el número del informe es anterior al día del oro."""
@@ -95,6 +107,16 @@ def lectura_coeficiente(fila: dict) -> str:
         return f"un dólar 1% más alto se asocia con {coef:+.2f}% en el oro"
     if nombre == "log_brent":
         return f"un petróleo 1% más alto se asocia con {coef:+.2f}% en el oro"
+    if nombre == "log_gld_ton":
+        return f"unas tenencias de GLD 1% más altas se asocian con {coef:+.2f}% en el oro"
+    if nombre == "log_usd_mxn":
+        return f"un tipo de cambio 1% más alto (más pesos por dólar) se asocia con {coef:+.2f}% en el oro en pesos"
+    if nombre == "gpr":
+        cambio = (math.exp(coef) - 1.0) * 100.0
+        return f"+1 punto del índice GPR se asocia con {cambio:+.3f}% en el oro"
+    if nombre == "compras_bc_ton":
+        cambio = (math.exp(coef * 100.0) - 1.0) * 100.0
+        return f"+100 toneladas netas en el trimestre se asocian con {cambio:+.2f}% en el oro"
     return ""
 
 
@@ -272,18 +294,374 @@ def _texto_pronostico(horizonte: int, info: dict) -> list[str]:
     return lineas
 
 
-def construir_informe(datos: dict, valor: dict, pronostico: dict) -> str:
+def _texto_boosting(horizonte: int, info: dict) -> list[str]:
+    """Misma ventana y mismo embargo que Ridge. Otro método, no otra muestra."""
+    if "metricas_boosting" not in info:
+        return []
+    limpio = info["metricas_boosting"]["sin_solapar"]
+    pred = float(info.get("pred_ultimo_boosting", float("nan")))
+    esperado = (math.exp(pred) - 1.0) * 100.0 if math.isfinite(pred) else float("nan")
+    ridge = info["metricas"]["sin_solapar"]
+    lineas = [
+        f"Gradient boosting, mismo horizonte de {horizonte} días, misma caminata y el mismo embargo.",
+        f"Apunta a {pct(esperado, 2, signo=True)} (el número de hoy, no la nota histórica).",
+        f"Sin solapar, n={limpio['n']}: "
+        f"R² contra cero {r2_txt(limpio['r2_cero'])} "
+        f"(Ridge {r2_txt(ridge['r2_cero'])}), "
+        f"R² contra el promedio {r2_txt(limpio['r2_media'])} "
+        f"(Ridge {r2_txt(ridge['r2_media'])}).",
+        f"  RMSE boosting {pct(limpio['rmse'] * 100, 2)} | "
+        f"Ridge {pct(ridge['rmse'] * 100, 2)} | "
+        f"baseline cero {pct(limpio['rmse_cero'] * 100, 2)} | "
+        f"baseline promedio {pct(limpio['rmse_media'] * 100, 2)}.",
+        f"  Acierto boosting {pct(limpio['acierto'] * 100, 1)} | "
+        f"Ridge {pct(ridge['acierto'] * 100, 1)} | "
+        f"siempre alza {pct(limpio['acierto_siempre_alza'] * 100, 1)}.",
+    ]
+    if info.get("importancias"):
+        top = info["importancias"][:3]
+        texto = ", ".join(f"{fila['etiqueta']} ({fila['peso']:.2f})" for fila in top)
+        lineas.append(f"Mayor peso del último bosque (importancia, suma 1): {texto}.")
+    gana_cero = math.isfinite(limpio["r2_cero"]) and limpio["r2_cero"] > 0
+    gana_media = math.isfinite(limpio["r2_media"]) and limpio["r2_media"] > 0
+    if not gana_cero and not gana_media:
+        lineas.append(
+            "Tampoco le gana a los dos baselines. Cambiar de recta a árboles no sacó una señal."
+        )
+    elif gana_cero and not gana_media:
+        lineas.append(
+            "Le gana al cero y no al promedio: alcanza para decir 'el oro suele subir', "
+            "no para decir cuándo."
+        )
+    return lineas
+
+
+def _seccion_variables_nuevas(valor: dict) -> list[str]:
+    ext = valor.get("extendido") or {}
+    lineas = ["", "4) Variables nuevas: bancos centrales, GLD y riesgo geopolítico"]
+    lineas.append(
+        "Al modelo de la sección 3 se le agregan, si la serie llegó, tres columnas: "
+        "compras netas de oro de bancos centrales (toneladas en el trimestre, World Gold Council, "
+        "usables a fin del mes siguiente al cierre del trimestre), "
+        "el logaritmo de las toneladas en GLD (el dato de una sesión entra al día hábil siguiente) "
+        "y el índice GPR de Caldara e Iacoviello (el diario se usa el mismo día). "
+        "La brecha de esta sección también camina hacia adelante: el día t no entra a sus propios coeficientes."
+    )
+    if not ext.get("disponible"):
+        lineas.append(ext.get("nota") or "No se pudo armar el modelo ampliado.")
+        return lineas
+    lineas.append("Entraron: " + ", ".join(ext.get("variables") or []) + f". n={ext['n']}.")
+    lineas.append(
+        f"Valor justo ampliado, con toda la historia: {num(ext['valor_justo'])} USD/oz. "
+        f"Brecha: {pct(ext['brecha_pct'], 1, signo=True)}."
+    )
+    lineas.append(
+        f"Valor justo ampliado, solo con el pasado: {num(ext['valor_justo_vf'])} USD/oz. "
+        f"Brecha: {pct(ext['brecha_vf_pct'], 1, signo=True)}."
+    )
+    base = ext.get("brecha_base_vf_pct")
+    cierre = ext.get("cierre_abs_pp")
+    if base is not None and cierre is not None and math.isfinite(base) and math.isfinite(cierre):
+        lineas.append(
+            f"La brecha del modelo base, el mismo día y también solo con el pasado, era {pct(base, 1, signo=True)}. "
+            f"En valor absoluto, las variables nuevas la mueven {cierre:+.1f} puntos porcentuales "
+            "(positivo quiere decir que la brecha se acerca a cero)."
+        )
+        if cierre > 1 and base * ext["brecha_vf_pct"] < 0:
+            lineas.append(
+                "La distancia a cero baja, pero el signo cambia: el modelo base decía que el oro estaba "
+                "caro y el ampliado dice que está barato. No es un cierre limpio. Es otra recta."
+            )
+            lineas.append(
+                "Ojo con GLD: las toneladas del fondo suben en los mismos años en que sube el precio, "
+                "porque entran inversionistas. Un coeficiente grande ahí puede estar contando esa subida, "
+                "no una causa que empuje el oro desde afuera. El cambio de signo no se lea como "
+                "'ahora está barato y hay que comprar'."
+            )
+        elif cierre > 1:
+            lineas.append("Sí cierran parte de la brecha, y el signo se queda igual. No la hacen desaparecer.")
+        elif cierre < -1:
+            lineas.append(
+                "No la cierran: con estas columnas el precio queda aún más lejos del valor justo. "
+                "Eso también es un resultado."
+            )
+        else:
+            lineas.append("Casi no mueven la brecha: el hueco no era, sobre todo, estas tres series.")
+    lineas.append(
+        f"R² dentro de muestra del modelo ampliado: {ext['r2']:.3f}. "
+        f"El del modelo base está en la sección 3. Ninguno de los dos es la nota del pronóstico."
+    )
+    lineas.append("Coeficientes del modelo ampliado (Newey-West, 21 rezagos):")
+    lineas.append(f"{'Variable':<28}{'Coef':>10}{'EE':>10}{'t':>8}   Lectura")
+    for fila_coef in ext.get("coeficientes") or []:
+        lineas.append(
+            f"{fila_coef['etiqueta']:<28}"
+            f"{fila_coef['coef']:>10.3f}"
+            f"{fila_coef['ee']:>10.3f}"
+            f"{fila_coef['t']:>8.2f}   "
+            f"{lectura_coeficiente(fila_coef)}"
+        )
+    return lineas
+
+
+def _seccion_movil(valor: dict) -> list[str]:
+    movil = valor.get("movil") or {}
+    lineas = ["", "5) Coeficientes que cambian (ventanas de 2 y 3 años)"]
+    espec = movil.get("especificacion") or []
+    lineas.append(
+        "Cada día, la recta se estima solo con las últimas 504 sesiones (cerca de 2 años) "
+        "o las últimas 756 (cerca de 3). El día de hoy no entra. Se reestima más o menos cada 21 sesiones. "
+        "Especificación: " + ", ".join(espec) + "."
+    )
+    lineas.append(
+        "La gráfica coeficientes_moviles.png muestra el camino de cada coeficiente. "
+        "Si una línea cruza el cero, el signo que salía en la muestra completa no era una ley."
+    )
+    for clave, titulo in (("2a", "2 años"), ("3a", "3 años")):
+        bloque = (movil.get("ventanas") or {}).get(clave)
+        if not bloque or bloque.get("fecha") is None:
+            lineas.append(f"Ventana de {titulo}: todavía no hay suficientes sesiones.")
+            continue
+        lineas.append(
+            f"Ventana de {titulo}, último día {fecha_larga(bloque['fecha'])}: "
+            f"valor justo {num(bloque['valor_justo'])} USD/oz, "
+            f"brecha {pct(bloque['brecha_pct'], 1, signo=True)}."
+        )
+        ultimo = bloque.get("ultimo") or {}
+        if "rendimiento_real_10" in ultimo or "log_dolar" in ultimo:
+            lineas.append(
+                f"  Últimos coeficientes: tasa real {ultimo.get('rendimiento_real_10', float('nan')):+.3f}, "
+                f"dólar {ultimo.get('log_dolar', float('nan')):+.3f}."
+            )
+    return lineas
+
+
+def _seccion_cointegracion(valor: dict) -> list[str]:
+    coint = valor.get("cointegracion") or {}
+    lineas = ["", "6) Cointegración y vida media de la brecha"]
+    lineas.append(
+        "Cointegración pregunta si el oro y sus causas se mueven juntos en el largo plazo, "
+        "aunque cada uno por su lado parezca no volver a un promedio. "
+        "Se prueba en datos semanales (viernes), para no contar cinco días seguidos como cinco pruebas. "
+        "La prueba ADF de la sección 3 no es esta prueba: sus valores críticos no sirven cuando el residuo "
+        "sale de una regresión estimada."
+    )
+    variables = coint.get("variables") or []
+    if coint.get("n"):
+        lineas.append(
+            f"Semanas usadas: {coint['n']}. Variables: {', '.join(variables)}."
+        )
+    adf = coint.get("adf") or {}
+    if adf:
+        partes = []
+        for nombre, pvalor in adf.items():
+            if pvalor is None:
+                partes.append(f"{nombre} sin ADF")
+            else:
+                partes.append(f"{nombre} p={pvalor:.3f}")
+        lineas.append("ADF de cada serie en niveles (p chico: se rechaza raíz unitaria): " + "; ".join(partes) + ".")
+    if coint.get("eg_p") is None:
+        lineas.append("Engle-Granger no quedó calculado.")
+    else:
+        decision = "rechaza" if coint["eg_p"] < 0.05 else "no rechaza"
+        lineas.append(
+            f"Engle-Granger: estadístico {coint['eg_stat']:.2f}, p={coint['eg_p']:.3f}. "
+            f"{decision.capitalize()} 'no hay relación', al 5%."
+        )
+    if coint.get("johansen_trace") is None:
+        lineas.append("Johansen no quedó calculado.")
+    else:
+        decision = "sí" if coint.get("johansen_rechaza_r0") else "no"
+        lineas.append(
+            f"Johansen, traza para cero relaciones: {coint['johansen_trace']:.2f}. "
+            f"Valor crítico al 5%: {coint['johansen_crit_5']:.2f}. "
+            f"{decision.capitalize()} se rechaza que no haya ninguna relación."
+        )
+    if coint.get("hay_relacion"):
+        cuales = " y ".join(coint.get("prueba_que_rechaza") or [])
+        lineas.append(f"Hay señal de relación según {cuales}.")
+        if coint.get("alpha_ecm") is not None:
+            lineas.append(
+                f"Modelo de corrección de errores, en semanas: el rezago de la brecha entra con "
+                f"coeficiente {coint['alpha_ecm']:+.3f} "
+                f"(EE {coint['ee_alpha']:.3f}, t={coint['t_alpha']:.2f}). "
+                "Negativo y entre -1 y 0 quiere decir que una brecha positiva empuja el precio hacia abajo."
+            )
+        if coint.get("vida_media_semanas") is not None:
+            lineas.append(
+                f"Vida media de la brecha: {coint['vida_media_semanas']:.1f} semanas "
+                f"(cerca de {coint['vida_media_dias']:.0f} días de mercado). "
+                "Es el tiempo para que, si el modelo de corrección fuera cierto, la brecha baje a la mitad. "
+                "No es una fecha en la que el oro vaya a caer."
+            )
+        else:
+            lineas.append(
+                "No hay vida media: el coeficiente de corrección no encoge la brecha hacia la mitad."
+            )
+    else:
+        lineas.append(
+            "No hay relación de largo plazo según estas dos pruebas, al 5%. "
+            "No se reporta un modelo de corrección ni una vida media de equilibrio."
+        )
+    if coint.get("ar1_vida_media_dias") is not None:
+        lineas.append(
+            f"Aparte, y sin llamarlo equilibrio: un AR(1) sobre la brecha diaria del modelo base "
+            f"tiene rho {coint['ar1_rho']:.3f} y una vida media descriptiva de "
+            f"{coint['ar1_vida_media_dias']:.0f} días de mercado. "
+            "Eso solo describe qué tan lento se mueve la brecha. No prueba que vaya a volver."
+        )
+    if coint.get("nota"):
+        lineas.append(parrafo(coint["nota"]))
+    return lineas
+
+
+def _seccion_mxn(mxn: dict | None) -> list[str]:
+    lineas = ["", "9) Oro en pesos por gramo"]
+    if not mxn:
+        lineas.append("No se estimó el modelo en pesos.")
+        return lineas
+    valor = mxn["valor"]
+    lineas.append(
+        "Esta regresión explica el logaritmo del oro en pesos por gramo. "
+        "Lleva el tipo de cambio (pesos por dólar) en lugar del índice dólar, "
+        "para no contar el dólar dos veces. No es el valor justo en dólares convertido al tipo de cambio de hoy: "
+        "esa conversión dejaría el mismo porcentaje de brecha."
+    )
+    lineas.append(
+        f"Precio: {num(valor['precio'])} pesos por gramo. "
+        f"Valor justo con toda la historia: {num(valor['valor_justo'])}. "
+        f"Brecha: {pct(valor['brecha_pct'], 1, signo=True)}."
+    )
+    lineas.append(
+        f"Valor justo solo con el pasado: {num(valor['valor_justo_vf'])} pesos por gramo. "
+        f"Brecha: {pct(valor['brecha_vf_pct'], 1, signo=True)}. "
+        f"R² dentro de muestra: {valor['r2']:.3f}. n={valor['n']}."
+    )
+    if valor.get("usadas_extra"):
+        lineas.append("También entraron: " + ", ".join(valor["usadas_extra"]) + ".")
+    lineas.append(
+        "Pronóstico del retorno en pesos, a 5 y 20 días, con la misma caminata, el mismo embargo "
+        "y los dos baselines (cero y promedio). Momentum del propio precio en pesos, cambio del peso, "
+        "tasa real, petróleo, VIX, la brecha en pesos y, si llegaron, el COT y la tasa a 2 años."
+    )
+    for horizonte in (5, 20):
+        info = mxn["por_horizonte"][horizonte]
+        lineas.append("")
+        lineas.append(f"Pesos, {horizonte} días.")
+        lineas.extend(_texto_pronostico(horizonte, info))
+        lineas.extend(_texto_boosting(horizonte, info))
+    return lineas
+
+
+def _seccion_papa(valor: dict, pronostico: dict, mxn: dict | None) -> list[str]:
+    """Cierre en lenguaje llano. Usa los números de esta corrida, no un discurso fijo."""
+    ext = valor.get("extendido") or {}
+    coint = valor.get("cointegracion") or {}
+    brecha = valor.get("brecha_vf_pct", valor.get("brecha_pct"))
+    lineas = ["", "10) Para tu papá"]
+    frases = []
+    frases.append(
+        f"El oro, en el futuro de Nueva York, está en {num(valor['precio'])} dólares la onza."
+    )
+    if mxn and mxn.get("valor"):
+        frases.append(
+            f"En pesos, el metal en el mercado mayorista sale en {num(mxn['valor']['precio'])} pesos el gramo. "
+            "Una joyería cobra más que eso: es el precio del metal, no el de un anillo."
+        )
+        frases.append(
+            f"La cuenta hecha directo en pesos, con su propia fórmula, lo deja "
+            f"{pct(mxn['valor']['brecha_vf_pct'], 0, signo=True)} "
+            "respecto de lo que tasas, tipo de cambio, petróleo e inflación explicarían con el pasado."
+        )
+    if math.isfinite(brecha):
+        if brecha > 8:
+            donde = f"cerca de {brecha:.0f}% por encima"
+        elif brecha < -8:
+            donde = f"cerca de {abs(brecha):.0f}% por debajo"
+        else:
+            donde = f"cerca (brecha de {brecha:+.0f}%)"
+        frases.append(
+            f"La cuenta en dólares, la de siempre (tasas reales, dólar, petróleo, nerviosismo e inflación), "
+            f"dice que el precio está {donde} de esa historia. "
+            "Esa brecha usa solo datos anteriores a hoy."
+        )
+    if ext.get("disponible") and ext.get("cierre_abs_pp") is not None and math.isfinite(ext["cierre_abs_pp"]):
+        cierre = ext["cierre_abs_pp"]
+        if cierre > 1:
+            que = f"la acercan a cero en {cierre:.0f} puntos"
+        elif cierre < -1:
+            que = f"no la cierran: la alejan {abs(cierre):.0f} puntos más"
+        else:
+            que = "casi no la mueven"
+        if math.isfinite(brecha) and brecha * ext["brecha_vf_pct"] < 0 and cierre > 1:
+            que = (
+                f"acercan el número a cero en {cierre:.0f} puntos, pero le cambian el signo: "
+                "pasa de 'caro' a 'barato'. Parte de eso es el fondo GLD, que guarda más oro "
+                "justo cuando el precio ya subió. No lo leas como una oferta"
+            )
+        frases.append(
+            f"Le agregué lo que compran los bancos centrales, cuánto oro guarda el fondo GLD "
+            f"y un índice de noticias de riesgo geopolítico. Esas tres {que}. "
+            f"La brecha ampliada, también solo con el pasado, queda en {pct(ext['brecha_vf_pct'], 0, signo=True)}."
+        )
+    frases.append(
+        "Los pesos de esa fórmula no están quietos. En ventanas de dos y de tres años, "
+        "el efecto de la tasa y del dólar cambia. No es una regla para siempre. "
+        "La gráfica de los coeficientes móviles es esa historia."
+    )
+    if coint.get("hay_relacion") and coint.get("vida_media_semanas") is not None:
+        frases.append(
+            f"Una prueba de largo plazo (cointegración) sí encuentra que el precio y esas causas se mueven juntos. "
+            f"Si eso fuera cierto, la brecha tardaría cerca de {coint['vida_media_semanas']:.0f} semanas "
+            "en bajar a la mitad. No quiere decir que el mes que viene baje."
+        )
+    elif coint.get("hay_relacion"):
+        frases.append(
+            "La prueba de largo plazo encuentra alguna relación, pero el ajuste no da una vida media clara "
+            "de regreso a la mitad."
+        )
+    else:
+        frases.append(
+            "La prueba de largo plazo (si el oro y esas causas vuelven a caminar juntos) "
+            "no encuentra esa relación con la confianza que pide el 5%. "
+            "Por eso no te doy una fecha en la que 'tiene que' regresar."
+        )
+    info5 = pronostico["por_horizonte"][5]
+    info20 = pronostico["por_horizonte"][20]
+    r2s = [
+        info5["metricas"]["sin_solapar"]["r2_media"],
+        info20["metricas"]["sin_solapar"]["r2_media"],
+        info5.get("metricas_boosting", {}).get("sin_solapar", {}).get("r2_media", float("nan")),
+        info20.get("metricas_boosting", {}).get("sin_solapar", {}).get("r2_media", float("nan")),
+    ]
+    if all(math.isfinite(valor_r2) and valor_r2 < 0 for valor_r2 in r2s):
+        frases.append(
+            "Para las próximas una y cuatro semanas comparé dos métodos, una recta penalizada y un bosque de árboles, "
+            "con el mismo examen: solo datos ya conocidos, y contra 'el precio no cambia' y contra 'el oro rinde lo de siempre'. "
+            "Ninguno le gana al promedio. No es un motivo para comprar ni para vender."
+        )
+    else:
+        frases.append(
+            "El detalle de una y de cuatro semanas está arriba, método por método, con su error. "
+            "Si el error es más ancho que el número esperado, la flecha no alcanza para una decisión."
+        )
+    frases.append("Esto no es un consejo. Es una cuenta con datos públicos, y a unos días el oro es casi ruido.")
+    lineas.append(parrafo(" ".join(frases)))
+    return lineas
+
+
+def construir_informe(datos: dict, valor: dict, pronostico: dict, mxn: dict | None = None) -> str:
     df = pronostico["df"]
     fecha_modelo = pd.Timestamp(valor["fecha"])
     fila = df.loc[fecha_modelo]
     ultima_oro = df["oro_usd"].dropna().index[-1]
     precio_ultimo = float(df.loc[ultima_oro, "oro_usd"])
-    mxn = float(fila["usd_mxn"]) if pd.notna(fila.get("usd_mxn")) else float("nan")
+    tipo_cambio = float(fila["usd_mxn"]) if pd.notna(fila.get("usd_mxn")) else float("nan")
     if pd.notna(df.loc[ultima_oro].get("usd_mxn")):
         mxn_precio = float(df.loc[ultima_oro, "usd_mxn"])
         fecha_mxn = ultima_oro
     else:
-        mxn_precio = mxn
+        mxn_precio = tipo_cambio
         fecha_mxn = fecha_modelo
     pesos_gramo = (
         onza_a_mxn_por_gramo(precio_ultimo, mxn_precio) if math.isfinite(mxn_precio) else float("nan")
@@ -409,8 +787,9 @@ def construir_informe(datos: dict, valor: dict, pronostico: dict) -> str:
             )
     if abs(valor["brecha_pct"]) > 15:
         lineas.append(
-            "Una brecha ancha también puede querer decir que al modelo le faltan piezas. "
-            "No incluye compras de bancos centrales ni primas geopolíticas, y en estos años han pesado."
+            "Una brecha ancha también puede querer decir que al modelo de esta sección le faltan piezas. "
+            "Las compras de bancos centrales, el oro en GLD y el riesgo geopolítico se agregan en la sección 4, "
+            "y ahí se mide si cierran esta brecha."
         )
         lineas.append(
             "Tampoco es una orden de venta ni de compra. La gráfica muestra que el precio puede "
@@ -423,7 +802,7 @@ def construir_informe(datos: dict, valor: dict, pronostico: dict) -> str:
     )
     lineas.append(
         "El R² en niveles, con series que suben durante años, se ve alto con facilidad. "
-        "No mide el pronóstico. El pronóstico está en la sección 4 y es fuera de muestra."
+        "No mide el pronóstico. El pronóstico está en la sección 7 y es fuera de muestra."
     )
     if valor["adf_p"] is None:
         lineas.append("No pude calcular la prueba ADF sobre la brecha.")
@@ -471,23 +850,33 @@ def construir_informe(datos: dict, valor: dict, pronostico: dict) -> str:
             + ", ".join(vifs_altos)
             + ". Esas columnas se parecen entre sí y su coeficiente individual es menos firme."
         )
+    lineas.extend(_seccion_variables_nuevas(valor))
+    lineas.extend(_seccion_movil(valor))
+    lineas.extend(_seccion_cointegracion(valor))
     lineas.append("")
-    lineas.append("4) Pronóstico a 5 y 20 días, fuera de muestra")
+    lineas.append("7) Pronóstico a 5 y 20 días, fuera de muestra")
     lineas.append(
         "Cada predicción usa solo información ya conocida ese día. El entrenamiento deja fuera "
         "las últimas observaciones cuyo retorno futuro todavía no había cerrado (embargo del horizonte). "
         "Se reentrena más o menos cada 21 sesiones. Ridge estandariza las columnas con la media y la "
-        "desviación del propio entrenamiento."
+        "desviación del propio entrenamiento. En la misma caminata, con las mismas filas y el mismo embargo, "
+        "se ajusta también un gradient boosting (árboles chicos). "
+        "Si llegaron, entran además el neto no comercial del COT (como fracción del interés abierto, "
+        "usable el viernes en que la CFTC publica) y la tasa nominal a 2 años, como aproximación a lo que "
+        "el mercado espera de la Fed. El momentum de 5, 20 y 60 días ya estaba."
     )
     lineas.append(
         "Baseline cero: predecir que el retorno logarítmico es 0 (caminata aleatoria, sin deriva). "
         "Baseline promedio: predecir el retorno medio del entrenamiento de esa ventana."
     )
+    if pronostico.get("columnas"):
+        lineas.append("Columnas de esta caminata: " + ", ".join(pronostico["columnas"]) + ".")
     for horizonte in (5, 20):
         lineas.append("")
         lineas.extend(_texto_pronostico(horizonte, pronostico["por_horizonte"][horizonte]))
+        lineas.extend(_texto_boosting(horizonte, pronostico["por_horizonte"][horizonte]))
     lineas.append("")
-    lineas.append("5) Qué variables pesan más en el nivel del oro")
+    lineas.append("8) Qué variables pesan más en el nivel del oro")
     lineas.append(
         "Ordenadas por el efecto de subir una desviación estándar de la muestra "
         "(un cambio grande, de un nivel típico a otro, no un salto de un solo día)."
@@ -513,35 +902,13 @@ def construir_informe(datos: dict, valor: dict, pronostico: dict) -> str:
             f"pero el periodo se parte: {antes['coef_real']:+.2f} hasta 2021 y "
             f"{despues['coef_real']:+.2f} desde 2022. El promedio esconde ese quiebre."
         ))
+    lineas.extend(_seccion_mxn(mxn))
+    lineas.extend(_seccion_papa(valor, pronostico, mxn))
     lineas.append("")
-    lineas.append("6) Para explicarle a tu papá, en corto")
-    brecha = valor["brecha_pct"]
-    if brecha >= 8:
-        donde = f"el futuro está cerca de {brecha:.0f}% por encima de lo que tasas reales, dólar, petróleo, VIX e inflación explicarían con la historia desde 2006"
-    elif brecha <= -8:
-        donde = f"el futuro está cerca de {abs(brecha):.0f}% por debajo de esa referencia histórica"
-    else:
-        donde = f"el futuro está cerca de esa referencia histórica (brecha de {brecha:+.1f}%)"
-    info5 = pronostico["por_horizonte"][5]
-    info20 = pronostico["por_horizonte"][20]
-    r2_5 = info5["metricas"]["sin_solapar"]["r2_media"]
-    r2_20 = info20["metricas"]["sin_solapar"]["r2_media"]
-    if (math.isfinite(r2_5) and r2_5 < 0) and (math.isfinite(r2_20) and r2_20 < 0):
-        futuro = (
-            "Para las próximas una a cuatro semanas el modelo no demuestra, fuera de muestra, "
-            "que sepa más que el promedio histórico. No es un motivo para comprar ni para vender."
-        )
-    else:
-        futuro = (
-            "El detalle de 5 y 20 días está arriba, con su banda de error. "
-            "Si la banda es mucho más ancha que el número esperado, la dirección no alcanza para una decisión."
-        )
-    lineas.append(parrafo(f"Con los datos de este informe, {donde}. {futuro}"))
-    lineas.append("")
-    lineas.append("7) Chequeo contra la nota del 5 de octubre de 2026")
+    lineas.append("11) Chequeo contra la nota del 5 de octubre de 2026")
     lineas.extend(_bloque_snapshot(df, datos))
     lineas.append("")
-    lineas.append("8) De dónde salió cada serie")
+    lineas.append("12) De dónde salió cada serie")
     for nombre, info in datos["fuentes"].items():
         if nombre == "cpi":
             continue
@@ -594,15 +961,22 @@ def _pie(fig, texto: str) -> None:
     fig.tight_layout(rect=(0, 0.04, 1, 1))
 
 
-def guardar_graficas(df: pd.DataFrame, valor: dict, carpeta: Path) -> list[Path]:
+def guardar_graficas(
+    df: pd.DataFrame,
+    valor: dict,
+    carpeta: Path,
+    mxn: dict | None = None,
+) -> list[Path]:
     carpeta.mkdir(parents=True, exist_ok=True)
     _estilo()
     rutas = [
         _grafica_precio(df, valor, carpeta / "precio_vs_valor_justo.png"),
         _grafica_brecha(df, valor, carpeta / "brecha_valor_justo.png"),
         _grafica_coeficientes(valor, carpeta / "coeficientes_valor_justo.png"),
+        _grafica_coeficientes_moviles(valor, carpeta / "coeficientes_moviles.png"),
+        _grafica_mxn(df, mxn, carpeta / "oro_mxn_vs_valor_justo.png"),
     ]
-    return rutas
+    return [ruta for ruta in rutas if ruta is not None]
 
 
 def _grafica_precio(df: pd.DataFrame, valor: dict, ruta: Path) -> Path:
@@ -613,8 +987,25 @@ def _grafica_precio(df: pd.DataFrame, valor: dict, ruta: Path) -> Path:
         df["valor_justo_vf"],
         color=COLOR_MODELO,
         linewidth=1.3,
-        label="Valor justo con datos anteriores",
+        label="Valor justo base, solo el pasado",
     )
+    if "valor_ext" in df.columns:
+        ax.plot(
+            df.index,
+            df["valor_ext"],
+            color="#5C4B8A",
+            linewidth=1.15,
+            label="Con bancos centrales, GLD y GPR",
+        )
+    if "valor_movil_3a" in df.columns:
+        ax.plot(
+            df.index,
+            df["valor_movil_3a"],
+            color="#8A5A2B",
+            linewidth=1.05,
+            linestyle="--",
+            label="Pesos móviles, ventana de 3 años",
+        )
     ultimo = df["oro_usd"].dropna()
     ax.scatter([ultimo.index[-1]], [ultimo.iloc[-1]], color=COLOR_ORO, s=28, zorder=4)
     ax.annotate(
@@ -666,7 +1057,11 @@ def _grafica_brecha(df: pd.DataFrame, valor: dict, ruta: Path) -> Path:
         alpha=0.25,
         interpolate=True,
     )
-    ax.plot(df.index, brecha, color=COLOR_TEXTO, linewidth=1.0)
+    ax.plot(df.index, brecha, color=COLOR_TEXTO, linewidth=1.0, label="Modelo base")
+    if "residuo_ext" in df.columns:
+        brecha_ext = (np.exp(df["residuo_ext"].astype(float)) - 1.0) * 100.0
+        ax.plot(df.index, brecha_ext, color="#5C4B8A", linewidth=1.05, label="Con las variables nuevas")
+        ax.legend(frameon=False, loc="upper left")
     ultima = brecha.dropna()
     if len(ultima):
         ax.scatter([ultima.index[-1]], [ultima.iloc[-1]], color=COLOR_TEXTO, s=28, zorder=4)
@@ -703,19 +1098,119 @@ def _grafica_coeficientes(valor: dict, ruta: Path) -> Path:
     return ruta
 
 
-def guardar_tablas(valor: dict, pronostico: dict, carpeta: Path) -> None:
+def _grafica_coeficientes_moviles(valor: dict, ruta: Path) -> Path | None:
+    movil = valor.get("movil") or {}
+    bloque = (movil.get("ventanas") or {}).get("3a")
+    if not bloque or bloque.get("coeficientes") is None:
+        return None
+    coefs = bloque["coeficientes"]
+    nombres = [nombre for nombre in coefs.columns if nombre != "constante" and coefs[nombre].notna().any()]
+    if not nombres:
+        return None
+    fig, ejes = plt.subplots(len(nombres), 1, figsize=(11.2, 2.1 * len(nombres)), sharex=True)
+    if len(nombres) == 1:
+        ejes = [ejes]
+    ventana_2 = (movil.get("ventanas") or {}).get("2a", {}).get("coeficientes")
+    for ax, nombre in zip(ejes, nombres):
+        ax.axhline(0, color="#7B8794", linewidth=0.8)
+        ax.plot(coefs.index, coefs[nombre], color=COLOR_MODELO, linewidth=1.1, label="3 años")
+        if ventana_2 is not None and nombre in ventana_2.columns:
+            ax.plot(ventana_2.index, ventana_2[nombre], color=COLOR_ORO, linewidth=1.0, label="2 años")
+        ax.set_ylabel(ETIQUETA_CORTA.get(nombre, nombre))
+        ax.legend(frameon=False, loc="upper left", fontsize=8)
+    ejes[0].set_title("Coeficientes en ventanas móviles, estimados solo con el pasado")
+    ejes[-1].set_xlabel("El día de la estimación no entra en la ventana. Se reestima más o menos cada mes de mercado.")
+    _pie(fig, "No es asesoría financiera. Una línea que cruza el cero cambió de signo: el promedio de toda la historia no es una ley.")
+    fig.savefig(ruta, dpi=140)
+    plt.close(fig)
+    return ruta
+
+
+def _grafica_mxn(df: pd.DataFrame, mxn: dict | None, ruta: Path) -> Path | None:
+    if mxn is None or "oro_mxn_g" not in df.columns or "valor_mxn" not in df.columns:
+        return None
+    fig, ax = plt.subplots(figsize=(11.2, 6.2))
+    ax.plot(df.index, df["oro_mxn_g"], color=COLOR_ORO, linewidth=1.4, label="Oro, pesos por gramo")
+    ax.plot(
+        df.index,
+        df["valor_mxn"],
+        color=COLOR_MODELO,
+        linewidth=1.3,
+        label="Valor justo en pesos, solo el pasado",
+    )
+    ultimo = df["oro_mxn_g"].dropna()
+    if len(ultimo):
+        ax.scatter([ultimo.index[-1]], [ultimo.iloc[-1]], color=COLOR_ORO, s=28, zorder=4)
+        ax.annotate(
+            f"{ultimo.iloc[-1]:,.0f}",
+            xy=(ultimo.index[-1], ultimo.iloc[-1]),
+            xytext=(-70, 12),
+            textcoords="offset points",
+            fontsize=10,
+            color=COLOR_ORO,
+        )
+    brecha = mxn["valor"].get("brecha_vf_pct", float("nan"))
+    ax.set_title("Oro en pesos por gramo y su propio valor justo")
+    ax.set_ylabel("Pesos por gramo")
+    ax.legend(frameon=False, loc="upper left")
+    ax.set_xlabel(f"Brecha con coeficientes solo del pasado: {brecha:+.1f}%. No es el precio de una joyería.")
+    _pie(fig, "No es asesoría financiera. Regresión propia del precio en pesos, no el valor en dólares convertido al tipo de cambio.")
+    fig.savefig(ruta, dpi=140)
+    plt.close(fig)
+    return ruta
+
+
+def _filas_metricas(por_horizonte: dict, mercado: str, modelo: str, clave: str) -> list[dict]:
+    filas = []
+    for horizonte, info in por_horizonte.items():
+        metricas = info.get(clave) or {}
+        for esquema, bloque in metricas.items():
+            fila = {"mercado": mercado, "modelo": modelo, "horizonte": horizonte, "esquema": esquema}
+            fila.update(bloque)
+            filas.append(fila)
+    return filas
+
+
+def guardar_tablas(valor: dict, pronostico: dict, carpeta: Path, mxn: dict | None = None) -> None:
     carpeta.mkdir(parents=True, exist_ok=True)
     coef = pd.DataFrame(valor["coeficientes"])
     coef.to_csv(carpeta / "coeficientes_valor_justo.csv", index=False)
-    filas = []
-    for horizonte, info in pronostico["por_horizonte"].items():
-        for esquema, bloque in info["metricas"].items():
-            fila = {"horizonte": horizonte, "esquema": esquema}
-            fila.update(bloque)
-            filas.append(fila)
+    ext = valor.get("extendido") or {}
+    if ext.get("coeficientes"):
+        pd.DataFrame(ext["coeficientes"]).to_csv(carpeta / "coeficientes_valor_justo_ampliado.csv", index=False)
+    movil = (valor.get("movil") or {}).get("ventanas") or {}
+    if "3a" in movil:
+        camino = movil["3a"]["coeficientes"].dropna(how="all")
+        camino.to_csv(carpeta / "coeficientes_moviles_3a.csv")
+    filas = _filas_metricas(pronostico["por_horizonte"], "usd", "ridge", "metricas")
+    filas.extend(_filas_metricas(pronostico["por_horizonte"], "usd", "boosting", "metricas_boosting"))
+    if mxn is not None:
+        filas.extend(_filas_metricas(mxn["por_horizonte"], "mxn", "ridge", "metricas"))
+        filas.extend(_filas_metricas(mxn["por_horizonte"], "mxn", "boosting", "metricas_boosting"))
     pd.DataFrame(filas).to_csv(carpeta / "metricas_pronostico.csv", index=False)
     df = pronostico["df"]
-    columnas = [c for c in ("pred_5", "y_5", "pred_20", "y_20", "residuo_vf", "valor_justo_vf", "oro_usd") if c in df.columns]
-    salida = df.loc[df["pred_5"].notna() | df["pred_20"].notna(), columnas].copy()
+    columnas = [
+        c
+        for c in (
+            "pred_5",
+            "pred_gb_5",
+            "y_5",
+            "pred_20",
+            "pred_gb_20",
+            "y_20",
+            "residuo_vf",
+            "valor_justo_vf",
+            "valor_ext",
+            "valor_movil_3a",
+            "oro_usd",
+            "oro_mxn_g",
+            "valor_mxn",
+            "pred_mxn_5",
+            "pred_mxn_20",
+        )
+        if c in df.columns
+    ]
+    mascara = df["pred_5"].notna() | df["pred_20"].notna()
+    salida = df.loc[mascara, columnas].copy()
     salida.index.name = "fecha"
     salida.to_csv(carpeta / "predicciones_fuera_de_muestra.csv")

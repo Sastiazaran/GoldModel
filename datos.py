@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import io
 import json
+import re
 import sys
 import time
 from pathlib import Path
@@ -393,32 +394,6 @@ def descargar_tesoro(
     return serie.loc[inicio:fin]
 
 
-def filas_desde_puntos_bls(puntos: list[dict]) -> list[tuple[pd.Timestamp, float]]:
-    """Lee los meses del IPC que el BLS ya publicó.
-
-    El mes que todavía no sale llega con ``value`` igual a ``"-"`` (a veces
-    vacío). No es un fallo de la descarga: se salta y se queda el resto.
-    ``M13`` es el promedio anual y no entra al índice mensual.
-    """
-    filas: list[tuple[pd.Timestamp, float]] = []
-    for punto in puntos:
-        periodo = str(punto.get("period", ""))
-        if not periodo.startswith("M") or periodo == "M13":
-            continue
-        try:
-            mes = int(periodo[1:])
-            anio = int(punto["year"])
-        except (TypeError, ValueError, KeyError):
-            continue
-        if not 1 <= mes <= 12:
-            continue
-        valor = pd.to_numeric(str(punto.get("value", "")).strip(), errors="coerce")
-        if pd.isna(valor) or float(valor) <= 0:
-            continue
-        filas.append((pd.Timestamp(year=anio, month=mes, day=1), float(valor)))
-    return filas
-
-
 def descargar_cpi_bls(sesion: requests.Session, avisos: list[str]) -> pd.Series:
     """IPC de Estados Unidos, ajustado por estacionalidad.
 
@@ -450,10 +425,20 @@ def descargar_cpi_bls(sesion: requests.Session, avisos: list[str]) -> pd.Series:
             cuerpo = respuesta.json()
             if cuerpo.get("status") != "REQUEST_SUCCEEDED":
                 raise RuntimeError(cuerpo.get("message"))
-            filas.extend(filas_desde_puntos_bls(cuerpo["Results"]["series"][0]["data"]))
+            for punto in cuerpo["Results"]["series"][0]["data"]:
+                periodo = str(punto.get("period", ""))
+                if not periodo.startswith("M") or periodo == "M13":
+                    continue
+                mes = int(periodo[1:])
+                if not 1 <= mes <= 12:
+                    continue
+                filas.append(
+                    (
+                        pd.Timestamp(year=int(punto["year"]), month=mes, day=1),
+                        float(punto["value"]),
+                    )
+                )
             time.sleep(0.2)
-        if not filas:
-            raise RuntimeError("El BLS respondió, pero ningún mes traía un IPC numérico.")
     except Exception as error:  # noqa: BLE001
         cache = _leer_serie_cache("cpi_bls", solo_positivos=True)
         if cache is None:
@@ -530,9 +515,454 @@ def _etiqueta_fred(serie_id: str, uso_fred: bool, respaldo: str) -> str:
     return respaldo
 
 
+def fecha_publicacion_cot(fecha_corte: pd.Timestamp) -> pd.Timestamp:
+    """Día en que el COT de la CFTC ya se puede usar.
+
+    El informe legacy corta el martes y se publica el viernes de esa semana
+    (tres días después). Si la fecha no es martes —los informes viejos, de
+    antes del calendario semanal, caían el 15 o a fin de mes— se usan los
+    mismos tres días y, si caen en sábado o domingo, el lunes.
+    """
+    fecha = pd.Timestamp(fecha_corte).normalize()
+    salida = fecha + pd.Timedelta(days=3)
+    while salida.weekday() >= 5:
+        salida += pd.Timedelta(days=1)
+    return salida
+
+
+def fecha_publicacion_gld(fecha_corte: pd.Timestamp) -> pd.Timestamp:
+    """Las tenencias de un día se publican al día hábil siguiente.
+
+    El archivo de GLD trae el cierre de la sesión D. Ese archivo no está
+    la misma tarde: aparece a la mañana siguiente. Por eso el dato de un
+    viernes entra el lunes, y el de un lunes entra el martes.
+    """
+    dia = pd.Timestamp(fecha_corte).normalize() + pd.Timedelta(days=1)
+    while dia.weekday() >= 5:
+        dia += pd.Timedelta(days=1)
+    return dia
+
+
+def fecha_publicacion_compras_bc(fin_trimestre: pd.Timestamp) -> pd.Timestamp:
+    """El trimestre oficial se trata como conocido a fin del mes siguiente.
+
+    El World Gold Council dice que el dato trimestral se actualiza alrededor
+    de un mes después de que cierra el trimestre. Fin de julio para el
+    segundo trimestre, fin de enero para el cuarto. Es una regla fija, un
+    poco tardía: mejor entrar tarde que usar el trimestre antes de tiempo.
+    `fin_trimestre` tiene que ser el último día del trimestre (31 mar, 30 jun,
+    30 sep o 31 dic).
+    """
+    fin = pd.Timestamp(fin_trimestre).normalize()
+    return (fin + pd.offsets.MonthEnd(1)).normalize()
+
+
+def fecha_publicacion_mes_siguiente(mes: pd.Timestamp) -> pd.Timestamp:
+    """Primer día hábil del mes siguiente. Respaldo si el GPR solo es mensual."""
+    mes = pd.Timestamp(mes).normalize().replace(day=1)
+    if mes.month == 12:
+        dia = pd.Timestamp(year=mes.year + 1, month=1, day=1)
+    else:
+        dia = pd.Timestamp(year=mes.year, month=mes.month + 1, day=1)
+    while dia.weekday() >= 5:
+        dia += pd.Timedelta(days=1)
+    return dia
+
+
+def _fecha_etiqueta_trimestre(texto: str) -> pd.Timestamp | None:
+    """Convierte 'Q2 26' en el último día de ese trimestre (2026-06-30)."""
+    partes = str(texto).strip().split()
+    if len(partes) != 2 or not partes[0].startswith("Q"):
+        return None
+    try:
+        trimestre = int(partes[0][1:])
+        anio = int(partes[1])
+    except ValueError:
+        return None
+    if trimestre < 1 or trimestre > 4:
+        return None
+    if anio < 100:
+        anio = 2000 + anio
+    mes = trimestre * 3
+    return (pd.Timestamp(year=anio, month=mes, day=1) + pd.offsets.MonthEnd(0)).normalize()
+
+
+def pegar_publicado(fechas, tabla: pd.DataFrame, columnas: list[str]) -> pd.DataFrame:
+    """Pega, en cada día, el último dato cuya fecha de publicación ya pasó.
+
+    Misma idea que el IPC: `merge_asof` hacia atrás. Una fila con
+    `fecha_disponible` en el futuro no entra.
+    """
+    base = pd.DataFrame({"fecha": _fechas_ns(fechas)})
+    base = base.sort_values("fecha")
+    tab = tabla.copy()
+    tab["fecha_disponible"] = _fechas_ns(tab["fecha_disponible"])
+    for columna in columnas:
+        if columna not in tab.columns:
+            tab[columna] = np.nan
+    tab = tab.dropna(subset=["fecha_disponible"])
+    tab = tab.sort_values("fecha_disponible").drop_duplicates("fecha_disponible", keep="last")
+    return pd.merge_asof(
+        base,
+        tab[["fecha_disponible", *columnas]],
+        left_on="fecha",
+        right_on="fecha_disponible",
+        direction="backward",
+    )
+
+
+def _guardar_tabla(nombre: str, tabla: pd.DataFrame) -> None:
+    CARPETA_CRUDOS.mkdir(parents=True, exist_ok=True)
+    tabla.to_csv(CARPETA_CRUDOS / f"{nombre}.csv", index=False)
+
+
+def _leer_tabla_cache(nombre: str) -> pd.DataFrame | None:
+    ruta = CARPETA_CRUDOS / f"{nombre}.csv"
+    if not ruta.exists():
+        return None
+    tabla = pd.read_csv(ruta)
+    if "fecha_disponible" not in tabla.columns or tabla.empty:
+        return None
+    tabla["fecha_disponible"] = pd.to_datetime(tabla["fecha_disponible"])
+    return tabla
+
+
+def _get_bytes(sesion: requests.Session, url: str, segundos: int = 60) -> bytes:
+    respuesta = sesion.get(url, timeout=(10, segundos))
+    respuesta.raise_for_status()
+    return respuesta.content
+
+
+def descargar_gpr(sesion: requests.Session, avisos: list[str]) -> tuple[pd.DataFrame | None, str]:
+    """Índice GPR de Caldara e Iacoviello.
+
+    El diario (GPRD) se puede usar el mismo día: es un conteo de noticias
+    de esa fecha, como el VIX. Si el archivo diario no responde, se usa el
+    mensual y entra el primer día hábil del mes siguiente.
+    """
+    url_diaria = "https://www.matteoiacoviello.com/gpr_files/data_gpr_daily_recent.xls"
+    url_mensual = "https://www.matteoiacoviello.com/gpr_files/data_gpr_export.xls"
+    try:
+        contenido = _get_bytes(sesion, url_diaria, segundos=90)
+        tabla = pd.read_excel(io.BytesIO(contenido))
+        if "date" not in tabla.columns or "GPRD" not in tabla.columns:
+            raise RuntimeError("el archivo diario no trae columnas date y GPRD")
+        fechas = pd.to_datetime(tabla["date"], errors="coerce")
+        valores = pd.to_numeric(tabla["GPRD"], errors="coerce")
+        salida = pd.DataFrame({"fecha_disponible": fechas, "gpr": valores})
+        salida = salida.dropna()
+        if len(salida) < 1000:
+            raise RuntimeError("el GPR diario llegó casi vacío")
+        _guardar_tabla("gpr_publicado", salida)
+        return salida.sort_values("fecha_disponible"), (
+            "GPR diario de Caldara-Iacoviello (GPRD), usable el mismo día"
+        )
+    except Exception as error:  # noqa: BLE001
+        avisos.append(
+            f"El GPR diario (Caldara-Iacoviello) no respondió ({error}). "
+            "Intento el índice mensual."
+        )
+    try:
+        contenido = _get_bytes(sesion, url_mensual, segundos=90)
+        tabla = pd.read_excel(io.BytesIO(contenido))
+        columnas = {str(columna).strip().lower(): columna for columna in tabla.columns}
+        col_fecha = columnas.get("month") or columnas.get("date")
+        col_gpr = columnas.get("gpr")
+        if col_fecha is None or col_gpr is None:
+            raise RuntimeError("el archivo mensual no trae month y GPR")
+        fechas = pd.to_datetime(tabla[col_fecha], errors="coerce")
+        valores = pd.to_numeric(tabla[col_gpr], errors="coerce")
+        salida = pd.DataFrame({"mes": fechas, "gpr": valores}).dropna()
+        salida["fecha_disponible"] = salida["mes"].map(fecha_publicacion_mes_siguiente)
+        salida = salida[["fecha_disponible", "gpr"]]
+        if len(salida) < 100:
+            raise RuntimeError("el GPR mensual llegó casi vacío")
+        _guardar_tabla("gpr_publicado", salida)
+        return salida.sort_values("fecha_disponible"), (
+            "GPR mensual de Caldara-Iacoviello (respaldo), "
+            "usable el primer día hábil del mes siguiente"
+        )
+    except Exception as error:  # noqa: BLE001
+        avisos.append(f"Tampoco respondió el GPR mensual ({error}).")
+        cache = _leer_tabla_cache("gpr_publicado")
+        if cache is not None:
+            avisos.append("Uso la copia guardada del GPR.")
+            return cache, "GPR, copia guardada en data/raw"
+        return None, ""
+
+
+def descargar_gld_tenencias(sesion: requests.Session, avisos: list[str]) -> tuple[pd.DataFrame | None, str]:
+    """Toneladas de oro en el fondo GLD.
+
+    Primero el archivo histórico de SPDR, que trae las toneladas. Si no
+    responde, el historial de NAV de SSGA: ahí no vienen toneladas, así que
+    se usan las acciones en circulación como respaldo de las tenencias.
+    En los dos casos el dato de la sesión D entra al día hábil siguiente.
+    """
+    url_archivo = (
+        "https://api.spdrgoldshares.com/api/v1/historical-archive"
+        "?product=gld&exchange=NYSE&lang=en"
+    )
+    url_nav = "https://www.ssga.com/library-content/products/fund-data/etfs/us/navhist-us-en-gld.xlsx"
+    try:
+        contenido = _get_bytes(sesion, url_archivo, segundos=90)
+        if contenido[:2] != b"PK":
+            raise RuntimeError("la respuesta no es un archivo de Excel")
+        tabla = pd.read_excel(io.BytesIO(contenido), sheet_name="US GLD Historical Archive")
+        fechas = pd.to_datetime(tabla["Date"], format="%d-%b-%Y", errors="coerce")
+        if fechas.isna().mean() > 0.5:
+            fechas = pd.to_datetime(tabla["Date"], errors="coerce")
+        toneladas = pd.to_numeric(tabla["Tonnes of Gold"], errors="coerce")
+        salida = pd.DataFrame(
+            {
+                "fecha_corte": fechas,
+                "gld_toneladas": toneladas,
+            }
+        ).dropna()
+        salida = salida.loc[salida["gld_toneladas"] > 0]
+        if len(salida) < 1000:
+            raise RuntimeError("el archivo de GLD llegó casi vacío")
+        salida["fecha_disponible"] = salida["fecha_corte"].map(fecha_publicacion_gld)
+        salida = salida[["fecha_disponible", "fecha_corte", "gld_toneladas"]]
+        _guardar_tabla("gld_publicado", salida)
+        return salida.sort_values("fecha_disponible"), (
+            "SPDR Gold Shares, archivo histórico (toneladas en el fideicomiso), "
+            "usable al día hábil siguiente"
+        )
+    except Exception as error:  # noqa: BLE001
+        avisos.append(
+            f"El archivo histórico de GLD (SPDR) no respondió ({error}). "
+            "Intento el historial de NAV de SSGA."
+        )
+    try:
+        contenido = _get_bytes(sesion, url_nav, segundos=90)
+        libro = pd.read_excel(io.BytesIO(contenido), header=None)
+        fila_titulo = None
+        for i, fila in libro.iterrows():
+            textos = [str(valor).strip().lower() for valor in fila.tolist()]
+            if "date" in textos and any("shares" in texto for texto in textos):
+                fila_titulo = i
+                break
+        if fila_titulo is None:
+            raise RuntimeError("no encontré la fila de títulos en el NAV de SSGA")
+        tabla = pd.read_excel(io.BytesIO(contenido), header=int(fila_titulo))
+        columnas = {str(columna).strip().lower(): columna for columna in tabla.columns}
+        col_fecha = columnas.get("date")
+        col_acciones = None
+        for nombre, original in columnas.items():
+            if "shares" in nombre:
+                col_acciones = original
+                break
+        if col_fecha is None or col_acciones is None:
+            raise RuntimeError("el NAV de SSGA no trae fecha y acciones")
+        fechas = pd.to_datetime(tabla[col_fecha], errors="coerce")
+        acciones = pd.to_numeric(tabla[col_acciones], errors="coerce")
+        # Las acciones en circulación se mueven casi igual que las toneladas
+        # (cada acción representa cerca de una décima de onza, y esa fracción
+        # baja muy despacio). Se guardan en la misma columna para no dejar
+        # el modelo sin tenencias, y el informe dice que es el respaldo.
+        salida = pd.DataFrame({"fecha_corte": fechas, "gld_toneladas": acciones / 1_000_000.0})
+        salida = salida.dropna()
+        salida = salida.loc[salida["gld_toneladas"] > 0]
+        if len(salida) < 500:
+            raise RuntimeError("el NAV de SSGA llegó casi vacío")
+        salida["fecha_disponible"] = salida["fecha_corte"].map(fecha_publicacion_gld)
+        salida = salida[["fecha_disponible", "fecha_corte", "gld_toneladas"]]
+        _guardar_tabla("gld_publicado", salida)
+        avisos.append(
+            "GLD quedó en millones de acciones en circulación (respaldo de SSGA), "
+            "no en toneladas. El archivo de toneladas no respondió."
+        )
+        return salida.sort_values("fecha_disponible"), (
+            "SSGA, acciones en circulación de GLD (respaldo; no son toneladas), "
+            "usable al día hábil siguiente"
+        )
+    except Exception as error:  # noqa: BLE001
+        avisos.append(f"Tampoco respondió el NAV de GLD ({error}).")
+        cache = _leer_tabla_cache("gld_publicado")
+        if cache is not None:
+            avisos.append("Uso la copia guardada de las tenencias de GLD.")
+            return cache, "Tenencias de GLD, copia guardada en data/raw"
+        return None, ""
+
+
+def descargar_cot_oro(sesion: requests.Session, avisos: list[str]) -> tuple[pd.DataFrame | None, str]:
+    """Posición neta no comercial del oro en el COMEX, informe legacy de la CFTC.
+
+    Neta = largos no comerciales − cortos no comerciales. También se guarda
+    esa neta dividida por el interés abierto, para que un contrato de 2006
+    y uno de 2026 se puedan comparar. La fecha del JSON es el martes de
+    corte. Aquí se cambia por el viernes de publicación.
+    """
+    url = "https://publicreporting.cftc.gov/resource/6dca-aqww.json"
+    params = {
+        "$where": "cftc_contract_market_code='088691'",
+        "$select": (
+            "report_date_as_yyyy_mm_dd,noncomm_positions_long_all,"
+            "noncomm_positions_short_all,open_interest_all"
+        ),
+        "$order": "report_date_as_yyyy_mm_dd",
+        "$limit": 50000,
+    }
+    etiqueta = (
+        "CFTC COT legacy, futuros de oro COMEX (código 088691), "
+        "neto no comercial, usable el viernes posterior al martes de corte"
+    )
+    try:
+        respuesta = sesion.get(url, params=params, timeout=(10, 90))
+        respuesta.raise_for_status()
+        filas = respuesta.json()
+        if not isinstance(filas, list) or len(filas) < 100:
+            raise RuntimeError("la CFTC no devolvió el historial del oro")
+        registros = []
+        for fila in filas:
+            corte = pd.to_datetime(fila.get("report_date_as_yyyy_mm_dd"), errors="coerce")
+            if pd.isna(corte):
+                continue
+            largo = pd.to_numeric(fila.get("noncomm_positions_long_all"), errors="coerce")
+            corto = pd.to_numeric(fila.get("noncomm_positions_short_all"), errors="coerce")
+            abierto = pd.to_numeric(fila.get("open_interest_all"), errors="coerce")
+            if pd.isna(largo) or pd.isna(corto):
+                continue
+            neto = float(largo) - float(corto)
+            ratio = float("nan")
+            if pd.notna(abierto) and float(abierto) > 0:
+                ratio = neto / float(abierto)
+            registros.append(
+                {
+                    "fecha_disponible": fecha_publicacion_cot(corte),
+                    "fecha_corte": pd.Timestamp(corte).normalize(),
+                    "cot_neto": neto,
+                    "cot_neto_oi": ratio,
+                }
+            )
+        salida = pd.DataFrame(registros)
+        if len(salida) < 100:
+            raise RuntimeError("el COT del oro quedó casi vacío")
+        _guardar_tabla("cot_publicado", salida)
+        return salida.sort_values("fecha_disponible"), etiqueta
+    except Exception as error:  # noqa: BLE001
+        avisos.append(f"El COT de la CFTC no respondió ({error}).")
+        cache = _leer_tabla_cache("cot_publicado")
+        if cache is not None:
+            avisos.append("Uso la copia guardada del COT.")
+            return cache, "COT del oro, copia guardada en data/raw"
+        return None, ""
+
+
+def _sumar_toneladas_wgc(tabla_metrica: dict) -> pd.DataFrame:
+    """Compra neta del trimestre, solo con países que reportaron los dos cortes.
+
+    Si un país todavía no mandó el trimestre nuevo, su celda viene vacía.
+    Sumar los que sí reportaron y restar el total anterior contaría a los
+    faltantes como si hubieran vendido todo su oro. Aquí el cambio se arma
+    país por país, y solo entra quien tiene los dos números.
+    """
+    encabezados = tabla_metrica["headers"][0]
+    fechas = [None]
+    for celda in encabezados[1:]:
+        fechas.append(_fecha_etiqueta_trimestre(celda.get("val", "")))
+    registros = []
+    for i, fin in enumerate(fechas):
+        if i == 0 or fin is None or fechas[i - 1] is None:
+            continue
+        compra = 0.0
+        paises = 0
+        for fila in tabla_metrica["rows"]:
+            if i >= len(fila) or i - 1 >= len(fila):
+                continue
+            anterior = pd.to_numeric(fila[i - 1].get("val"), errors="coerce")
+            actual = pd.to_numeric(fila[i].get("val"), errors="coerce")
+            if pd.notna(anterior) and pd.notna(actual):
+                compra += float(actual) - float(anterior)
+                paises += 1
+        if paises >= 20:
+            registros.append(
+                {"fin_trimestre": fin, "compras_bc_ton": compra, "paises": paises}
+            )
+    salida = pd.DataFrame(registros).drop_duplicates("fin_trimestre").sort_values("fin_trimestre")
+    salida["fecha_disponible"] = salida["fin_trimestre"].map(fecha_publicacion_compras_bc)
+    return salida[["fecha_disponible", "fin_trimestre", "compras_bc_ton", "paises"]]
+
+
+def descargar_compras_bancos(sesion: requests.Session, avisos: list[str]) -> tuple[pd.DataFrame | None, str]:
+    """Compras netas oficiales de oro, en toneladas por trimestre.
+
+    El Excel que publica el World Gold Council en la página de reservas
+    pide un permiso y aquí responde 403. El respaldo es la API pública del
+    mismo consejo (el tablero de bancos centrales): suma de toneladas
+    reportadas al FMI, con los ajustes que el consejo documenta. La compra
+    del trimestre es el cambio de esa suma. Entra a fin del mes siguiente.
+    """
+    url_pagina = "https://www.gold.org/goldhub/data/gold-reserves-by-country"
+    url_api = "https://fsapi.gold.org/api/cbd/v11/charts/getPage"
+    etiqueta = (
+        "World Gold Council, suma de reservas oficiales en toneladas "
+        "(API pública del tablero; el Excel de la página respondió 403), "
+        "cambio trimestral solo entre países que reportaron los dos cortes, "
+        "usable a fin del mes siguiente"
+    )
+    try:
+        pagina = sesion.get(url_pagina, timeout=(8, 20))
+        enlace = None
+        if pagina.ok:
+            hallados = re.findall(r'href="(/download/file/\d+/Quarterly_gold[^"]+)"', pagina.text)
+            if hallados:
+                enlace = "https://www.gold.org" + hallados[0].replace(" ", "")
+        if enlace:
+            try:
+                archivo = sesion.get(enlace, timeout=(8, 25))
+                if archivo.status_code != 200 or archivo.content[:2] != b"PK":
+                    avisos.append(
+                        "El Excel trimestral del World Gold Council no se pudo bajar "
+                        f"(respuesta {archivo.status_code}). Uso la API pública del mismo sitio."
+                    )
+                else:
+                    avisos.append(
+                        "El Excel del World Gold Council sí bajó, pero el modelo usa la API "
+                        "pública del tablero, que trae el mismo agregado país por país."
+                    )
+            except Exception as error:  # noqa: BLE001
+                avisos.append(
+                    f"El Excel trimestral del World Gold Council no respondió ({error}). "
+                    "Uso la API pública del mismo sitio."
+                )
+        else:
+            avisos.append(
+                "No encontré el enlace al Excel de reservas del World Gold Council. "
+                "Uso la API pública del tablero de bancos centrales."
+            )
+        respuesta = sesion.get(
+            url_api,
+            params={
+                "page": "date_range",
+                "periodicity": "QTD_FULL",
+                "startDate": "2000-03-31",
+                "endDate": "2026-12-31",
+            },
+            timeout=(10, 90),
+        )
+        respuesta.raise_for_status()
+        cuerpo = respuesta.json()
+        metrica = cuerpo["chartData"]["table"]["QTD_FULL"]["gold_reserves_tns"]
+        salida = _sumar_toneladas_wgc(metrica)
+        if len(salida) < 40:
+            raise RuntimeError("la suma trimestral de reservas quedó corta")
+        _guardar_tabla("compras_bc_publicado", salida)
+        return salida.sort_values("fecha_disponible"), etiqueta
+    except Exception as error:  # noqa: BLE001
+        avisos.append(f"La API de reservas del World Gold Council no respondió ({error}).")
+        cache = _leer_tabla_cache("compras_bc_publicado")
+        if cache is not None:
+            avisos.append("Uso la copia guardada de las compras de bancos centrales.")
+            return cache, "Compras de bancos centrales, copia guardada en data/raw"
+        return None, ""
+
+
 def construir_panel(
     series: dict[str, pd.Series],
     tabla_cpi: pd.DataFrame,
+    publicadas: dict[str, pd.DataFrame] | None = None,
 ) -> pd.DataFrame:
     """Pone todas las columnas en los días en que hubo precio del oro.
 
@@ -557,6 +987,28 @@ def construir_panel(
     panel["cpi_mes"] = cpi_diario["mes_referencia"].reindex(panel.index)
     panel["cpi_fecha_publicacion"] = cpi_diario["fecha_disponible"].reindex(panel.index)
 
+    # Series que no son diarias: entran por su fecha de publicación y se
+    # quedan vigentes hasta el siguiente dato. No pasan por el relleno de
+    # 5 días, porque un trimestre o un COT vive más que eso, y porque
+    # rellenar desde la fecha de corte (y no desde la de publicación)
+    # adelantaría el dato.
+    no_rellenar = {
+        "oro_usd",
+        "cpi_indice",
+        "cpi_anual",
+        "cpi_mes",
+        "cpi_fecha_publicacion",
+    }
+    for tabla in (publicadas or {}).values():
+        if tabla is None or len(tabla) == 0 or "fecha_disponible" not in tabla.columns:
+            continue
+        columnas = [columna for columna in tabla.columns if columna != "fecha_disponible"]
+        pegado = pegar_publicado(panel.index, tabla, columnas)
+        pegado = pegado.drop_duplicates("fecha", keep="last").set_index("fecha")
+        for columna in columnas:
+            panel[columna] = pegado[columna].reindex(panel.index)
+            no_rellenar.add(columna)
+
     # El breakeven de mercado es, en corto, tasa nominal menos tasa real.
     # Si FRED no dio T10YIE, lo calculamos. No lo uses junto con las dos
     # tasas en la misma regresión: sería contar lo mismo dos veces.
@@ -566,11 +1018,7 @@ def construir_panel(
                 panel["rendimiento_nominal_10"] - panel["rendimiento_real_10"]
             )
 
-    columnas_diarias = [
-        columna
-        for columna in panel.columns
-        if columna not in {"oro_usd", "cpi_indice", "cpi_anual", "cpi_mes", "cpi_fecha_publicacion"}
-    ]
+    columnas_diarias = [columna for columna in panel.columns if columna not in no_rellenar]
     for columna in columnas_diarias:
         panel[columna] = rellenar_hacia_adelante(panel[columna], LIMITE_RELLENO)
 
@@ -728,6 +1176,50 @@ def actualizar_datos() -> dict:
     if "tnx_yahoo" in yahoo:
         poner("tnx_yahoo", yahoo["tnx_yahoo"], "Yahoo Finance ^TNX (chequeo de la tasa a 10 años)", "https://finance.yahoo.com/quote/%5ETNX")
 
+    _aviso("Descargando GPR, tenencias de GLD, COT y compras de bancos centrales...")
+    publicadas: dict[str, pd.DataFrame] = {}
+    gpr_tabla, gpr_etiqueta = descargar_gpr(sesion, avisos)
+    if gpr_tabla is not None:
+        publicadas["gpr"] = gpr_tabla
+        fuentes["gpr"] = {
+            "etiqueta": gpr_etiqueta,
+            "url": "https://www.matteoiacoviello.com/gpr.htm",
+        }
+        _aviso(f"  GPR: {len(gpr_tabla)} publicaciones, hasta {pd.Timestamp(gpr_tabla['fecha_disponible'].max()).date()}")
+    gld_tabla, gld_etiqueta = descargar_gld_tenencias(sesion, avisos)
+    if gld_tabla is not None:
+        publicadas["gld_toneladas"] = gld_tabla
+        fuentes["gld_toneladas"] = {
+            "etiqueta": gld_etiqueta,
+            "url": "https://www.spdrgoldshares.com/usa/historical-data/",
+        }
+        _aviso(
+            f"  GLD: {len(gld_tabla)} publicaciones, "
+            f"hasta {pd.Timestamp(gld_tabla['fecha_disponible'].max()).date()}"
+        )
+    cot_tabla, cot_etiqueta = descargar_cot_oro(sesion, avisos)
+    if cot_tabla is not None:
+        publicadas["cot_neto"] = cot_tabla
+        fuentes["cot_neto"] = {
+            "etiqueta": cot_etiqueta,
+            "url": "https://publicreporting.cftc.gov/resource/6dca-aqww.json",
+        }
+        _aviso(
+            f"  COT: {len(cot_tabla)} publicaciones, "
+            f"hasta {pd.Timestamp(cot_tabla['fecha_disponible'].max()).date()}"
+        )
+    bc_tabla, bc_etiqueta = descargar_compras_bancos(sesion, avisos)
+    if bc_tabla is not None:
+        publicadas["compras_bc_ton"] = bc_tabla
+        fuentes["compras_bc_ton"] = {
+            "etiqueta": bc_etiqueta,
+            "url": "https://fsapi.gold.org/api/cbd/v11/charts/getPage",
+        }
+        _aviso(
+            f"  Bancos centrales: {len(bc_tabla)} trimestres, "
+            f"hasta {pd.Timestamp(bc_tabla['fecha_disponible'].max()).date()}"
+        )
+
     if not cpi_es_fred:
         fuentes["cpi"] = {
             "etiqueta": "BLS CUSR0000SA0 (IPC-U ajustado; equivalente a FRED CPIAUCSL)",
@@ -737,7 +1229,7 @@ def actualizar_datos() -> dict:
         fuentes["cpi"] = {"etiqueta": "FRED CPIAUCSL", "url": "https://fred.stlouisfed.org/series/CPIAUCSL"}
 
     tabla_cpi = tabla_publicacion_cpi(cpi)
-    panel = construir_panel(series, tabla_cpi)
+    panel = construir_panel(series, tabla_cpi, publicadas)
     if "breakeven_10" in panel.columns and "breakeven_10" not in fuentes:
         fuentes["breakeven_10"] = {
             "etiqueta": "Nominal 10 años menos real 10 años (aproxima a T10YIE)",
@@ -752,6 +1244,10 @@ def actualizar_datos() -> dict:
         ultima_cpi = tabla_cpi.iloc[-1]
         fechas["cpi_mes"] = str(pd.Timestamp(ultima_cpi["mes_referencia"]).date())
         fechas["cpi_fecha_publicacion"] = str(pd.Timestamp(ultima_cpi["fecha_disponible"]).date())
+    for nombre, tabla in publicadas.items():
+        if tabla is None or tabla.empty:
+            continue
+        fechas[nombre] = str(pd.Timestamp(tabla["fecha_disponible"].max()).date())
 
     panel.to_csv(CARPETA_DATOS / "panel_diario.csv", index_label="fecha")
     (CARPETA_DATOS / "fuentes.json").write_text(
