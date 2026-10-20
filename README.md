@@ -2,9 +2,9 @@
 
 A small Python study of the gold price. It is not financial advice.
 
-**What it does.** A fair-value regression of log(gold) on the 10-year real yield, log(USD index), log(Brent), VIX, and inflation, with Newey–West errors. It also runs walk-forward Ridge forecasts of 5-day and 20-day returns and compares them with a random walk. The sample is about 20 years of daily data from yfinance and FRED.
+**What it does.** A fair-value regression of log(gold) on the 10-year real yield, log(USD index), log(Brent), VIX, and inflation, with Newey–West errors. An extended fair value adds central-bank net gold purchases, log(GLD holdings), and the Caldara–Iacoviello geopolitical risk index, each lagged so it is not used before it is public. The same equation is re-estimated on rolling 2-year and 3-year windows. Engle–Granger and Johansen tests look for cointegration on weekly data, and an error-correction half-life is reported only when a relation is found. Walk-forward Ridge and gradient-boosting forecasts of 5-day and 20-day returns are compared with a random walk and with the training-window mean; those forecasts also use CFTC COT positioning and the 2-year nominal yield. A separate regression and forecast covers gold in Mexican pesos per gram. The sample is about 20 years of daily data from yfinance, FRED, and the public backups those series use.
 
-**Results, as of October 2026.** Gold sits about +42% above fair value. Out-of-sample R² is slightly negative at both horizons, so the forecasts do not beat a random walk. The signs on the real yield and the USD index flipped after 2022.
+**Results, as of 19 October 2026.** COMEX gold at $4,146.80/oz sits about +35% above the base walk-forward fair value. Adding central-bank purchases, GLD holdings, and geopolitical risk closes about 17 percentage points of that gap and leaves it near +18%. The latest 2-year and 3-year windows put the price about 11% and 8% below those shorter-sample values. Engle–Granger (p = 0.87) and Johansen (trace 18.8 against a 5% critical value of 29.8) do not find cointegration, so no equilibrium half-life is reported. Out-of-sample R² is negative for both Ridge and gradient boosting: about −0.02 and −0.05 for Ridge at 5 and 20 days against a random walk, and about −0.04 and −0.04 for boosting. Neither beats a random walk or the training-window mean. The signs on the real yield and the USD index flipped after 2022. In pesos per gram the metal is about +11% above its own fair value.
 
 **How to run.**
 
@@ -14,13 +14,17 @@ python pruebas.py
 python main.py
 ```
 
-`pruebas.py` is the offline check. `main.py` downloads the data and writes the report and the charts below.
+`pruebas.py` is the offline check (23 tests). `main.py` downloads the data and writes the report and the charts below.
 
 ![Gold price and walk-forward fair value](outputs/precio_vs_valor_justo.png)
 
 ![Fair-value gap in percent](outputs/brecha_valor_justo.png)
 
 ![One-standard-deviation effects of each fair-value regressor](outputs/coeficientes_valor_justo.png)
+
+![Rolling 2-year and 3-year fair-value coefficients](outputs/coeficientes_moviles.png)
+
+![Gold in pesos per gram and its own fair value](outputs/oro_mxn_vs_valor_justo.png)
 
 The rest of this file is in Spanish.
 
@@ -151,7 +155,7 @@ dice cuál usó.
 | VIX | `VIXCLS` | Histórico diario de CBOE, o Yahoo `^VIX` |
 | Petróleo | `DCOILBRENTEU` (Brent spot) | Yahoo `BZ=F` (futuro Brent) |
 | Bolsa | — | Yahoo `^GSPC` (S&P 500) |
-| Plata y GLD | — | Yahoo `SI=F`, `GLD`. Quedan en la tabla. No entran al valor justo. |
+| Plata y precio de GLD | — | Yahoo `SI=F`, `GLD`. Quedan en la tabla. El precio de GLD no entra al valor justo. |
 | Pesos por dólar | `DEXMXUS` | Yahoo `MXN=X` |
 | Fondos federales | `DFF` | Fed de Nueva York, tasa efectiva (EFFR) |
 | IPC de EE.UU. | `CPIAUCSL` | BLS `CUSR0000SA0` (IPC-U ajustado por estacionalidad) |
@@ -223,9 +227,11 @@ Hay dos brechas el día del informe:
   días anteriores. Esta es la brecha que luego usa el pronóstico, para no
   colar el futuro. También es la línea de las gráficas.
 
-El modelo no ve compras de bancos centrales ni geopolítica. Una brecha
+El modelo base no ve compras de bancos centrales ni geopolítica. Esas
+series entran en un segundo valor justo (sección de abajo). Una brecha
 grande puede ser "el oro está caro" o "al modelo le faltan piezas". El
-informe lo dice cuando la brecha pasa de 15%.
+informe lo dice cuando la brecha pasa de 15%, y mide si las series nuevas
+la cierran.
 
 ### 2. Pronóstico (retornos a 5 y 20 días)
 
@@ -294,9 +300,11 @@ o vender.
 
 En `outputs/`:
 
-- `precio_vs_valor_justo.png` — precio y valor justo con datos anteriores.
+- `precio_vs_valor_justo.png` — precio, valor justo base, valor justo ampliado y ventana de 3 años.
 - `brecha_valor_justo.png` — la brecha en por ciento. Arriba de cero: más caro que el modelo.
 - `coeficientes_valor_justo.png` — efecto de mover cada variable una desviación estándar de la muestra. Eso es un cambio grande entre niveles históricos, no un salto de un día.
+- `coeficientes_moviles.png` — el camino de cada coeficiente en ventanas de 2 y 3 años.
+- `oro_mxn_vs_valor_justo.png` — el oro en pesos por gramo y su propio valor justo.
 
 También quedan `informe.txt`, `coeficientes_valor_justo.csv`,
 `metricas_pronostico.csv` y `predicciones_fuera_de_muestra.csv`.
@@ -319,11 +327,58 @@ También quedan `informe.txt`, `coeficientes_valor_justo.csv`,
 - **Un R² negativo.** No es un bug. Es el resultado. El corto plazo del oro
   se parece a una caminata aleatoria.
 
+## Lo que se agregó después
+
+El modelo base de arriba se queda. Encima hay cinco piezas. Si una fuente
+no responde, el programa lo escribe en los avisos y sigue con lo que sí llegó.
+
+1. **Valor justo ampliado.** A la recta se le suman, cuando existen:
+   - compras netas de bancos centrales, en toneladas por trimestre
+     (World Gold Council; el Excel de la página a veces responde 403 y
+     entonces se usa la API pública del mismo consejo). El trimestre se usa
+     desde el **último día del mes siguiente**;
+   - toneladas de oro en GLD (archivo histórico de SPDR; si falla, las
+     acciones en circulación de SSGA). El dato de una sesión entra al
+     **día hábil siguiente**;
+   - índice de riesgo geopolítico GPR de Caldara e Iacoviello. El diario
+     se usa **el mismo día**. Si solo llega el mensual, entra el primer
+     día hábil del mes siguiente.
+   El informe dice cuántos puntos se mueve la brecha (en valor absoluto)
+   respecto del modelo base. Las dos brechas caminan hacia adelante.
+
+2. **Coeficientes móviles.** La misma recta, reestimada con las últimas
+   504 sesiones (cerca de 2 años) y las últimas 756 (cerca de 3). El día
+   de la estimación no entra. La gráfica `coeficientes_moviles.png` muestra
+   si el signo se queda quieto. También hay un valor justo con esos pesos.
+
+3. **Cointegración.** Engle-Granger y Johansen, en datos semanales.
+   Si alguna rechaza "no hay relación" al 5%, se estima un modelo de
+   corrección de errores y la vida media de la brecha (el tiempo para que
+   baje a la mitad). Si no, no se inventa esa vida media. Un AR(1) sobre
+   la brecha diaria, si aparece, está marcado como descripción, no como
+   equilibrio. La prueba ADF del residuo no reemplaza a estas dos.
+
+4. **Pronóstico.** Siguen el momentum de 5, 20 y 60 días. Se agregan el
+   neto no comercial del COT de la CFTC (largos menos cortos, partido por
+   el interés abierto; el corte es el martes y se usa el **viernes** de
+   publicación) y la tasa nominal a 2 años, como aproximación a lo que el
+   mercado espera de la Fed. En la **misma** caminata, con el mismo embargo,
+   se comparan Ridge y gradient boosting contra el baseline cero y el
+   baseline promedio.
+
+5. **Oro en pesos por gramo.** Tiene su propia regresión (con el tipo de
+   cambio en lugar del índice dólar, para no contar el dólar dos veces) y
+   su propio pronóstico a 5 y 20 días. No es el valor justo en dólares
+   convertido al tipo de cambio del día: eso dejaría el mismo porcentaje.
+
+Hacen falta `xlrd` (el GPR viene en `.xls`) y `openpyxl` (los Excel de
+GLD). Están en `requirements.txt`.
+
 ## Qué este modelo no hace
 
-No incluye compras de bancos centrales, flujos de ETF, ni la posición del
-COT del CFTC: esas series no son diarias y gratuitas con la misma facilidad.
 No da un precio de compra en una joyería de México. No es una recomendación
 de entrar o salir. Una regresión lineal no captura un quiebre estructural
-por sí sola; por eso el informe parte los coeficientes en 2022 y separa la
-brecha de toda la historia de la brecha calculada solo con el pasado.
+por sí sola; por eso el informe parte los coeficientes en 2022, los vuelve
+a estimar en ventanas de 2 y 3 años, y separa la brecha de toda la historia
+de la brecha calculada solo con el pasado. Si el pronóstico no le gana al
+promedio, el informe lo dice.

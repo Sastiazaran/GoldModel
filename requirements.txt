@@ -5,3 +5,5 @@ statsmodels>=0.14
 matplotlib>=3.8
 requests>=2.31
 yfinance>=0.2.50
+xlrd>=2.0.1
+openpyxl>=3.1

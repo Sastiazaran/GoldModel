@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 from datos import actualizar_datos
-from modelos import ajustar_pronosticos, ajustar_valor_justo, preparar_muestra
+from modelos import ajustar_oro_mxn, ajustar_pronosticos, ajustar_valor_justo, preparar_muestra
 from reporte import construir_informe, guardar_graficas, guardar_tablas
 
 CARPETA_SALIDAS = Path(__file__).resolve().parent / "outputs"
@@ -40,14 +40,15 @@ def main() -> None:
     muestra = preparar_muestra(datos["panel"])
     valor = ajustar_valor_justo(muestra)
     pronostico = ajustar_pronosticos(valor["df"])
-    texto = construir_informe(datos, valor, pronostico)
+    mxn = ajustar_oro_mxn(pronostico["df"])
+    texto = construir_informe(datos, valor, pronostico, mxn)
     print(texto, end="")
 
     CARPETA_SALIDAS.mkdir(parents=True, exist_ok=True)
     ruta_informe = CARPETA_SALIDAS / "informe.txt"
     ruta_informe.write_text(texto, encoding="utf-8")
-    graficas = guardar_graficas(pronostico["df"], valor, CARPETA_SALIDAS)
-    guardar_tablas(valor, pronostico, CARPETA_SALIDAS)
+    graficas = guardar_graficas(pronostico["df"], valor, CARPETA_SALIDAS, mxn)
+    guardar_tablas(valor, pronostico, CARPETA_SALIDAS, mxn)
     _copiar_artefactos([ruta_informe, *graficas])
 
     print("\nArchivos:", file=sys.stderr)
