@@ -3,6 +3,7 @@ venv/
 dashboard/node_modules/
 dashboard/.next/
 dashboard/out/
+dashboard/tsconfig.tsbuildinfo
 __pycache__/
 *.pyc
 .pytest_cache/
