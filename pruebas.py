@@ -8,7 +8,10 @@ el futuro, y que los pesos por gramo salen de la fórmula que dice el informe.
 
 from __future__ import annotations
 
+import importlib.util
+import json
 import math
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -409,6 +412,118 @@ def probar_extraer_cierre_de_yfinance() -> None:
     tabla = pd.DataFrame([[1.0, 2.0], [3.0, 4.0]], columns=columnas)
     serie = extraer_cierre(tabla)
     assert list(serie.values) == [2.0, 4.0]
+
+
+def _modulo_export():
+    if getattr(_modulo_export, "cache", None) is None:
+        ruta = Path(__file__).resolve().parent / "scripts" / "export_dashboard_data.py"
+        spec = importlib.util.spec_from_file_location("export_dashboard_data", ruta)
+        modulo = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(modulo)
+        _modulo_export.cache = modulo
+    return _modulo_export.cache
+
+
+def probar_esquema_de_reportes_coincide_con_el_validador() -> None:
+    modulo = _modulo_export()
+    esquema = json.loads((Path(__file__).resolve().parent / "data" / "reports" / "schema.json").read_text(encoding="utf-8"))
+    assert tuple(esquema["required"]) == modulo.CAMPOS_REPORTE
+    assert esquema["version"] == 1
+
+
+def probar_reportes_de_octubre_no_inventan_huecos() -> None:
+    modulo = _modulo_export()
+    reportes = modulo.cargar_reportes()
+    por_fecha = {reporte["fecha"]: reporte for reporte in reportes}
+    assert list(por_fecha) == [
+        "2026-10-21",
+        "2026-10-22",
+        "2026-10-23",
+        "2026-10-24",
+        "2026-10-25",
+        "2026-10-26",
+        "2026-10-27",
+        "2026-10-28",
+    ]
+    hoy = por_fecha["2026-10-28"]
+    assert hoy["precio_usd_oz"] == 4047
+    assert hoy["mxn_por_gramo"] == 2427
+    assert hoy["usd_mxn"] == 18.6525
+    assert hoy["cambio_usd"] == -12.3
+    assert hoy["usd_mxn_fecha"] == "2026-10-27"
+    assert hoy["lectura"]
+    assert hoy["drivers"][0]["url"].startswith("https://")
+    for fecha in ("2026-10-24", "2026-10-25"):
+        vacio = por_fecha[fecha]
+        assert vacio["sesion"] == "sin_registro"
+        assert vacio["precio_usd_oz"] is None
+        assert vacio["usd_mxn"] is None
+        assert vacio["mxn_por_gramo"] is None
+        assert vacio["lectura"] is None
+        assert vacio["drivers"] == []
+    sucio = dict(vacio)
+    sucio["precio_usd_oz"] = 4000
+    assert modulo.validar_reporte(sucio)
+
+
+def probar_mae_rmse_contra_el_baseline_de_no_cambio() -> None:
+    modulo = _modulo_export()
+    y = np.array([0.10, -0.20, 0.30])
+    perfecto = modulo.errores_contra_cero(y, y.copy(), horizonte=1)
+    assert perfecto["sin_solapar"]["n"] == 3
+    assert abs(perfecto["sin_solapar"]["mae"]) < 1e-12
+    assert abs(perfecto["sin_solapar"]["rmse"]) < 1e-12
+    assert abs(perfecto["sin_solapar"]["mae_cero"] - float(np.mean(np.abs(y)))) < 1e-12
+    ceros = modulo.errores_contra_cero(y, np.zeros(3), horizonte=1)
+    assert abs(ceros["sin_solapar"]["mae"] - ceros["sin_solapar"]["mae_cero"]) < 1e-12
+    assert abs(ceros["sin_solapar"]["rmse"] - ceros["sin_solapar"]["rmse_cero"]) < 1e-12
+
+
+def probar_acierto_en_vivo_ignora_pronosticos_abiertos() -> None:
+    modulo = _modulo_export()
+    fechas = pd.bdate_range("2024-01-02", periods=6)
+    precios = np.array([100.0, 110.0, 90.0, 120.0, 100.0, 130.0])
+    y = np.array([0.10, -0.20, np.nan, 0.05, np.nan, np.nan])
+    pred = np.array([0.01, -0.01, 0.02, -0.03, 0.04, 0.05])
+    vivo = modulo.acierto_en_vivo(fechas, precios, y, pred, horizonte=2)
+    assert vivo["n"] == 2
+    assert vivo["aciertos"] == 1
+    assert abs(vivo["tasa"] - 0.5) < 1e-12
+    assert vivo["ultimos"][0]["acierto"] is True
+    assert vivo["ultimos"][0]["direccion"] == "alza"
+    assert vivo["ultimos"][1]["acierto"] is False
+    assert vivo["ultimos"][1]["direccion"] == "baja"
+    assert vivo["ultimos"][1]["direccion_realizada"] == "alza"
+    fechas_contadas = {fila["fecha"] for fila in vivo["ultimos"]}
+    assert "2024-01-08" not in fechas_contadas
+    assert vivo["serie"][-1]["tasa"] == vivo["tasa"]
+    # Un cero exacto no vota y no recorre la rejilla: el día siguiente se queda.
+    y_cero = np.array([0.10, 0.0, -0.20])
+    pred_cero = np.array([0.05, 0.05, 0.05])
+    precios_cero = np.array([100.0, 100.0, 90.0])
+    fechas_cero = pd.bdate_range("2024-02-01", periods=3)
+    con_cero = modulo.acierto_en_vivo(fechas_cero, precios_cero, y_cero, pred_cero, horizonte=1)
+    assert con_cero["n"] == 2
+    assert con_cero["aciertos"] == 1
+    assert con_cero["ultimos"][1]["fecha"] == "2024-02-05"
+
+
+def probar_direccion_y_nivel_objetivo() -> None:
+    modulo = _modulo_export()
+    assert modulo.direccion_pronostico(0.01) == "alza"
+    assert modulo.direccion_pronostico(-0.02) == "baja"
+    assert modulo.direccion_pronostico(0.0) == "sin_cambio"
+    assert abs(modulo.nivel_objetivo(100.0, math.log(1.1)) - 110.0) < 1e-9
+
+
+def probar_pronostico_alineado_cae_en_el_dia_que_vence() -> None:
+    modulo = _modulo_export()
+    precios = np.array([100.0, 100.0, 100.0, 100.0])
+    pred = np.array([math.log(1.1), np.nan, np.nan, np.nan])
+    alineado = modulo.niveles_alineados(precios, pred, horizonte=2)
+    assert math.isnan(alineado[0]) and math.isnan(alineado[1])
+    assert abs(alineado[2] - 110.0) < 1e-9
+    assert math.isnan(alineado[3])
 
 
 def main() -> None:

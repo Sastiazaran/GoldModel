@@ -1,0 +1,49 @@
+{
+  "fecha": "2026-10-22",
+  "sesion": "con_registro",
+  "precio_usd_oz": 4076.1,
+  "precio_aproximado": true,
+  "precio_fuente": "Kitco, lectura de la mañana (~6:40 AM, hora del centro de México)",
+  "precio_url": "https://www.kitco.com/charts/gold",
+  "cierre_previo_usd_oz": 4140,
+  "cierre_previo_aproximado": true,
+  "cambio_usd": -64.2,
+  "cambio_pct": -1.55,
+  "cambio_texto": "−$64.20 (−1.55%) vs cierre ~$4,140; más bajo desde 14 oct",
+  "usd_mxn": 18.6425,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-10-21",
+  "usd_mxn_fuente": "Banxico FIX",
+  "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+  "mxn_por_gramo": 2443,
+  "mxn_por_gramo_aproximado": true,
+  "drivers": [
+    {
+      "titulo": "Petróleo y Aramco",
+      "detalle": "El petróleo volvió a subir tras un ataque con dron al campo Shaybah de Saudi Aramco. El log lo lee como inflación esperada y tasas altas por más tiempo.",
+      "fuente": "Reuters vía MarketScreener",
+      "url": "https://uk.marketscreener.com/news/gold-drops-over-1-as-oil-rally-reinforces-higher-for-longer-rate-outlook-ce785cd9df8cff21"
+    },
+    {
+      "titulo": "Empleo en Estados Unidos",
+      "detalle": "Las solicitudes de desempleo bajaron a 194 mil en la semana al 17 de octubre, el menor nivel desde julio según el reporte.",
+      "fuente": "Kitco",
+      "url": "https://www.kitco.com/news/article/2026-10-22/gold-prices-struggling-us-weekly-jobless-claims-fall-three-month-low"
+    },
+    {
+      "titulo": "Fed",
+      "detalle": "La decisión sigue siendo el miércoles 28. El log de este día cita cerca de 16% de probabilidad de alza en esa reunión y una probabilidad alta en diciembre.",
+      "fuente": "Reuters vía CNBC",
+      "url": "https://www.cnbc.com/2026/10/22/gold-hits-over-two-week-low-as-oil-rally-fuels-inflation-worries.html"
+    },
+    {
+      "titulo": "Peso mexicano",
+      "detalle": "El FIX del 21 de octubre fue 18.6425. El peso más débil amortigua la caída: en pesos el gramo queda casi igual que el día anterior.",
+      "fuente": "Banxico",
+      "url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do"
+    }
+  ],
+  "lectura": "Presión bajista por petróleo y empleo fuerte; piso a vigilar ~$4,073. Sin prisas hasta la Fed (28 oct).",
+  "notion_url": "https://app.notion.com/p/401f98ae11128198928ff7998d2f75ea",
+  "notas": "Cifras del log de Notion (Log del Oro), entrada del 22 de octubre de 2026. El cambio en dólares es el de la propiedad Cambio (−$64.20, −1.55%). El cierre previo está marcado como aproximado. No es asesoría financiera."
+}

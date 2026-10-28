@@ -1,0 +1,344 @@
+[
+  {
+    "fecha": "2026-10-21",
+    "sesion": "con_registro",
+    "precio_usd_oz": 4136,
+    "precio_aproximado": true,
+    "precio_fuente": "Kitco, lectura de la mañana (7:32 AM, hora del centro de México)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 4124,
+    "cierre_previo_aproximado": true,
+    "cambio_usd": 11.6,
+    "cambio_pct": 0.3,
+    "cambio_texto": "+$11.60 (+0.3%) vs cierre ~$4,124; mínimo madrugada ~$4,105 (más bajo desde 15 oct)",
+    "usd_mxn": 18.42,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-10-20",
+    "usd_mxn_fuente": "Banxico FIX",
+    "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+    "mxn_por_gramo": 2449,
+    "mxn_por_gramo_aproximado": true,
+    "drivers": [
+      {
+        "titulo": "Petróleo y Medio Oriente",
+        "detalle": "El Brent seguía arriba de 110 dólares por las tensiones en Medio Oriente. Más petróleo alimenta la inflación y, con ella, la presión de tasas sobre el oro.",
+        "fuente": "Reuters vía CNBC",
+        "url": "https://www.cnbc.com/2026/10/21/gold-dips-for-fourth-session-as-oil-rally-fans-inflation-concerns.html"
+      },
+      {
+        "titulo": "Fed",
+        "detalle": "La Fed decide el miércoles 28. El log cita una pausa esperada en esa reunión y una probabilidad alta de alza en diciembre.",
+        "fuente": "Kitco",
+        "url": "https://www.kitco.com/news/article/2026-10-21/gold-gains-silver-slips-oil-prices-rise-fed-rate-hike-expectations-persist"
+      },
+      {
+        "titulo": "Inflación PCE",
+        "detalle": "El jueves 29 sale el PCE de Estados Unidos, el dato que el reporte marca como el siguiente parteaguas después de la Fed.",
+        "fuente": "Kitco",
+        "url": "https://www.kitco.com/news/article/2026-10-21/gold-gains-silver-slips-oil-prices-rise-fed-rate-hike-expectations-persist"
+      },
+      {
+        "titulo": "Peso mexicano",
+        "detalle": "El FIX del 20 de octubre fue 18.42 pesos por dólar. Con ese tipo de cambio el log deja el metal en unos 2,449 pesos por gramo.",
+        "fuente": "Banxico",
+        "url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do"
+      }
+    ],
+    "lectura": "Tendencia bajista de ~2 meses; aguanta zona $4,100. Sin prisas hasta la Fed (28 oct).",
+    "notion_url": "https://app.notion.com/p/400f98ae111281aca9f7cb1bfde2b15f",
+    "notas": "Cifras del log de Notion (Log del Oro), entrada del 21 de octubre de 2026. El precio de la mañana está marcado como aproximado. El MXN/g usa el FIX citado, no un tipo de cambio intradía. No es asesoría financiera."
+  },
+  {
+    "fecha": "2026-10-22",
+    "sesion": "con_registro",
+    "precio_usd_oz": 4076.1,
+    "precio_aproximado": true,
+    "precio_fuente": "Kitco, lectura de la mañana (~6:40 AM, hora del centro de México)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 4140,
+    "cierre_previo_aproximado": true,
+    "cambio_usd": -64.2,
+    "cambio_pct": -1.55,
+    "cambio_texto": "−$64.20 (−1.55%) vs cierre ~$4,140; más bajo desde 14 oct",
+    "usd_mxn": 18.6425,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-10-21",
+    "usd_mxn_fuente": "Banxico FIX",
+    "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+    "mxn_por_gramo": 2443,
+    "mxn_por_gramo_aproximado": true,
+    "drivers": [
+      {
+        "titulo": "Petróleo y Aramco",
+        "detalle": "El petróleo volvió a subir tras un ataque con dron al campo Shaybah de Saudi Aramco. El log lo lee como inflación esperada y tasas altas por más tiempo.",
+        "fuente": "Reuters vía MarketScreener",
+        "url": "https://uk.marketscreener.com/news/gold-drops-over-1-as-oil-rally-reinforces-higher-for-longer-rate-outlook-ce785cd9df8cff21"
+      },
+      {
+        "titulo": "Empleo en Estados Unidos",
+        "detalle": "Las solicitudes de desempleo bajaron a 194 mil en la semana al 17 de octubre, el menor nivel desde julio según el reporte.",
+        "fuente": "Kitco",
+        "url": "https://www.kitco.com/news/article/2026-10-22/gold-prices-struggling-us-weekly-jobless-claims-fall-three-month-low"
+      },
+      {
+        "titulo": "Fed",
+        "detalle": "La decisión sigue siendo el miércoles 28. El log de este día cita cerca de 16% de probabilidad de alza en esa reunión y una probabilidad alta en diciembre.",
+        "fuente": "Reuters vía CNBC",
+        "url": "https://www.cnbc.com/2026/10/22/gold-hits-over-two-week-low-as-oil-rally-fuels-inflation-worries.html"
+      },
+      {
+        "titulo": "Peso mexicano",
+        "detalle": "El FIX del 21 de octubre fue 18.6425. El peso más débil amortigua la caída: en pesos el gramo queda casi igual que el día anterior.",
+        "fuente": "Banxico",
+        "url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do"
+      }
+    ],
+    "lectura": "Presión bajista por petróleo y empleo fuerte; piso a vigilar ~$4,073. Sin prisas hasta la Fed (28 oct).",
+    "notion_url": "https://app.notion.com/p/401f98ae11128198928ff7998d2f75ea",
+    "notas": "Cifras del log de Notion (Log del Oro), entrada del 22 de octubre de 2026. El cambio en dólares es el de la propiedad Cambio (−$64.20, −1.55%). El cierre previo está marcado como aproximado. No es asesoría financiera."
+  },
+  {
+    "fecha": "2026-10-23",
+    "sesion": "con_registro",
+    "precio_usd_oz": 4024.9,
+    "precio_aproximado": true,
+    "precio_fuente": "Kitco, lectura de la mañana (~7:33 AM, hora del centro de México)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 4023,
+    "cierre_previo_aproximado": true,
+    "cambio_usd": 1.6,
+    "cambio_pct": 0.04,
+    "cambio_texto": "+$1.60 (+0.04%) vs cierre jueves ~$4,023; mínimo del día $3,986 (más bajo desde 20 jul); semana −3.5%",
+    "usd_mxn": 18.7005,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-10-22",
+    "usd_mxn_fuente": "Banxico FIX",
+    "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+    "mxn_por_gramo": 2420,
+    "mxn_por_gramo_aproximado": true,
+    "drivers": [
+      {
+        "titulo": "Petróleo en máximos",
+        "detalle": "El Brent tocó un máximo de más de cinco meses por ataques hutíes en Arabia Saudita y tensión en Ormuz. El reporte lo vincula con inflación y tasas altas por más tiempo.",
+        "fuente": "Reuters vía Kitco",
+        "url": "https://www.kitco.com/news/off-the-wire/2026-10-23/gold-three-month-lows-oil-rally-fans-inflation-worries"
+      },
+      {
+        "titulo": "Fed",
+        "detalle": "Para este día el log cita cerca de 9% de probabilidad de alza el 28 de octubre y cerca de 81% en diciembre.",
+        "fuente": "Reuters vía Kitco",
+        "url": "https://www.kitco.com/news/off-the-wire/2026-10-23/gold-three-month-lows-oil-rally-fans-inflation-worries"
+      },
+      {
+        "titulo": "Piso de 4,000 dólares",
+        "detalle": "En la madrugada el spot perforó los 4,000 y tocó 3,986 dólares, el nivel más bajo desde el 20 de julio. La semana iba en −3.5%.",
+        "fuente": "Reuters vía Kitco",
+        "url": "https://www.kitco.com/news/off-the-wire/2026-10-23/gold-three-month-lows-oil-rally-fans-inflation-worries"
+      },
+      {
+        "titulo": "Peso mexicano",
+        "detalle": "El FIX del 22 de octubre fue 18.7005. El peso más débil amortigua parte de la baja en pesos por gramo.",
+        "fuente": "Banxico",
+        "url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do"
+      }
+    ],
+    "lectura": "Prueba del piso de $4,000; si no aguanta puede bajar más. Sin prisas hasta la Fed (28 oct).",
+    "notion_url": "https://app.notion.com/p/402f98ae11128147b948e35862091a81",
+    "notas": "Cifras del log de Notion (Log del Oro), entrada del 23 de octubre de 2026. El mínimo de 3,986 dólares está en el texto del cambio, no se usa como cierre. No es asesoría financiera."
+  },
+  {
+    "fecha": "2026-10-24",
+    "sesion": "sin_registro",
+    "precio_usd_oz": null,
+    "precio_aproximado": null,
+    "precio_fuente": null,
+    "precio_url": null,
+    "cierre_previo_usd_oz": null,
+    "cierre_previo_aproximado": null,
+    "cambio_usd": null,
+    "cambio_pct": null,
+    "cambio_texto": null,
+    "usd_mxn": null,
+    "usd_mxn_tipo": null,
+    "usd_mxn_fecha": null,
+    "usd_mxn_fuente": null,
+    "usd_mxn_url": null,
+    "mxn_por_gramo": null,
+    "mxn_por_gramo_aproximado": null,
+    "drivers": [],
+    "lectura": null,
+    "notion_url": null,
+    "notas": "Sábado 24 de octubre de 2026. El log de Notion (Log del Oro) no tiene entrada para este día y el COMEX no publica un cierre de sesión. Los campos numéricos quedan vacíos a propósito."
+  },
+  {
+    "fecha": "2026-10-25",
+    "sesion": "sin_registro",
+    "precio_usd_oz": null,
+    "precio_aproximado": null,
+    "precio_fuente": null,
+    "precio_url": null,
+    "cierre_previo_usd_oz": null,
+    "cierre_previo_aproximado": null,
+    "cambio_usd": null,
+    "cambio_pct": null,
+    "cambio_texto": null,
+    "usd_mxn": null,
+    "usd_mxn_tipo": null,
+    "usd_mxn_fecha": null,
+    "usd_mxn_fuente": null,
+    "usd_mxn_url": null,
+    "mxn_por_gramo": null,
+    "mxn_por_gramo_aproximado": null,
+    "drivers": [],
+    "lectura": null,
+    "notion_url": null,
+    "notas": "Domingo 25 de octubre de 2026. El log de Notion (Log del Oro) no tiene entrada para este día y el COMEX no publica un cierre de sesión. Los campos numéricos quedan vacíos a propósito."
+  },
+  {
+    "fecha": "2026-10-26",
+    "sesion": "con_registro",
+    "precio_usd_oz": 4001.3,
+    "precio_aproximado": true,
+    "precio_fuente": "Kitco, lectura de la mañana (~7:41 AM, hora del centro de México)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 3995,
+    "cierre_previo_aproximado": true,
+    "cambio_usd": 6.4,
+    "cambio_pct": 0.16,
+    "cambio_texto": "+$6.40 (+0.16%) vs cierre viernes ~$3,995; rango del día $3,977.90–$4,026.50; viernes tocó ~$3,975 (mínimo desde 20 jul); semana pasada ~−4%",
+    "usd_mxn": 18.667,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-10-23",
+    "usd_mxn_fuente": "Banxico FIX",
+    "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+    "mxn_por_gramo": 2401,
+    "mxn_por_gramo_aproximado": true,
+    "drivers": [
+      {
+        "titulo": "Petróleo más bajo",
+        "detalle": "El Brent bajó cerca de 2% y rondaba 114 dólares. El reporte lo lee como menos presión inflacionaria y un alivio para el oro.",
+        "fuente": "Reuters vía CNBC",
+        "url": "https://www.cnbc.com/2026/10/26/gold-gains-on-softer-oil-prices-fed-decision-in-focus.html"
+      },
+      {
+        "titulo": "Fed",
+        "detalle": "La decisión es el miércoles 28. Este día el log cita cerca de 9% de alza en esa reunión y cerca de 80% en diciembre.",
+        "fuente": "Reuters vía CNBC",
+        "url": "https://www.cnbc.com/2026/10/26/gold-gains-on-softer-oil-prices-fed-decision-in-focus.html"
+      },
+      {
+        "titulo": "Regreso arriba de 4,000",
+        "detalle": "El viernes el spot tocó unos 3,975 dólares, mínimo desde el 20 de julio, y la semana anterior cayó cerca de 4%. El lunes volvió a asomarse arriba de 4,000.",
+        "fuente": "Reuters vía The Hindu Business Line",
+        "url": "https://www.thehindubusinessline.com/markets/gold/gold-gains-as-oil-slide-cools-some-inflation-concerns/article71626429.ece"
+      },
+      {
+        "titulo": "Peso mexicano",
+        "detalle": "El FIX usado es el del 23 de octubre, 18.6670 pesos por dólar. Con ese tipo el log deja el gramo en unos 2,401 pesos, abajo del viernes.",
+        "fuente": "Banxico",
+        "url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do"
+      }
+    ],
+    "lectura": "Los $4,000 aguantan como piso; UBS lo ve zona de compra, pero la Fed (~80% alza en dic) pone techo. Calma hasta el miércoles 28.",
+    "notion_url": "https://app.notion.com/p/405f98ae1112814a964df8f6f319225b",
+    "notas": "Cifras del log de Notion (Log del Oro), entrada del 26 de octubre de 2026. El FIX es del viernes 23 porque el fin de semana no publica uno nuevo. No es asesoría financiera."
+  },
+  {
+    "fecha": "2026-10-27",
+    "sesion": "con_registro",
+    "precio_usd_oz": 4025,
+    "precio_aproximado": true,
+    "precio_fuente": "Kitco, lectura de la mañana (~7:37 AM, hora del centro de México)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 4016,
+    "cierre_previo_aproximado": true,
+    "cambio_usd": 8.8,
+    "cambio_pct": 0.22,
+    "cambio_texto": "+$8.80 (+0.22%) vs cierre lunes ~$4,016; rango del día $3,988.50–$4,031.80; en la madrugada bajó a ~$3,996 (Reuters 0929 GMT) y rebotó",
+    "usd_mxn": 18.5798,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-10-26",
+    "usd_mxn_fuente": "Banxico FIX",
+    "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+    "mxn_por_gramo": 2404,
+    "mxn_por_gramo_aproximado": true,
+    "drivers": [
+      {
+        "titulo": "Dólar y bonos",
+        "detalle": "El índice del dólar subió a su nivel más alto en casi dos semanas y los rendimientos del Tesoro seguían elevados. Reuters ubicó el spot en 3,995.89 dólares a las 09:29 GMT.",
+        "fuente": "Reuters vía MarketScreener",
+        "url": "https://ca.marketscreener.com/news/gold-retreats-on-stronger-dollar-traders-brace-for-fed-ce785cddd880f721"
+      },
+      {
+        "titulo": "Petróleo cerca de 116",
+        "detalle": "El Brent rondaba 116 dólares por nuevos ataques hutíes a Arabia Saudita. El reporte lo lee como miedo a inflación y a una Fed más restrictiva.",
+        "fuente": "Reuters vía Kitco",
+        "url": "https://www.kitco.com/news/off-the-wire/2026-10-27/gold-retreats-stronger-dollar-traders-brace-fed"
+      },
+      {
+        "titulo": "Fed y PCE",
+        "detalle": "Se espera pausa el miércoles 28. El log cita cerca de 80% de probabilidad de alza en diciembre, y el PCE el jueves 29.",
+        "fuente": "Reuters vía CNBC",
+        "url": "https://www.cnbc.com/2026/10/27/gold-eases-on-firmer-dollar-ahead-of-fed-decision.html"
+      },
+      {
+        "titulo": "Peso mexicano",
+        "detalle": "El FIX del 26 de octubre fue 18.5798, más fuerte que el del 23. Por eso el oro en pesos casi no sube aunque en dólares sí.",
+        "fuente": "Banxico",
+        "url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do"
+      }
+    ],
+    "lectura": "$4,000 sigue de piso, pero dólar fuerte, bonos altos y petróleo ~$116 pesan. Esperar a la Fed (mié 28) y PCE (jue 29).",
+    "notion_url": "https://app.notion.com/p/406f98ae1112815cbc8fd0b7bd919b32",
+    "notas": "Cifras del log de Notion (Log del Oro), entrada del 27 de octubre de 2026. El precio de las 09:29 GMT (3,995.89) es un dato intradía de Reuters, distinto del precio de la mañana que usa el tablero. No es asesoría financiera."
+  },
+  {
+    "fecha": "2026-10-28",
+    "sesion": "con_registro",
+    "precio_usd_oz": 4047,
+    "precio_aproximado": true,
+    "precio_fuente": "Kitco, lectura de la mañana (~7:36 AM, hora del centro de México)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 4059,
+    "cierre_previo_aproximado": true,
+    "cambio_usd": -12.3,
+    "cambio_pct": -0.3,
+    "cambio_texto": "−$12.30 (−0.30%) vs cierre martes ~$4,059 (el martes subió ~1%); rango del día $4,027.30–$4,071.60",
+    "usd_mxn": 18.6525,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-10-27",
+    "usd_mxn_fuente": "Banxico FIX",
+    "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+    "mxn_por_gramo": 2427,
+    "mxn_por_gramo_aproximado": true,
+    "drivers": [
+      {
+        "titulo": "Petróleo y una refinería en Arabia Saudita",
+        "detalle": "El petróleo subió más de 2 dólares tras un ataque a una refinería en Arabia Saudita. El log deja el Brent arriba de 110 dólares y cita el riesgo de una Fed más dura.",
+        "fuente": "Reuters vía CNBC",
+        "url": "https://www.cnbc.com/2026/10/28/gold-slips-on-oil-fueled-inflation-fears-ahead-of-fed-meeting.html"
+      },
+      {
+        "titulo": "Fed hoy y PCE mañana",
+        "detalle": "La Fed decide hoy a las 12:00, hora del centro de México. Se espera pausa. El log cita cerca de 84% de probabilidad de alza en diciembre, y el PCE el jueves 29 a las 6:30.",
+        "fuente": "Reuters vía CNBC",
+        "url": "https://www.cnbc.com/2026/10/28/gold-slips-on-oil-fueled-inflation-fears-ahead-of-fed-meeting.html"
+      },
+      {
+        "titulo": "Dólar firme",
+        "detalle": "El índice del dólar subió 0.1% a 102.42, cerca de máximos de dos semanas, y el reporte lo pone como peso sobre el oro.",
+        "fuente": "Investing.com",
+        "url": "https://au.investing.com/news/commodities-news/gold-retreats-as-dollar-firms-slightly-ahead-of-fed-decision-4720920"
+      },
+      {
+        "titulo": "Peso mexicano",
+        "detalle": "El FIX del 27 de octubre fue 18.6525, más débil que el 18.5798 del 26. Por eso el oro en pesos sube frente a ayer aunque en dólares baje.",
+        "fuente": "Banxico",
+        "url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do"
+      }
+    ],
+    "lectura": "Aguanta arriba de $4,000, pero petróleo alto y dólar firme pesan. Fed hoy 12:00 (Warsh) y PCE jueves 6:30 deciden el rumbo.",
+    "notion_url": "https://app.notion.com/p/407f98ae1112815f8613d4f01ac3eb38",
+    "notas": "Cifras del log de Notion (Log del Oro), entrada del 28 de octubre de 2026. El precio es la lectura de la mañana, no el cierre del futuro COMEX. No es asesoría financiera."
+  }
+]

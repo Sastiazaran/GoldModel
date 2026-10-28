@@ -1,0 +1,49 @@
+{
+  "fecha": "2026-10-27",
+  "sesion": "con_registro",
+  "precio_usd_oz": 4025,
+  "precio_aproximado": true,
+  "precio_fuente": "Kitco, lectura de la mañana (~7:37 AM, hora del centro de México)",
+  "precio_url": "https://www.kitco.com/charts/gold",
+  "cierre_previo_usd_oz": 4016,
+  "cierre_previo_aproximado": true,
+  "cambio_usd": 8.8,
+  "cambio_pct": 0.22,
+  "cambio_texto": "+$8.80 (+0.22%) vs cierre lunes ~$4,016; rango del día $3,988.50–$4,031.80; en la madrugada bajó a ~$3,996 (Reuters 0929 GMT) y rebotó",
+  "usd_mxn": 18.5798,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-10-26",
+  "usd_mxn_fuente": "Banxico FIX",
+  "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+  "mxn_por_gramo": 2404,
+  "mxn_por_gramo_aproximado": true,
+  "drivers": [
+    {
+      "titulo": "Dólar y bonos",
+      "detalle": "El índice del dólar subió a su nivel más alto en casi dos semanas y los rendimientos del Tesoro seguían elevados. Reuters ubicó el spot en 3,995.89 dólares a las 09:29 GMT.",
+      "fuente": "Reuters vía MarketScreener",
+      "url": "https://ca.marketscreener.com/news/gold-retreats-on-stronger-dollar-traders-brace-for-fed-ce785cddd880f721"
+    },
+    {
+      "titulo": "Petróleo cerca de 116",
+      "detalle": "El Brent rondaba 116 dólares por nuevos ataques hutíes a Arabia Saudita. El reporte lo lee como miedo a inflación y a una Fed más restrictiva.",
+      "fuente": "Reuters vía Kitco",
+      "url": "https://www.kitco.com/news/off-the-wire/2026-10-27/gold-retreats-stronger-dollar-traders-brace-fed"
+    },
+    {
+      "titulo": "Fed y PCE",
+      "detalle": "Se espera pausa el miércoles 28. El log cita cerca de 80% de probabilidad de alza en diciembre, y el PCE el jueves 29.",
+      "fuente": "Reuters vía CNBC",
+      "url": "https://www.cnbc.com/2026/10/27/gold-eases-on-firmer-dollar-ahead-of-fed-decision.html"
+    },
+    {
+      "titulo": "Peso mexicano",
+      "detalle": "El FIX del 26 de octubre fue 18.5798, más fuerte que el del 23. Por eso el oro en pesos casi no sube aunque en dólares sí.",
+      "fuente": "Banxico",
+      "url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do"
+    }
+  ],
+  "lectura": "$4,000 sigue de piso, pero dólar fuerte, bonos altos y petróleo ~$116 pesan. Esperar a la Fed (mié 28) y PCE (jue 29).",
+  "notion_url": "https://app.notion.com/p/406f98ae1112815cbc8fd0b7bd919b32",
+  "notas": "Cifras del log de Notion (Log del Oro), entrada del 27 de octubre de 2026. El precio de las 09:29 GMT (3,995.89) es un dato intradía de Reuters, distinto del precio de la mañana que usa el tablero. No es asesoría financiera."
+}

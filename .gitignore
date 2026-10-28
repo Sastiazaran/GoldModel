@@ -1,5 +1,8 @@
 .venv/
 venv/
+dashboard/node_modules/
+dashboard/.next/
+dashboard/out/
 __pycache__/
 *.pyc
 .pytest_cache/
