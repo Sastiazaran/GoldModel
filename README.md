@@ -4,7 +4,7 @@ A small Python study of the gold price. It is not financial advice.
 
 **What it does.** A fair-value regression of log(gold) on the 10-year real yield, log(USD index), log(Brent), VIX, and inflation, with Newey–West errors. An extended fair value adds central-bank net gold purchases, log(GLD holdings), and the Caldara–Iacoviello geopolitical risk index, each lagged so it is not used before it is public. The same equation is re-estimated on rolling 2-year and 3-year windows. Engle–Granger and Johansen tests look for cointegration on weekly data, and an error-correction half-life is reported only when a relation is found. Walk-forward Ridge and gradient-boosting forecasts of 5-day and 20-day returns are compared with a random walk and with the training-window mean; those forecasts also use CFTC COT positioning and the 2-year nominal yield. A separate regression and forecast covers gold in Mexican pesos per gram. The sample is about 20 years of daily data from yfinance, FRED, and the public backups those series use.
 
-**Dashboard.** `dashboard/` is a Next.js app with a Spanish (es-MX) interface. It reads JSON committed under `dashboard/data/`: the daily note (spot, change, pesos per gram, drivers with links, hedged takeaway), the model's fair value and 5- and 20-day forecasts, and accuracy against a no-change baseline. Refresh with `python scripts/export_dashboard_data.py`, then commit `dashboard/data/snapshot.json` and `dashboard/data/reportes.json`. Daily notes are `data/reports/YYYY-MM-DD.json`. On Vercel, set the root directory to `dashboard`, framework Next.js, build command `npm run build`. No environment variables. The longer instructions are in the Spanish section below.
+**Dashboard.** `dashboard/` is a Next.js app with a Spanish (es-MX) interface. It reads JSON committed under `dashboard/data/`: the daily note (spot, change, pesos per gram, drivers with links, hedged takeaway), the model's fair value and 5- and 20-day forecasts, accuracy against a no-change baseline, and a plain-language story (`La historia del oro`) that the export writes from those numbers. Refresh with `python scripts/export_dashboard_data.py`, then commit `dashboard/data/snapshot.json` and `dashboard/data/reportes.json`. Daily notes are `data/reports/YYYY-MM-DD.json`. On Vercel, set the root directory to `dashboard`, framework Next.js, build command `npm run build`. No environment variables. The longer instructions are in the Spanish section below.
 
 **Results, as of 19 October 2026.** COMEX gold at $4,146.80/oz sits about +35% above the base walk-forward fair value. Adding central-bank purchases, GLD holdings, and geopolitical risk closes about 17 percentage points of that gap and leaves it near +18%. The latest 2-year and 3-year windows put the price about 11% and 8% below those shorter-sample values. Engle–Granger (p = 0.87) and Johansen (trace 18.8 against a 5% critical value of 29.8) do not find cointegration, so no equilibrium half-life is reported. Out-of-sample R² is negative for both Ridge and gradient boosting: about −0.02 and −0.05 for Ridge at 5 and 20 days against a random walk, and about −0.04 and −0.04 for boosting. Neither beats a random walk or the training-window mean. The signs on the real yield and the USD index flipped after 2022. In pesos per gram the metal is about +11% above its own fair value.
 
@@ -16,7 +16,7 @@ python pruebas.py
 python main.py
 ```
 
-`pruebas.py` is the offline check (29 tests). `main.py` downloads the data and writes the report and the charts below.
+`pruebas.py` is the offline check (34 tests). `main.py` downloads the data and writes the report and the charts below.
 
 ![Gold price and walk-forward fair value](outputs/precio_vs_valor_justo.png)
 
@@ -136,10 +136,12 @@ fecha de publicación, y que el entrenamiento del pronóstico no vea el futuro.
 
 ## Tablero
 
-El tablero junta tres cosas: el reporte del día, el valor justo y los
-pronósticos a 5 y 20 días, y la nota del modelo contra el baseline de
-"el precio no cambia". La interfaz está en español (es-MX). No es
-asesoría financiera.
+El tablero junta el reporte del día, el valor justo, los pronósticos a
+5 y 20 días, y la nota contra el baseline de "el precio no cambia".
+Arriba va **La historia del oro**: un relato en español de México que
+arma `scripts/export_dashboard_data.py` con plantillas y los números
+del JSON. No está escrito a mano. Si falta un dato, el texto lo dice.
+La interfaz está en español (es-MX). No es asesoría financiera.
 
 Los reportes viven en `data/reports/`, un archivo por día. El esquema
 está en `data/reports/schema.json`. Si un número no existe, el campo

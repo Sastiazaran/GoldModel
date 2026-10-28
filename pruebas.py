@@ -526,6 +526,169 @@ def probar_pronostico_alineado_cae_en_el_dia_que_vence() -> None:
     assert math.isnan(alineado[3])
 
 
+def _texto_relato(relato: dict) -> str:
+    return _modulo_export()._texto_relato(relato)
+
+
+def _historia_de_prueba() -> list[dict]:
+    fechas = pd.bdate_range("2026-01-02", periods=21)
+    return [
+        {"fecha": fecha.strftime("%Y-%m-%d"), "precio": round(100 + i * 0.5, 2)}
+        for i, fecha in enumerate(fechas)
+    ]
+
+
+def _modelo_de_prueba(**cambios) -> dict:
+    modelo = {
+        "fecha": "2026-01-30",
+        "instrumento": "GC=F",
+        "precio_usd_oz": 110.0,
+        "valor_justo_usd": 100.0,
+        "brecha_pct": 10.0,
+        "ampliado": None,
+        "historia": _historia_de_prueba(),
+        "pronosticos": {
+            "5": {
+                "direccion": "alza",
+                "retorno_pct": 1.0,
+                "nivel_objetivo_usd": 111.1,
+                "banda_baja_pct": -1.0,
+                "banda_alta_pct": 3.0,
+                "senal_debil": False,
+            },
+            "20": {
+                "direccion": "baja",
+                "retorno_pct": -2.0,
+                "nivel_objetivo_usd": 107.8,
+                "banda_baja_pct": -6.0,
+                "banda_alta_pct": 2.0,
+                "senal_debil": True,
+            },
+        },
+        "precision": {
+            "5": {
+                "le_gana_al_cero": False,
+                "errores": {"sin_solapar": {"mae_pct": 2.5, "mae_cero_pct": 1.2}},
+                "metricas": {"sin_solapar": {"r2_cero": -0.02, "acierto": 0.5, "acierto_siempre_alza": 0.6}},
+                "en_vivo": {"n": 10, "aciertos": 5, "tasa": 0.5},
+            },
+            "20": {
+                "le_gana_al_cero": False,
+                "errores": {"sin_solapar": {"mae_pct": 4.0, "mae_cero_pct": 3.5}},
+                "metricas": {"sin_solapar": {"r2_cero": -0.04, "acierto": 0.48, "acierto_siempre_alza": 0.55}},
+                "en_vivo": {"n": 4, "aciertos": 2, "tasa": 0.5},
+            },
+        },
+    }
+    modelo.update(cambios)
+    return modelo
+
+
+def probar_relato_cuenta_con_los_numeros_que_recibe() -> None:
+    modulo = _modulo_export()
+    reportes = [
+        {
+            "fecha": "2026-01-30",
+            "sesion": "con_registro",
+            "precio_usd_oz": 108.0,
+            "precio_aproximado": True,
+            "cambio_usd": -1.5,
+            "cambio_pct": -1.37,
+            "cambio_texto": "bajó frente al cierre previo",
+            "mxn_por_gramo": 70,
+            "usd_mxn": 20.0,
+            "usd_mxn_fecha": "2026-01-29",
+            "lectura": "Sin prisas.",
+            "drivers": [
+                {
+                    "titulo": "Petróleo",
+                    "detalle": "Brent en 110 dólares según el log.",
+                    "fuente": "Reuters",
+                    "url": "https://example.com/brent",
+                }
+            ],
+        }
+    ]
+    relato = modulo.construir_relato(_modelo_de_prueba(), reportes)
+    texto = _texto_relato(relato)
+    assert "110 dólares" in texto
+    assert "108 dólares" in texto
+    assert "subió 10.0%" in texto
+    assert "9,999" not in texto
+    assert "Brent en 110 dólares según el log." in json.dumps(relato, ensure_ascii=False)
+    assert relato["secciones"][0]["grafica"]["puntos"][-1]["valor"] == 110.0
+    assert "No tengo el cierre de 2025" in texto
+    assert "No tengo 60 días de mercado" in texto
+
+
+def probar_relato_no_inventa_cuando_falta_el_modelo() -> None:
+    modulo = _modulo_export()
+    relato = modulo.construir_relato(None, [])
+    texto = _texto_relato(relato)
+    assert "No tengo el cierre del futuro" in texto
+    assert "No tengo valor justo" in texto
+    assert "No hay reportes con registro" in texto
+    assert "No tengo pronósticos ni precisión" in texto
+    assert "4,051" not in texto
+    assert "dólares" not in texto.split("No tengo el cierre del futuro")[0] or "108" not in texto
+
+
+def probar_relato_solo_habla_de_bancos_si_el_modelo_los_trae() -> None:
+    modulo = _modulo_export()
+    sin_extra = modulo.construir_relato(_modelo_de_prueba(ampliado=None), [])
+    texto_sin = _texto_relato(sin_extra)
+    assert "No hay valor justo ampliado" in texto_sin
+    assert "acercan la brecha" not in texto_sin
+    con_extra = modulo.construir_relato(
+        _modelo_de_prueba(
+            ampliado={
+                "valor_justo_usd": 105.0,
+                "brecha_pct": 4.8,
+                "cierre_abs_pp": 10.1,
+                "variables": ["rendimiento_real_10", "compras_bc_ton", "gpr", "log_gld_ton"],
+            }
+        ),
+        [],
+    )
+    texto_con = _texto_relato(con_extra)
+    assert "las compras de bancos centrales" in texto_con
+    assert "el riesgo geopolítico" in texto_con
+    assert "acercan la brecha a cero en 10.1 puntos" in texto_con
+    assert "105 dólares" in texto_con
+
+
+def probar_relato_confianza_contra_el_baseline() -> None:
+    modulo = _modulo_export()
+    relato = modulo.construir_relato(_modelo_de_prueba(), [])
+    texto = _texto_relato(relato)
+    assert "se equivoca más que asumir que el precio no cambia" in texto
+    assert "2.50% de error contra 1.20%" in texto
+    assert "no le gana a la idea de que el precio no cambia" in texto
+    assert "A 5 días de mercado la cuenta apunta al alza: +1.00%" in texto
+    assert "hacia 111.10 dólares" in texto
+    assert "A 20 días de mercado la cuenta apunta a la baja: -2.00%" in texto
+    assert "Esa banda incluye subida y bajada." in texto
+    vacio = dict(_modelo_de_prueba())
+    vacio["precision"] = {
+        "5": {"le_gana_al_cero": False, "errores": {"sin_solapar": {}}, "metricas": {"sin_solapar": {}}, "en_vivo": {"n": 0}},
+        "20": {"le_gana_al_cero": False, "errores": {"sin_solapar": {}}, "metricas": {"sin_solapar": {}}, "en_vivo": {"n": 0}},
+    }
+    vacio["pronosticos"] = {}
+    texto_vacio = _texto_relato(modulo.construir_relato(vacio, []))
+    assert "No tengo el pronóstico a 5 días." in texto_vacio
+    assert "no tengo el error contra el baseline" in texto_vacio
+
+
+def probar_relato_cierra_sin_venderlo_como_consejo() -> None:
+    modulo = _modulo_export()
+    relato = modulo.construir_relato(_modelo_de_prueba(), [])
+    cierre = relato["secciones"][-1]["parrafos"][0].lower()
+    assert "no es asesoría financiera" in cierre
+    assert "compra en partes" in cierre
+    assert relato["secciones"][-1]["id"] == "cierre"
+    assert "no le gana a pensar que el precio no cambia" in cierre
+
+
 def main() -> None:
     funciones = [valor for nombre, valor in sorted(globals().items()) if nombre.startswith("probar_")]
     fallos = 0

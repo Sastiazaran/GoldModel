@@ -1,5 +1,5 @@
 {
-  "generado_en": "2026-10-28T17:41:02Z",
+  "generado_en": "2026-10-28T19:21:18Z",
   "aviso": "No es asesoría financiera. El pronóstico a 5 y 20 días se compara con predecir que el precio no cambia. Si no le gana, la flecha es la cuenta, no una señal.",
   "grafica_desde": "2020-01-01",
   "reportes": [
@@ -346,6 +346,443 @@
       "notas": "Cifras del log de Notion (Log del Oro), entrada del 28 de octubre de 2026. El precio es la lectura de la mañana, no el cierre del futuro COMEX. No es asesoría financiera."
     }
   ],
+  "relato": {
+    "titulo": "La historia del oro",
+    "fecha": "2026-10-28",
+    "intro": "Te la platico con los números de esta exportación. No está escrita a mano. Si falta un dato, se dice, y no se rellena.",
+    "secciones": [
+      {
+        "id": "donde",
+        "paso": "01",
+        "kicker": "Dónde está",
+        "titulo": "El precio, y cómo llegó hasta aquí",
+        "parrafos": [
+          "Por la mañana del 28 de octubre de 2026 el spot del log anda en 4,047 dólares. La cifra del log está marcada como aproximada. Es la lectura del reporte, no el cierre del futuro.",
+          "En pesos el log lo deja en 2,427 el gramo, con el dólar a 18.6525 (27 de octubre de 2026).",
+          "Contra el cierre previo bajó 0.3%, unos 12.30 dólares.",
+          "El futuro GC=F cerró el 28 de octubre de 2026 en 4,051.40 dólares.",
+          "En los últimos 20 días de mercado el futuro bajó 3.2%: de 4,186.70 dólares el 30 de septiembre de 2026 a 4,051.40 dólares el 28 de octubre de 2026.",
+          "En 60 días de mercado bajó 2.4%, desde 4,152.60 dólares el 4 de agosto de 2026.",
+          "En lo que va de 2026 el futuro bajó 6.7% frente al 31 de diciembre de 2025 (4,341.10 dólares).",
+          "En 2026, dentro de esta serie, el futuro tocó 5,318.40 dólares el 29 de enero de 2026 y 3,992.10 dólares el 16 de julio de 2026."
+        ],
+        "notas": [
+          {
+            "texto": "Cierre del futuro",
+            "valor": "4,051.40 dólares"
+          }
+        ],
+        "enlaces": [],
+        "grafica": {
+          "tipo": "linea",
+          "titulo": "Futuro, últimos días de mercado",
+          "puntos": [
+            {
+              "fecha": "2026-08-05",
+              "valor": 4305.2
+            },
+            {
+              "fecha": "2026-08-06",
+              "valor": 4299.6
+            },
+            {
+              "fecha": "2026-08-07",
+              "valor": 4399.7
+            },
+            {
+              "fecha": "2026-08-10",
+              "valor": 4419.7
+            },
+            {
+              "fecha": "2026-08-11",
+              "valor": 4441.1
+            },
+            {
+              "fecha": "2026-08-12",
+              "valor": 4467.5
+            },
+            {
+              "fecha": "2026-08-13",
+              "valor": 4420.4
+            },
+            {
+              "fecha": "2026-08-14",
+              "valor": 4437.3
+            },
+            {
+              "fecha": "2026-08-17",
+              "valor": 4473.7
+            },
+            {
+              "fecha": "2026-08-18",
+              "valor": 4420.6
+            },
+            {
+              "fecha": "2026-08-19",
+              "valor": 4545.3
+            },
+            {
+              "fecha": "2026-08-20",
+              "valor": 4571.4
+            },
+            {
+              "fecha": "2026-08-21",
+              "valor": 4680.6
+            },
+            {
+              "fecha": "2026-08-24",
+              "valor": 4697.8
+            },
+            {
+              "fecha": "2026-08-25",
+              "valor": 4694.5
+            },
+            {
+              "fecha": "2026-08-26",
+              "valor": 4653.3
+            },
+            {
+              "fecha": "2026-08-27",
+              "valor": 4664.0
+            },
+            {
+              "fecha": "2026-08-28",
+              "valor": 4529.9
+            },
+            {
+              "fecha": "2026-08-31",
+              "valor": 4481.5
+            },
+            {
+              "fecha": "2026-09-01",
+              "valor": 4396.4
+            },
+            {
+              "fecha": "2026-09-02",
+              "valor": 4414.6
+            },
+            {
+              "fecha": "2026-09-03",
+              "valor": 4539.9
+            },
+            {
+              "fecha": "2026-09-04",
+              "valor": 4476.6
+            },
+            {
+              "fecha": "2026-09-08",
+              "valor": 4439.0
+            },
+            {
+              "fecha": "2026-09-09",
+              "valor": 4460.7
+            },
+            {
+              "fecha": "2026-09-10",
+              "valor": 4407.3
+            },
+            {
+              "fecha": "2026-09-11",
+              "valor": 4408.9
+            },
+            {
+              "fecha": "2026-09-14",
+              "valor": 4351.9
+            },
+            {
+              "fecha": "2026-09-15",
+              "valor": 4332.8
+            },
+            {
+              "fecha": "2026-09-16",
+              "valor": 4387.5
+            },
+            {
+              "fecha": "2026-09-17",
+              "valor": 4399.7
+            },
+            {
+              "fecha": "2026-09-18",
+              "valor": 4424.9
+            },
+            {
+              "fecha": "2026-09-21",
+              "valor": 4383.9
+            },
+            {
+              "fecha": "2026-09-22",
+              "valor": 4376.4
+            },
+            {
+              "fecha": "2026-09-23",
+              "valor": 4318.4
+            },
+            {
+              "fecha": "2026-09-24",
+              "valor": 4298.0
+            },
+            {
+              "fecha": "2026-09-25",
+              "valor": 4321.2
+            },
+            {
+              "fecha": "2026-09-28",
+              "valor": 4168.4
+            },
+            {
+              "fecha": "2026-09-29",
+              "valor": 4179.7
+            },
+            {
+              "fecha": "2026-09-30",
+              "valor": 4186.7
+            },
+            {
+              "fecha": "2026-10-01",
+              "valor": 4202.3
+            },
+            {
+              "fecha": "2026-10-02",
+              "valor": 4162.3
+            },
+            {
+              "fecha": "2026-10-05",
+              "valor": 4156.8
+            },
+            {
+              "fecha": "2026-10-06",
+              "valor": 4187.1
+            },
+            {
+              "fecha": "2026-10-07",
+              "valor": 4140.7
+            },
+            {
+              "fecha": "2026-10-08",
+              "valor": 4157.0
+            },
+            {
+              "fecha": "2026-10-09",
+              "valor": 4216.3
+            },
+            {
+              "fecha": "2026-10-12",
+              "valor": 4190.6
+            },
+            {
+              "fecha": "2026-10-13",
+              "valor": 4177.3
+            },
+            {
+              "fecha": "2026-10-14",
+              "valor": 4107.9
+            },
+            {
+              "fecha": "2026-10-15",
+              "valor": 4170.1
+            },
+            {
+              "fecha": "2026-10-16",
+              "valor": 4181.1
+            },
+            {
+              "fecha": "2026-10-19",
+              "valor": 4160.1
+            },
+            {
+              "fecha": "2026-10-20",
+              "valor": 4142.6
+            },
+            {
+              "fecha": "2026-10-21",
+              "valor": 4150.0
+            },
+            {
+              "fecha": "2026-10-22",
+              "valor": 4060.4
+            },
+            {
+              "fecha": "2026-10-23",
+              "valor": 4007.9
+            },
+            {
+              "fecha": "2026-10-26",
+              "valor": 4038.4
+            },
+            {
+              "fecha": "2026-10-27",
+              "valor": 4074.6
+            },
+            {
+              "fecha": "2026-10-28",
+              "valor": 4051.4
+            }
+          ],
+          "marcas": [
+            {
+              "fecha": "2026-08-05",
+              "etiqueta": "inicio del tramo"
+            },
+            {
+              "fecha": "2026-10-28",
+              "etiqueta": "último cierre"
+            }
+          ]
+        }
+      },
+      {
+        "id": "impulso",
+        "paso": "02",
+        "kicker": "Qué lo empuja",
+        "titulo": "Lo que dicen los reportes de estos días",
+        "parrafos": [
+          "En los reportes de estos días: «Peso mexicano» sale en 6 días, la última el 28 de octubre de 2026; «Fed» sale en 4 días, la última el 26 de octubre de 2026; «Petróleo y una refinería en Arabia Saudita» sale en 1 día, la última el 28 de octubre de 2026.",
+          "El día con más movimiento en el log fue el 22 de octubre de 2026: bajó 1.6%.",
+          "El log lo escribió así: «−$64.20 (−1.55%) vs cierre ~$4,140; más bajo desde 14 oct».",
+          "La lectura del 28 de octubre de 2026, tal como quedó en el log: «Aguanta arriba de $4,000, pero petróleo alto y dólar firme pesan. Fed hoy 12:00 (Warsh) y PCE jueves 6:30 deciden el rumbo.»."
+        ],
+        "notas": [],
+        "enlaces": [
+          {
+            "texto": "Peso mexicano",
+            "detalle": "El FIX del 27 de octubre fue 18.6525, más débil que el 18.5798 del 26. Por eso el oro en pesos sube frente a ayer aunque en dólares baje.",
+            "fuente": "Banxico",
+            "url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+            "fecha": "2026-10-28"
+          },
+          {
+            "texto": "Fed",
+            "detalle": "La decisión es el miércoles 28. Este día el log cita cerca de 9% de alza en esa reunión y cerca de 80% en diciembre.",
+            "fuente": "Reuters vía CNBC",
+            "url": "https://www.cnbc.com/2026/10/26/gold-gains-on-softer-oil-prices-fed-decision-in-focus.html",
+            "fecha": "2026-10-26"
+          },
+          {
+            "texto": "Petróleo y una refinería en Arabia Saudita",
+            "detalle": "El petróleo subió más de 2 dólares tras un ataque a una refinería en Arabia Saudita. El log deja el Brent arriba de 110 dólares y cita el riesgo de una Fed más dura.",
+            "fuente": "Reuters vía CNBC",
+            "url": "https://www.cnbc.com/2026/10/28/gold-slips-on-oil-fueled-inflation-fears-ahead-of-fed-meeting.html",
+            "fecha": "2026-10-28"
+          }
+        ],
+        "grafica": {
+          "tipo": "barras",
+          "titulo": "Cambio del día en el log, %",
+          "puntos": [
+            {
+              "etiqueta": "10-21",
+              "valor": 0.3
+            },
+            {
+              "etiqueta": "10-22",
+              "valor": -1.55
+            },
+            {
+              "etiqueta": "10-23",
+              "valor": 0.04
+            },
+            {
+              "etiqueta": "10-26",
+              "valor": 0.16
+            },
+            {
+              "etiqueta": "10-27",
+              "valor": 0.22
+            },
+            {
+              "etiqueta": "10-28",
+              "valor": -0.3
+            }
+          ]
+        }
+      },
+      {
+        "id": "modelo",
+        "paso": "03",
+        "kicker": "Qué dice la cuenta",
+        "titulo": "El valor justo, y por qué queda hueco",
+        "parrafos": [
+          "El cierre del futuro está en 4,051.40 dólares. El valor justo, armado solo con lo ya conocido (tasas, dólar, petróleo, nerviosismo e inflación), queda en 2,954.04 dólares. El precio está 37.1% por encima de esa cuenta.",
+          "Una brecha así de ancha puede durar. No es una orden de vender ni de comprar.",
+          "El modelo base no ve las compras de bancos centrales, el oro guardado en GLD y el riesgo geopolítico. En esta corrida sí entran, y acercan la brecha a cero en 10.1 puntos. Con esas series la brecha queda en +27.0%. El valor justo ampliado queda en 3,189.46 dólares. Cierran una parte. El resto del hueco sigue ahí."
+        ],
+        "notas": [
+          {
+            "texto": "Valor justo",
+            "valor": "2,954.04 dólares"
+          },
+          {
+            "texto": "Valor justo ampliado",
+            "valor": "3,189.46 dólares"
+          }
+        ],
+        "enlaces": [],
+        "grafica": {
+          "tipo": "barras",
+          "titulo": "Dólares por onza",
+          "puntos": [
+            {
+              "etiqueta": "Cierre",
+              "valor": 4051.4
+            },
+            {
+              "etiqueta": "Valor justo",
+              "valor": 2954.04
+            },
+            {
+              "etiqueta": "Con lo que el base no ve",
+              "valor": 3189.46
+            }
+          ]
+        }
+      },
+      {
+        "id": "confianza",
+        "paso": "04",
+        "kicker": "Cuánto creerle",
+        "titulo": "A dónde apunta, y qué tan seguido le atina",
+        "parrafos": [
+          "A 5 días de mercado la cuenta apunta al alza: +0.96%, hacia 4,090.47 dólares. La banda de un error típico va de -1.3% a +3.3%. Esa banda incluye subida y bajada.",
+          "A 20 días de mercado la cuenta apunta al alza: +3.67%, hacia 4,200.23 dólares. La banda de un error típico va de -1.2% a +8.8%. Esa banda incluye subida y bajada.",
+          "A 5 días, el modelo se equivoca más que asumir que el precio no cambia: 1.70% de error contra 1.68%. El R² contra cero es -0.021: no le gana a la idea de que el precio no cambia. La dirección coincidió el 50.5%. Siempre decir que sube habría acertado el 55.6%. Ya con el precio realizado, acertó 375 de 743 (50.5%).",
+          "A 20 días, el modelo se equivoca más que asumir que el precio no cambia: 3.73% de error contra 3.66%. El R² contra cero es -0.055: no le gana a la idea de que el precio no cambia. La dirección coincidió el 53.0%. Siempre decir que sube habría acertado el 51.4%. Ya con el precio realizado, acertó 98 de 185 (53.0%).",
+          "Ni a 5 ni a 20 días esta cuenta le gana a pensar que el precio no cambia. La flecha es la cuenta, no una señal para irse de lleno."
+        ],
+        "notas": [],
+        "enlaces": [],
+        "grafica": {
+          "tipo": "comparacion",
+          "titulo": "Error típico, en % del retorno",
+          "filas": [
+            {
+              "etiqueta": "5 días",
+              "modelo": 1.7,
+              "base": 1.68,
+              "acierto": 0.505
+            },
+            {
+              "etiqueta": "20 días",
+              "modelo": 3.73,
+              "base": 3.66,
+              "acierto": 0.53
+            }
+          ]
+        }
+      },
+      {
+        "id": "cierre",
+        "paso": "05",
+        "kicker": "Con calma",
+        "titulo": "Si vas a hacer algo, hazlo en partes",
+        "parrafos": [
+          "Para cerrar, con calma. Esto no es asesoría financiera. A unos días el modelo no le gana a pensar que el precio no cambia. Que el precio esté lejos del valor justo no te dice el día en que va a regresar. Si vas a comprar, compra en partes: no tiene caso jugártela toda en un solo día."
+        ],
+        "notas": [],
+        "enlaces": [],
+        "grafica": null
+      }
+    ]
+  },
   "modelo": {
     "fecha": "2026-10-28",
     "instrumento": "GC=F",

@@ -474,6 +474,557 @@ def serie_grafica(df: pd.DataFrame, desde: str = DESDE_GRAFICA) -> list[dict]:
     return puntos
 
 
+MESES = (
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+)
+EXTRAS_BRECHA = (
+    ("compras_bc_ton", "las compras de bancos centrales"),
+    ("log_gld_ton", "el oro guardado en GLD"),
+    ("gpr", "el riesgo geopolítico"),
+)
+
+
+def _usd_texto(valor) -> str | None:
+    numero = _num(valor)
+    if numero is None:
+        return None
+    if abs(numero - round(numero)) < 0.005:
+        return f"{numero:,.0f} dólares"
+    return f"{numero:,.2f} dólares"
+
+
+def _fecha_hablada(iso: str | None) -> str | None:
+    if not iso or not isinstance(iso, str) or len(iso) < 10:
+        return None
+    try:
+        anio, mes, dia = (int(parte) for parte in iso[:10].split("-"))
+    except ValueError:
+        return None
+    if not 1 <= mes <= 12:
+        return None
+    return f"{dia} de {MESES[mes - 1]} de {anio}"
+
+
+def _frase_cambio(pct) -> str | None:
+    numero = _num(pct)
+    if numero is None:
+        return None
+    if numero > 0.05:
+        return f"subió {numero:.1f}%"
+    if numero < -0.05:
+        return f"bajó {abs(numero):.1f}%"
+    return "quedó casi igual"
+
+
+def _frase_brecha(pct) -> str | None:
+    numero = _num(pct)
+    if numero is None:
+        return None
+    if numero > 0.05:
+        return f"está {numero:.1f}% por encima"
+    if numero < -0.05:
+        return f"está {abs(numero):.1f}% por debajo"
+    return "está pegado"
+
+
+def _puntos_historia(modelo: dict | None) -> list[dict]:
+    if not modelo:
+        return []
+    puntos = []
+    for punto in modelo.get("historia") or []:
+        precio = _num(punto.get("precio"))
+        fecha = punto.get("fecha")
+        if precio is None or precio <= 0 or not fecha:
+            continue
+        puntos.append({"fecha": str(fecha)[:10], "precio": precio})
+    return puntos
+
+
+def _hace(puntos: list[dict], sesiones: int) -> dict | None:
+    if len(puntos) <= sesiones:
+        return None
+    return puntos[-1 - sesiones]
+
+
+def _texto_relato(relato: dict) -> str:
+    partes = [relato.get("intro") or ""]
+    for seccion in relato.get("secciones") or []:
+        partes.extend(seccion.get("parrafos") or [])
+    return "\n".join(partes)
+
+
+def _enlaces_drivers(reportes: list[dict]) -> tuple[str, list[dict]]:
+    """Arma la frase de temas y las citas literales de los reportes."""
+    con_registro = [reporte for reporte in reportes if reporte.get("sesion") == "con_registro"]
+    if not con_registro:
+        return "No hay reportes con registro en esta exportación.", []
+    temas: dict[str, dict] = {}
+    for reporte in con_registro:
+        for driver in reporte.get("drivers") or []:
+            titulo = (driver.get("titulo") or "").strip()
+            if not titulo:
+                continue
+            actual = temas.setdefault(
+                titulo,
+                {"titulo": titulo, "n": 0, "fecha": "", "detalle": "", "fuente": "", "url": ""},
+            )
+            actual["n"] += 1
+            fecha = str(reporte.get("fecha") or "")
+            if fecha >= actual["fecha"]:
+                actual["fecha"] = fecha
+                actual["detalle"] = (driver.get("detalle") or "").strip()
+                actual["fuente"] = (driver.get("fuente") or "").strip()
+                actual["url"] = driver.get("url") or ""
+    if not temas:
+        return "No hay drivers en los reportes de estos días.", []
+    ordenados = sorted(temas.values(), key=lambda tema: (tema["n"], tema["fecha"]), reverse=True)
+    frases = []
+    enlaces = []
+    for tema in ordenados[:3]:
+        cuando = _fecha_hablada(tema["fecha"]) or tema["fecha"]
+        veces = "1 día" if tema["n"] == 1 else f"{tema['n']} días"
+        frases.append(f"«{tema['titulo']}» sale en {veces}, la última el {cuando}")
+        if tema["detalle"]:
+            enlaces.append(
+                {
+                    "texto": tema["titulo"],
+                    "detalle": tema["detalle"],
+                    "fuente": tema["fuente"] or "Fuente del log",
+                    "url": tema["url"] or None,
+                    "fecha": tema["fecha"],
+                }
+            )
+    return "En los reportes de estos días: " + "; ".join(frases) + ".", enlaces
+
+
+def _parrafos_donde(modelo: dict | None, reportes: list[dict], puntos: list[dict]) -> tuple[list[str], dict | None, list[dict]]:
+    parrafos: list[str] = []
+    notas: list[dict] = []
+    ultimo_reporte = None
+    for reporte in reversed(reportes):
+        if reporte.get("sesion") == "con_registro" and _num(reporte.get("precio_usd_oz")):
+            ultimo_reporte = reporte
+            break
+    if ultimo_reporte is None:
+        parrafos.append("No hay lectura de la mañana en los reportes.")
+    else:
+        precio = _usd_texto(ultimo_reporte["precio_usd_oz"])
+        cuando = _fecha_hablada(ultimo_reporte.get("fecha")) or "ese día"
+        aprox = " La cifra del log está marcada como aproximada." if ultimo_reporte.get("precio_aproximado") else ""
+        parrafos.append(f"Por la mañana del {cuando} el spot del log anda en {precio}.{aprox} Es la lectura del reporte, no el cierre del futuro.")
+        if _num(ultimo_reporte.get("mxn_por_gramo")) is not None:
+            gramos = f"{float(ultimo_reporte['mxn_por_gramo']):,.0f}"
+            extra = ""
+            if _num(ultimo_reporte.get("usd_mxn")) is not None:
+                extra = f", con el dólar a {float(ultimo_reporte['usd_mxn']):,.4f}"
+                if ultimo_reporte.get("usd_mxn_fecha"):
+                    extra += f" ({_fecha_hablada(ultimo_reporte['usd_mxn_fecha'])})"
+            parrafos.append(f"En pesos el log lo deja en {gramos} el gramo{extra}.")
+        cambio = _frase_cambio(ultimo_reporte.get("cambio_pct"))
+        if cambio and _num(ultimo_reporte.get("cambio_usd")) is not None:
+            parrafos.append(
+                f"Contra el cierre previo {cambio}, unos {abs(float(ultimo_reporte['cambio_usd'])):,.2f} dólares."
+            )
+        elif cambio:
+            parrafos.append(f"Contra el cierre previo {cambio}.")
+        else:
+            parrafos.append("El reporte no trae el cambio contra el cierre previo.")
+
+    if not modelo or _num((modelo or {}).get("precio_usd_oz")) is None:
+        parrafos.append("No tengo el cierre del futuro en esta exportación.")
+    else:
+        cuando = _fecha_hablada(modelo.get("fecha")) or "el último día del modelo"
+        parrafos.append(
+            f"El futuro {modelo.get('instrumento') or 'GC=F'} cerró el {cuando} en {_usd_texto(modelo['precio_usd_oz'])}."
+        )
+        notas.append({"texto": "Cierre del futuro", "valor": _usd_texto(modelo["precio_usd_oz"])})
+
+    if len(puntos) <= 20:
+        parrafos.append("No tengo 20 días de mercado en la serie para contar el tramo reciente.")
+    else:
+        antes = _hace(puntos, 20)
+        ultimo = puntos[-1]
+        pct = (ultimo["precio"] / antes["precio"] - 1.0) * 100.0
+        parrafos.append(
+            f"En los últimos 20 días de mercado el futuro {_frase_cambio(pct)}: "
+            f"de {_usd_texto(antes['precio'])} el {_fecha_hablada(antes['fecha'])} "
+            f"a {_usd_texto(ultimo['precio'])} el {_fecha_hablada(ultimo['fecha'])}."
+        )
+    if len(puntos) <= 60:
+        parrafos.append("No tengo 60 días de mercado en la serie para ese tramo.")
+    else:
+        antes = _hace(puntos, 60)
+        ultimo = puntos[-1]
+        pct = (ultimo["precio"] / antes["precio"] - 1.0) * 100.0
+        parrafos.append(
+            f"En 60 días de mercado {_frase_cambio(pct)}, desde {_usd_texto(antes['precio'])} "
+            f"el {_fecha_hablada(antes['fecha'])}."
+        )
+
+    if puntos:
+        anio = int(puntos[-1]["fecha"][:4])
+        del_anio = [punto for punto in puntos if punto["fecha"].startswith(f"{anio}-")]
+        anteriores = [punto for punto in puntos if punto["fecha"] < f"{anio}-01-01"]
+        if not anteriores:
+            parrafos.append(f"No tengo el cierre de {anio - 1} en la serie, así que no hay variación del año.")
+        else:
+            base = anteriores[-1]
+            pct = (puntos[-1]["precio"] / base["precio"] - 1.0) * 100.0
+            parrafos.append(
+                f"En lo que va de {anio} el futuro {_frase_cambio(pct)} frente al {_fecha_hablada(base['fecha'])} "
+                f"({_usd_texto(base['precio'])})."
+            )
+        if del_anio:
+            alto = max(del_anio, key=lambda punto: punto["precio"])
+            bajo = min(del_anio, key=lambda punto: punto["precio"])
+            parrafos.append(
+                f"En {anio}, dentro de esta serie, el futuro tocó {_usd_texto(alto['precio'])} "
+                f"el {_fecha_hablada(alto['fecha'])} y {_usd_texto(bajo['precio'])} "
+                f"el {_fecha_hablada(bajo['fecha'])}."
+            )
+    else:
+        parrafos.append("No tengo serie de precios para contar cómo llegó hasta aquí.")
+
+    grafica = None
+    if len(puntos) >= 2:
+        ventana = puntos[-60:]
+        grafica = {
+            "tipo": "linea",
+            "titulo": "Futuro, últimos días de mercado",
+            "puntos": [{"fecha": punto["fecha"], "valor": round(punto["precio"], 2)} for punto in ventana],
+            "marcas": [
+                {"fecha": ventana[0]["fecha"], "etiqueta": "inicio del tramo"},
+                {"fecha": ventana[-1]["fecha"], "etiqueta": "último cierre"},
+            ],
+        }
+    return parrafos, grafica, notas
+
+
+def _parrafos_modelo(modelo: dict | None) -> tuple[list[str], dict | None, list[dict]]:
+    parrafos: list[str] = []
+    notas: list[dict] = []
+    barras = []
+    if not modelo or _num((modelo or {}).get("valor_justo_usd")) is None or _num((modelo or {}).get("precio_usd_oz")) is None:
+        parrafos.append("No tengo valor justo en esta exportación.")
+        return parrafos, None, notas
+    precio = float(modelo["precio_usd_oz"])
+    justo = float(modelo["valor_justo_usd"])
+    brecha = _frase_brecha(modelo.get("brecha_pct"))
+    if brecha is None:
+        parrafos.append(
+            f"El cierre del futuro está en {_usd_texto(precio)} y el valor justo, solo con el pasado, en {_usd_texto(justo)}. "
+            "No tengo la brecha en porcentaje."
+        )
+    else:
+        parrafos.append(
+            f"El cierre del futuro está en {_usd_texto(precio)}. El valor justo, armado solo con lo ya conocido "
+            f"(tasas, dólar, petróleo, nerviosismo e inflación), queda en {_usd_texto(justo)}. "
+            f"El precio {brecha} de esa cuenta."
+        )
+        if _num(modelo.get("brecha_pct")) is not None and abs(float(modelo["brecha_pct"])) > 15:
+            parrafos.append("Una brecha así de ancha puede durar. No es una orden de vender ni de comprar.")
+    notas.append({"texto": "Valor justo", "valor": _usd_texto(justo)})
+    barras.append({"etiqueta": "Cierre", "valor": round(precio, 2)})
+    barras.append({"etiqueta": "Valor justo", "valor": round(justo, 2)})
+
+    ampliado = modelo.get("ampliado")
+    if not ampliado:
+        parrafos.append(
+            "No hay valor justo ampliado en esta exportación, así que no puedo decir si "
+            "bancos centrales o geopolítica explican el hueco."
+        )
+    else:
+        variables = set(ampliado.get("variables") or [])
+        nombres = [frase for clave, frase in EXTRAS_BRECHA if clave in variables]
+        justo_ext = _usd_texto(ampliado.get("valor_justo_usd"))
+        brecha_ext = _num(ampliado.get("brecha_pct"))
+        cierre = _num(ampliado.get("cierre_abs_pp"))
+        if not nombres:
+            parrafos.append(
+                "Hay un valor justo ampliado, pero no trae compras de bancos centrales, GLD ni riesgo geopolítico. "
+                "No voy a decir que el hueco es por eso."
+            )
+        else:
+            if len(nombres) == 1:
+                lista = nombres[0]
+            else:
+                lista = ", ".join(nombres[:-1]) + " y " + nombres[-1]
+            if cierre is None:
+                efecto = "no tengo en cuántos puntos mueven la brecha"
+            elif cierre > 1:
+                efecto = f"acercan la brecha a cero en {cierre:.1f} puntos"
+            elif cierre < -1:
+                efecto = f"alejan la brecha de cero en {abs(cierre):.1f} puntos"
+            else:
+                efecto = f"casi no mueven la brecha ({cierre:.1f} puntos)"
+            frase_brecha = (
+                f" Con esas series la brecha queda en {brecha_ext:+.1f}%."
+                if brecha_ext is not None
+                else " No tengo la brecha del modelo ampliado."
+            )
+            if cierre is not None and cierre > 1:
+                cola = " Cierran una parte. El resto del hueco sigue ahí."
+            elif cierre is not None and cierre < -1:
+                cola = " No explican el hueco: lo dejan más lejos."
+            else:
+                cola = " Casi no cambia la historia."
+            nivel = f" El valor justo ampliado queda en {justo_ext}." if justo_ext else " No tengo el nivel del valor justo ampliado."
+            parrafos.append(
+                f"El modelo base no ve {lista}. En esta corrida sí entran, y {efecto}.{frase_brecha}{nivel}{cola}"
+            )
+        if _num(ampliado.get("valor_justo_usd")) is not None:
+            barras.append({"etiqueta": "Con lo que el base no ve", "valor": round(float(ampliado["valor_justo_usd"]), 2)})
+            if justo_ext:
+                notas.append({"texto": "Valor justo ampliado", "valor": justo_ext})
+    grafica = {"tipo": "barras", "titulo": "Dólares por onza", "puntos": barras} if len(barras) >= 2 else None
+    return parrafos, grafica, notas
+
+
+def _frase_pronostico(info: dict | None, horizonte: int) -> str:
+    if not info or _num(info.get("retorno_pct")) is None:
+        return f"No tengo el pronóstico a {horizonte} días."
+    hacia = {"alza": "al alza", "baja": "a la baja"}.get(info.get("direccion"), "a un cambio de cero")
+    frase = f"A {horizonte} días de mercado la cuenta apunta {hacia}: {float(info['retorno_pct']):+.2f}%"
+    if _num(info.get("nivel_objetivo_usd")) is not None:
+        frase += f", hacia {_usd_texto(info['nivel_objetivo_usd'])}."
+    else:
+        frase += ". No tengo el nivel objetivo."
+    bajo = _num(info.get("banda_baja_pct"))
+    alto = _num(info.get("banda_alta_pct"))
+    if bajo is None or alto is None:
+        frase += " No tengo la banda de error de este horizonte."
+    else:
+        frase += f" La banda de un error típico va de {bajo:+.1f}% a {alto:+.1f}%."
+        if bajo < 0 < alto:
+            frase += " Esa banda incluye subida y bajada."
+    if info.get("senal_debil"):
+        frase += " La señal cabe en el error típico."
+    return frase
+
+
+def _frase_confianza(horizonte: int, bloque: dict | None) -> str:
+    if not bloque:
+        return f"No tengo la precisión a {horizonte} días."
+    errores = (bloque.get("errores") or {}).get("sin_solapar") or {}
+    metricas = (bloque.get("metricas") or {}).get("sin_solapar") or {}
+    mae = _num(errores.get("mae_pct"))
+    mae_base = _num(errores.get("mae_cero_pct"))
+    partes = [f"A {horizonte} días,"]
+    if mae is None or mae_base is None:
+        partes.append("no tengo el error contra el baseline de que el precio no cambia.")
+    elif mae > mae_base + 0.005:
+        partes.append(
+            f"el modelo se equivoca más que asumir que el precio no cambia: {mae:.2f}% de error contra {mae_base:.2f}%."
+        )
+    elif mae < mae_base - 0.005:
+        partes.append(
+            f"el modelo se equivoca menos que asumir que el precio no cambia: {mae:.2f}% de error contra {mae_base:.2f}%."
+        )
+    else:
+        partes.append(
+            f"el error queda casi igual que el de no mover el precio ({mae:.2f}% contra {mae_base:.2f}%)."
+        )
+    r2_cero = _num(metricas.get("r2_cero"))
+    if r2_cero is None:
+        partes.append("No tengo el R² contra cero.")
+    elif r2_cero < 0:
+        partes.append(f"El R² contra cero es {r2_cero:+.3f}: no le gana a la idea de que el precio no cambia.")
+    else:
+        partes.append(f"El R² contra cero es {r2_cero:+.3f}.")
+    acierto = _num(metricas.get("acierto"))
+    siempre = _num(metricas.get("acierto_siempre_alza"))
+    if acierto is None:
+        partes.append("No tengo el acierto de dirección.")
+    elif siempre is None:
+        partes.append(f"La dirección coincidió el {acierto * 100:.1f}%. No tengo el acierto de siempre alza.")
+    else:
+        partes.append(
+            f"La dirección coincidió el {acierto * 100:.1f}%. Siempre decir que sube habría acertado el {siempre * 100:.1f}%."
+        )
+    vivo = bloque.get("en_vivo") or {}
+    n = vivo.get("n")
+    if not n:
+        partes.append("Todavía no hay pronósticos vencidos para contar un acierto en vivo.")
+    else:
+        tasa = _num(vivo.get("tasa"))
+        tasa_txt = f" ({tasa * 100:.1f}%)" if tasa is not None else ""
+        partes.append(f"Ya con el precio realizado, acertó {vivo.get('aciertos')} de {n}{tasa_txt}.")
+    return " ".join(partes)
+
+
+def _parrafos_confianza(modelo: dict | None) -> tuple[list[str], dict | None]:
+    if not modelo:
+        return ["No tengo pronósticos ni precisión en esta exportación."], None
+    pronosticos = modelo.get("pronosticos") or {}
+    precision = modelo.get("precision") or {}
+    parrafos = [
+        _frase_pronostico(pronosticos.get("5"), 5),
+        _frase_pronostico(pronosticos.get("20"), 20),
+        _frase_confianza(5, precision.get("5")),
+        _frase_confianza(20, precision.get("20")),
+    ]
+    if precision.get("5") and precision.get("20"):
+        gana = precision["5"].get("le_gana_al_cero") or precision["20"].get("le_gana_al_cero")
+        if not gana:
+            parrafos.append("Ni a 5 ni a 20 días esta cuenta le gana a pensar que el precio no cambia. La flecha es la cuenta, no una señal para irse de lleno.")
+    filas = []
+    for horizonte in ("5", "20"):
+        bloque = precision.get(horizonte) or {}
+        errores = (bloque.get("errores") or {}).get("sin_solapar") or {}
+        metricas = (bloque.get("metricas") or {}).get("sin_solapar") or {}
+        if _num(errores.get("mae_pct")) is None and _num(errores.get("mae_cero_pct")) is None:
+            continue
+        filas.append(
+            {
+                "etiqueta": f"{horizonte} días",
+                "modelo": _redondear(errores.get("mae_pct"), 2),
+                "base": _redondear(errores.get("mae_cero_pct"), 2),
+                "acierto": _redondear(metricas.get("acierto"), 3),
+            }
+        )
+    grafica = {"tipo": "comparacion", "titulo": "Error típico, en % del retorno", "filas": filas} if filas else None
+    return parrafos, grafica
+
+
+def _cierre(modelo: dict | None) -> str:
+    partes = ["Para cerrar, con calma. Esto no es asesoría financiera."]
+    precision = (modelo or {}).get("precision") or {}
+    if not precision:
+        partes.append("Hoy no tengo la nota del modelo para decir si la flecha merece confianza.")
+    else:
+        gana = any((precision.get(horizonte) or {}).get("le_gana_al_cero") for horizonte in ("5", "20"))
+        if gana:
+            partes.append("En algún horizonte la cuenta le gana al baseline de no cambiar, y aun así la banda de error manda.")
+        else:
+            partes.append("A unos días el modelo no le gana a pensar que el precio no cambia.")
+    brecha = _num((modelo or {}).get("brecha_pct"))
+    if brecha is not None and abs(brecha) > 15:
+        partes.append("Que el precio esté lejos del valor justo no te dice el día en que va a regresar.")
+    partes.append("Si vas a comprar, compra en partes: no tiene caso jugártela toda en un solo día.")
+    return " ".join(partes)
+
+
+def construir_relato(modelo: dict | None, reportes: list[dict] | None) -> dict:
+    """Arma «La historia del oro» solo con números que ya vienen en el export.
+
+    Las frases son plantillas. Si un campo no está, el texto lo dice y no
+    rellena la cifra.
+    """
+    reportes = list(reportes or [])
+    puntos = _puntos_historia(modelo)
+    donde, grafica_donde, notas_donde = _parrafos_donde(modelo, reportes, puntos)
+    temas, enlaces = _enlaces_drivers(reportes)
+    parrafos_impulso = [temas]
+    movido = None
+    for reporte in reportes:
+        if reporte.get("sesion") != "con_registro" or _num(reporte.get("cambio_pct")) is None:
+            continue
+        if movido is None or abs(float(reporte["cambio_pct"])) > abs(float(movido["cambio_pct"])):
+            movido = reporte
+    if movido is not None:
+        cuando = _fecha_hablada(movido.get("fecha")) or movido.get("fecha")
+        parrafos_impulso.append(
+            f"El día con más movimiento en el log fue el {cuando}: {_frase_cambio(movido['cambio_pct'])}."
+        )
+        if movido.get("cambio_texto"):
+            parrafos_impulso.append(f"El log lo escribió así: «{movido['cambio_texto']}».")
+    else:
+        parrafos_impulso.append("Ningún reporte trae el cambio del día, así que no hay un movimiento destacado.")
+    lectura = None
+    for reporte in reversed(reportes):
+        if reporte.get("sesion") == "con_registro" and (reporte.get("lectura") or "").strip():
+            lectura = reporte
+            break
+    if lectura:
+        parrafos_impulso.append(
+            f"La lectura del {_fecha_hablada(lectura.get('fecha')) or 'último reporte'}, tal como quedó en el log: «{lectura['lectura'].strip()}»."
+        )
+    barras_dias = []
+    for reporte in reportes:
+        if _num(reporte.get("cambio_pct")) is None:
+            continue
+        barras_dias.append(
+            {
+                "etiqueta": (reporte.get("fecha") or "")[5:10],
+                "valor": round(float(reporte["cambio_pct"]), 2),
+            }
+        )
+    grafica_impulso = (
+        {"tipo": "barras", "titulo": "Cambio del día en el log, %", "puntos": barras_dias}
+        if barras_dias
+        else None
+    )
+    modelo_pars, grafica_modelo, notas_modelo = _parrafos_modelo(modelo)
+    confianza, grafica_confianza = _parrafos_confianza(modelo)
+    cierre = _cierre(modelo)
+    fecha = None
+    if modelo and modelo.get("fecha"):
+        fecha = str(modelo["fecha"])[:10]
+    elif reportes:
+        fecha = reportes[-1].get("fecha")
+    return {
+        "titulo": "La historia del oro",
+        "fecha": fecha,
+        "intro": (
+            "Te la platico con los números de esta exportación. No está escrita a mano. "
+            "Si falta un dato, se dice, y no se rellena."
+        ),
+        "secciones": [
+            {
+                "id": "donde",
+                "paso": "01",
+                "kicker": "Dónde está",
+                "titulo": "El precio, y cómo llegó hasta aquí",
+                "parrafos": donde,
+                "notas": notas_donde,
+                "enlaces": [],
+                "grafica": grafica_donde,
+            },
+            {
+                "id": "impulso",
+                "paso": "02",
+                "kicker": "Qué lo empuja",
+                "titulo": "Lo que dicen los reportes de estos días",
+                "parrafos": parrafos_impulso,
+                "notas": [],
+                "enlaces": enlaces,
+                "grafica": grafica_impulso,
+            },
+            {
+                "id": "modelo",
+                "paso": "03",
+                "kicker": "Qué dice la cuenta",
+                "titulo": "El valor justo, y por qué queda hueco",
+                "parrafos": modelo_pars,
+                "notas": notas_modelo,
+                "enlaces": [],
+                "grafica": grafica_modelo,
+            },
+            {
+                "id": "confianza",
+                "paso": "04",
+                "kicker": "Cuánto creerle",
+                "titulo": "A dónde apunta, y qué tan seguido le atina",
+                "parrafos": confianza,
+                "notas": [],
+                "enlaces": [],
+                "grafica": grafica_confianza,
+            },
+            {
+                "id": "cierre",
+                "paso": "05",
+                "kicker": "Con calma",
+                "titulo": "Si vas a hacer algo, hazlo en partes",
+                "parrafos": [cierre],
+                "notas": [],
+                "enlaces": [],
+                "grafica": None,
+            },
+        ],
+    }
+
+
 def construir_snapshot(datos: dict, valor: dict, pronostico: dict, reportes: list[dict]) -> dict:
     """Junta el modelo ya estimado y los reportes diarios en un solo objeto."""
     df = pronostico["df"]
@@ -532,6 +1083,7 @@ def construir_snapshot(datos: dict, valor: dict, pronostico: dict, reportes: lis
         ),
         "grafica_desde": DESDE_GRAFICA,
         "reportes": reportes,
+        "relato": None,
         "modelo": {
             "fecha": _fecha_texto(fecha_modelo),
             "instrumento": "GC=F",
@@ -561,6 +1113,7 @@ def construir_snapshot(datos: dict, valor: dict, pronostico: dict, reportes: lis
             "avisos": list(datos.get("avisos") or []),
         },
     }
+    snapshot["relato"] = construir_relato(snapshot["modelo"], reportes)
     return sanitizar(snapshot)
 
 
@@ -609,6 +1162,13 @@ def main(argv: list[str] | None = None) -> None:
     ruta_reportes = escribir_reportes(reportes)
     print(f"Reportes: {len(reportes)} días → {ruta_reportes}", file=sys.stderr)
     if args.solo_reportes:
+        ruta_snapshot = CARPETA_TABLERO / "snapshot.json"
+        if ruta_snapshot.exists():
+            previo = json.loads(ruta_snapshot.read_text(encoding="utf-8"))
+            previo["reportes"] = reportes
+            previo["relato"] = construir_relato(previo.get("modelo"), reportes)
+            escribir_snapshot(sanitizar(previo))
+            print(f"Historia actualizada en {ruta_snapshot}", file=sys.stderr)
         return
 
     if args.sin_descarga:
