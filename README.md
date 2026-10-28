@@ -4,6 +4,8 @@ A small Python study of the gold price. It is not financial advice.
 
 **What it does.** A fair-value regression of log(gold) on the 10-year real yield, log(USD index), log(Brent), VIX, and inflation, with Newey–West errors. An extended fair value adds central-bank net gold purchases, log(GLD holdings), and the Caldara–Iacoviello geopolitical risk index, each lagged so it is not used before it is public. The same equation is re-estimated on rolling 2-year and 3-year windows. Engle–Granger and Johansen tests look for cointegration on weekly data, and an error-correction half-life is reported only when a relation is found. Walk-forward Ridge and gradient-boosting forecasts of 5-day and 20-day returns are compared with a random walk and with the training-window mean; those forecasts also use CFTC COT positioning and the 2-year nominal yield. A separate regression and forecast covers gold in Mexican pesos per gram. The sample is about 20 years of daily data from yfinance, FRED, and the public backups those series use.
 
+**Dashboard.** `dashboard/` is a Next.js app with a Spanish (es-MX) interface. It reads JSON committed under `dashboard/data/`: the daily note (spot, change, pesos per gram, drivers with links, hedged takeaway), the model's fair value and 5- and 20-day forecasts, and accuracy against a no-change baseline. Refresh with `python scripts/export_dashboard_data.py`, then commit `dashboard/data/snapshot.json` and `dashboard/data/reportes.json`. Daily notes are `data/reports/YYYY-MM-DD.json`. On Vercel, set the root directory to `dashboard`, framework Next.js, build command `npm run build`. No environment variables. The longer instructions are in the Spanish section below.
+
 **Results, as of 19 October 2026.** COMEX gold at $4,146.80/oz sits about +35% above the base walk-forward fair value. Adding central-bank purchases, GLD holdings, and geopolitical risk closes about 17 percentage points of that gap and leaves it near +18%. The latest 2-year and 3-year windows put the price about 11% and 8% below those shorter-sample values. Engle–Granger (p = 0.87) and Johansen (trace 18.8 against a 5% critical value of 29.8) do not find cointegration, so no equilibrium half-life is reported. Out-of-sample R² is negative for both Ridge and gradient boosting: about −0.02 and −0.05 for Ridge at 5 and 20 days against a random walk, and about −0.04 and −0.04 for boosting. Neither beats a random walk or the training-window mean. The signs on the real yield and the USD index flipped after 2022. In pesos per gram the metal is about +11% above its own fair value.
 
 **How to run.**
@@ -14,7 +16,7 @@ python pruebas.py
 python main.py
 ```
 
-`pruebas.py` is the offline check (23 tests). `main.py` downloads the data and writes the report and the charts below.
+`pruebas.py` is the offline check (29 tests). `main.py` downloads the data and writes the report and the charts below.
 
 ![Gold price and walk-forward fair value](outputs/precio_vs_valor_justo.png)
 
@@ -119,7 +121,7 @@ fecha de publicación, y que el entrenamiento del pronóstico no vea el futuro.
 
 | Archivo | Para qué está |
 | --- | --- |
-| `main.py` | El único comando. Llama a lo demás en orden. |
+| `main.py` | Corre el modelo y escribe el informe. |
 | `datos.py` | Descarga, alinea los días y aplica la regla del IPC. |
 | `modelos.py` | Las dos regresiones y las métricas fuera de muestra. |
 | `reporte.py` | El texto del informe y las gráficas. |
@@ -128,6 +130,78 @@ fecha de publicación, y que el entrenamiento del pronóstico no vea el futuro.
 | `data/panel_diario.csv` | La tabla ya alineada. Se reescribe en cada corrida. |
 | `referencia/snapshot_2026-10-05.csv` | Una nota de precios del 5 de octubre de 2026, solo para comparar. No se usa para estimar. |
 | `outputs/` | Informe, gráficas y tablas de métricas. |
+| `data/reports/YYYY-MM-DD.json` | Un reporte diario. El esquema está en `data/reports/schema.json`. |
+| `scripts/export_dashboard_data.py` | Arma el JSON del tablero a partir de los reportes y del modelo. |
+| `dashboard/` | Tablero en Next.js (español de México). Lee `dashboard/data/`. |
+
+## Tablero
+
+El tablero junta tres cosas: el reporte del día, el valor justo y los
+pronósticos a 5 y 20 días, y la nota del modelo contra el baseline de
+"el precio no cambia". La interfaz está en español (es-MX). No es
+asesoría financiera.
+
+Los reportes viven en `data/reports/`, un archivo por día. El esquema
+está en `data/reports/schema.json`. Si un número no existe, el campo
+va en `null`. No se rellena. Un sábado o domingo sin entrada en el log
+usa `"sesion": "sin_registro"` y deja los números vacíos.
+
+La semilla del 21 al 28 de octubre de 2026 sale del log de Notion
+("Log del Oro"): lectura de la mañana en Kitco, cambio contra el cierre
+previo, pesos por gramo y el FIX de Banxico que usa esa cuenta. El 24 y
+el 25 no tienen fila en ese log.
+
+### Cómo agrega un día el trabajo diario
+
+1. Crea `data/reports/YYYY-MM-DD.json`. El nombre y el campo `fecha`
+   tienen que coincidir. Copia las llaves del esquema.
+2. Llena solo lo que tenga fuente. Lo demás, `null`. En un día con
+   registro hacen falta `precio_usd_oz` y `lectura`.
+3. Con el entorno activado, desde la raíz del repositorio:
+
+```text
+python scripts/export_dashboard_data.py
+```
+
+Eso vuelve a bajar el panel, reestima el valor justo y los pronósticos,
+y reescribe `dashboard/data/snapshot.json` y
+`dashboard/data/reportes.json`. La primera corrida tarda: el pronóstico
+camina hacia adelante con Ridge y gradient boosting.
+
+Si solo cambió el reporte del día y el modelo puede quedarse como está:
+
+```text
+python scripts/export_dashboard_data.py --solo-reportes
+```
+
+Si ya existe `data/panel_diario.csv` y no hay red:
+
+```text
+python scripts/export_dashboard_data.py --sin-descarga
+```
+
+4. Haz commit de los JSON nuevos y súbelos. Vercel reconstruye el
+   tablero con esos archivos. El build no corre el modelo de Python.
+
+### Cómo verlo y cómo publicarlo en Vercel
+
+En local, dentro de `dashboard/`:
+
+```text
+npm install
+npm run dev
+```
+
+En Vercel, importa el repositorio y usa:
+
+| Ajuste | Valor |
+| --- | --- |
+| Root Directory | `dashboard` |
+| Framework | Next.js |
+| Build command | `npm run build` |
+| Install command | `npm install` |
+| Output directory | el de Next.js (no lo cambies) |
+| Variables de entorno | ninguna |
 
 `Path(__file__)` en el código es la carpeta del archivo, no la carpeta
 desde la que escribiste el comando. Puedes correr `python main.py` desde

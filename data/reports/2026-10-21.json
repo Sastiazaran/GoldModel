@@ -1,0 +1,49 @@
+{
+  "fecha": "2026-10-21",
+  "sesion": "con_registro",
+  "precio_usd_oz": 4136,
+  "precio_aproximado": true,
+  "precio_fuente": "Kitco, lectura de la mañana (7:32 AM, hora del centro de México)",
+  "precio_url": "https://www.kitco.com/charts/gold",
+  "cierre_previo_usd_oz": 4124,
+  "cierre_previo_aproximado": true,
+  "cambio_usd": 11.6,
+  "cambio_pct": 0.3,
+  "cambio_texto": "+$11.60 (+0.3%) vs cierre ~$4,124; mínimo madrugada ~$4,105 (más bajo desde 15 oct)",
+  "usd_mxn": 18.42,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-10-20",
+  "usd_mxn_fuente": "Banxico FIX",
+  "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+  "mxn_por_gramo": 2449,
+  "mxn_por_gramo_aproximado": true,
+  "drivers": [
+    {
+      "titulo": "Petróleo y Medio Oriente",
+      "detalle": "El Brent seguía arriba de 110 dólares por las tensiones en Medio Oriente. Más petróleo alimenta la inflación y, con ella, la presión de tasas sobre el oro.",
+      "fuente": "Reuters vía CNBC",
+      "url": "https://www.cnbc.com/2026/10/21/gold-dips-for-fourth-session-as-oil-rally-fans-inflation-concerns.html"
+    },
+    {
+      "titulo": "Fed",
+      "detalle": "La Fed decide el miércoles 28. El log cita una pausa esperada en esa reunión y una probabilidad alta de alza en diciembre.",
+      "fuente": "Kitco",
+      "url": "https://www.kitco.com/news/article/2026-10-21/gold-gains-silver-slips-oil-prices-rise-fed-rate-hike-expectations-persist"
+    },
+    {
+      "titulo": "Inflación PCE",
+      "detalle": "El jueves 29 sale el PCE de Estados Unidos, el dato que el reporte marca como el siguiente parteaguas después de la Fed.",
+      "fuente": "Kitco",
+      "url": "https://www.kitco.com/news/article/2026-10-21/gold-gains-silver-slips-oil-prices-rise-fed-rate-hike-expectations-persist"
+    },
+    {
+      "titulo": "Peso mexicano",
+      "detalle": "El FIX del 20 de octubre fue 18.42 pesos por dólar. Con ese tipo de cambio el log deja el metal en unos 2,449 pesos por gramo.",
+      "fuente": "Banxico",
+      "url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do"
+    }
+  ],
+  "lectura": "Tendencia bajista de ~2 meses; aguanta zona $4,100. Sin prisas hasta la Fed (28 oct).",
+  "notion_url": "https://app.notion.com/p/400f98ae111281aca9f7cb1bfde2b15f",
+  "notas": "Cifras del log de Notion (Log del Oro), entrada del 21 de octubre de 2026. El precio de la mañana está marcado como aproximado. El MXN/g usa el FIX citado, no un tipo de cambio intradía. No es asesoría financiera."
+}

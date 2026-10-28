@@ -1,0 +1,49 @@
+{
+  "fecha": "2026-10-26",
+  "sesion": "con_registro",
+  "precio_usd_oz": 4001.3,
+  "precio_aproximado": true,
+  "precio_fuente": "Kitco, lectura de la mañana (~7:41 AM, hora del centro de México)",
+  "precio_url": "https://www.kitco.com/charts/gold",
+  "cierre_previo_usd_oz": 3995,
+  "cierre_previo_aproximado": true,
+  "cambio_usd": 6.4,
+  "cambio_pct": 0.16,
+  "cambio_texto": "+$6.40 (+0.16%) vs cierre viernes ~$3,995; rango del día $3,977.90–$4,026.50; viernes tocó ~$3,975 (mínimo desde 20 jul); semana pasada ~−4%",
+  "usd_mxn": 18.6670,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-10-23",
+  "usd_mxn_fuente": "Banxico FIX",
+  "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+  "mxn_por_gramo": 2401,
+  "mxn_por_gramo_aproximado": true,
+  "drivers": [
+    {
+      "titulo": "Petróleo más bajo",
+      "detalle": "El Brent bajó cerca de 2% y rondaba 114 dólares. El reporte lo lee como menos presión inflacionaria y un alivio para el oro.",
+      "fuente": "Reuters vía CNBC",
+      "url": "https://www.cnbc.com/2026/10/26/gold-gains-on-softer-oil-prices-fed-decision-in-focus.html"
+    },
+    {
+      "titulo": "Fed",
+      "detalle": "La decisión es el miércoles 28. Este día el log cita cerca de 9% de alza en esa reunión y cerca de 80% en diciembre.",
+      "fuente": "Reuters vía CNBC",
+      "url": "https://www.cnbc.com/2026/10/26/gold-gains-on-softer-oil-prices-fed-decision-in-focus.html"
+    },
+    {
+      "titulo": "Regreso arriba de 4,000",
+      "detalle": "El viernes el spot tocó unos 3,975 dólares, mínimo desde el 20 de julio, y la semana anterior cayó cerca de 4%. El lunes volvió a asomarse arriba de 4,000.",
+      "fuente": "Reuters vía The Hindu Business Line",
+      "url": "https://www.thehindubusinessline.com/markets/gold/gold-gains-as-oil-slide-cools-some-inflation-concerns/article71626429.ece"
+    },
+    {
+      "titulo": "Peso mexicano",
+      "detalle": "El FIX usado es el del 23 de octubre, 18.6670 pesos por dólar. Con ese tipo el log deja el gramo en unos 2,401 pesos, abajo del viernes.",
+      "fuente": "Banxico",
+      "url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do"
+    }
+  ],
+  "lectura": "Los $4,000 aguantan como piso; UBS lo ve zona de compra, pero la Fed (~80% alza en dic) pone techo. Calma hasta el miércoles 28.",
+  "notion_url": "https://app.notion.com/p/405f98ae1112814a964df8f6f319225b",
+  "notas": "Cifras del log de Notion (Log del Oro), entrada del 26 de octubre de 2026. El FIX es del viernes 23 porque el fin de semana no publica uno nuevo. No es asesoría financiera."
+}

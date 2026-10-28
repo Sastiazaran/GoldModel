@@ -1,0 +1,49 @@
+{
+  "fecha": "2026-10-28",
+  "sesion": "con_registro",
+  "precio_usd_oz": 4047,
+  "precio_aproximado": true,
+  "precio_fuente": "Kitco, lectura de la mañana (~7:36 AM, hora del centro de México)",
+  "precio_url": "https://www.kitco.com/charts/gold",
+  "cierre_previo_usd_oz": 4059,
+  "cierre_previo_aproximado": true,
+  "cambio_usd": -12.3,
+  "cambio_pct": -0.3,
+  "cambio_texto": "−$12.30 (−0.30%) vs cierre martes ~$4,059 (el martes subió ~1%); rango del día $4,027.30–$4,071.60",
+  "usd_mxn": 18.6525,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-10-27",
+  "usd_mxn_fuente": "Banxico FIX",
+  "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+  "mxn_por_gramo": 2427,
+  "mxn_por_gramo_aproximado": true,
+  "drivers": [
+    {
+      "titulo": "Petróleo y una refinería en Arabia Saudita",
+      "detalle": "El petróleo subió más de 2 dólares tras un ataque a una refinería en Arabia Saudita. El log deja el Brent arriba de 110 dólares y cita el riesgo de una Fed más dura.",
+      "fuente": "Reuters vía CNBC",
+      "url": "https://www.cnbc.com/2026/10/28/gold-slips-on-oil-fueled-inflation-fears-ahead-of-fed-meeting.html"
+    },
+    {
+      "titulo": "Fed hoy y PCE mañana",
+      "detalle": "La Fed decide hoy a las 12:00, hora del centro de México. Se espera pausa. El log cita cerca de 84% de probabilidad de alza en diciembre, y el PCE el jueves 29 a las 6:30.",
+      "fuente": "Reuters vía CNBC",
+      "url": "https://www.cnbc.com/2026/10/28/gold-slips-on-oil-fueled-inflation-fears-ahead-of-fed-meeting.html"
+    },
+    {
+      "titulo": "Dólar firme",
+      "detalle": "El índice del dólar subió 0.1% a 102.42, cerca de máximos de dos semanas, y el reporte lo pone como peso sobre el oro.",
+      "fuente": "Investing.com",
+      "url": "https://au.investing.com/news/commodities-news/gold-retreats-as-dollar-firms-slightly-ahead-of-fed-decision-4720920"
+    },
+    {
+      "titulo": "Peso mexicano",
+      "detalle": "El FIX del 27 de octubre fue 18.6525, más débil que el 18.5798 del 26. Por eso el oro en pesos sube frente a ayer aunque en dólares baje.",
+      "fuente": "Banxico",
+      "url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do"
+    }
+  ],
+  "lectura": "Aguanta arriba de $4,000, pero petróleo alto y dólar firme pesan. Fed hoy 12:00 (Warsh) y PCE jueves 6:30 deciden el rumbo.",
+  "notion_url": "https://app.notion.com/p/407f98ae1112815f8613d4f01ac3eb38",
+  "notas": "Cifras del log de Notion (Log del Oro), entrada del 28 de octubre de 2026. El precio es la lectura de la mañana, no el cierre del futuro COMEX. No es asesoría financiera."
+}

@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "titulo": "Reporte diario del oro",
+  "descripcion": "Un archivo data/reports/YYYY-MM-DD.json por día. Los números salen de una fuente citada. Si un dato no existe, el campo va en null y no se rellena.",
+  "tipo": "object",
+  "required": [
+    "fecha",
+    "sesion",
+    "precio_usd_oz",
+    "precio_aproximado",
+    "precio_fuente",
+    "precio_url",
+    "cierre_previo_usd_oz",
+    "cierre_previo_aproximado",
+    "cambio_usd",
+    "cambio_pct",
+    "cambio_texto",
+    "usd_mxn",
+    "usd_mxn_tipo",
+    "usd_mxn_fecha",
+    "usd_mxn_fuente",
+    "usd_mxn_url",
+    "mxn_por_gramo",
+    "mxn_por_gramo_aproximado",
+    "drivers",
+    "lectura",
+    "notion_url",
+    "notas"
+  ],
+  "properties": {
+    "fecha": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Fecha del reporte, igual al nombre del archivo."
+    },
+    "sesion": {
+      "enum": ["con_registro", "sin_registro"],
+      "description": "con_registro: hay entrada en el log. sin_registro: no hubo entrada; los números van en null."
+    },
+    "precio_usd_oz": {
+      "type": ["number", "null"],
+      "description": "Spot en dólares por onza troy, como lo cita el log. No es el cierre del futuro GC=F."
+    },
+    "precio_aproximado": {
+      "type": ["boolean", "null"],
+      "description": "true si el log marcó el precio con virgulilla."
+    },
+    "precio_fuente": { "type": ["string", "null"] },
+    "precio_url": { "type": ["string", "null"] },
+    "cierre_previo_usd_oz": { "type": ["number", "null"] },
+    "cierre_previo_aproximado": { "type": ["boolean", "null"] },
+    "cambio_usd": {
+      "type": ["number", "null"],
+      "description": "Diferencia en USD/oz contra el cierre previo, con el signo que publicó el log."
+    },
+    "cambio_pct": {
+      "type": ["number", "null"],
+      "description": "Cambio porcentual contra el cierre previo. 0.3 significa 0.3%, no 30%."
+    },
+    "cambio_texto": {
+      "type": ["string", "null"],
+      "description": "Frase original del log, por si el rango del día no cabe en los dos números."
+    },
+    "usd_mxn": { "type": ["number", "null"], "description": "Pesos por dólar usados para el MXN/g." },
+    "usd_mxn_tipo": { "enum": ["banxico_fix", null] },
+    "usd_mxn_fecha": {
+      "type": ["string", "null"],
+      "description": "Día del FIX. Puede ser anterior a fecha si ese es el último publicado."
+    },
+    "usd_mxn_fuente": { "type": ["string", "null"] },
+    "usd_mxn_url": { "type": ["string", "null"] },
+    "mxn_por_gramo": { "type": ["number", "null"] },
+    "mxn_por_gramo_aproximado": { "type": ["boolean", "null"] },
+    "drivers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["titulo", "detalle", "fuente", "url"],
+        "properties": {
+          "titulo": { "type": "string" },
+          "detalle": { "type": "string" },
+          "fuente": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      }
+    },
+    "lectura": {
+      "type": ["string", "null"],
+      "description": "Lectura con cobertura: qué vigilar, sin tratarla como orden de compra o venta."
+    },
+    "notion_url": { "type": ["string", "null"] },
+    "notas": { "type": ["string", "null"] }
+  }
+}

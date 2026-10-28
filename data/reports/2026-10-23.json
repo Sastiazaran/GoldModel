@@ -1,0 +1,49 @@
+{
+  "fecha": "2026-10-23",
+  "sesion": "con_registro",
+  "precio_usd_oz": 4024.9,
+  "precio_aproximado": true,
+  "precio_fuente": "Kitco, lectura de la mañana (~7:33 AM, hora del centro de México)",
+  "precio_url": "https://www.kitco.com/charts/gold",
+  "cierre_previo_usd_oz": 4023,
+  "cierre_previo_aproximado": true,
+  "cambio_usd": 1.6,
+  "cambio_pct": 0.04,
+  "cambio_texto": "+$1.60 (+0.04%) vs cierre jueves ~$4,023; mínimo del día $3,986 (más bajo desde 20 jul); semana −3.5%",
+  "usd_mxn": 18.7005,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-10-22",
+  "usd_mxn_fuente": "Banxico FIX",
+  "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+  "mxn_por_gramo": 2420,
+  "mxn_por_gramo_aproximado": true,
+  "drivers": [
+    {
+      "titulo": "Petróleo en máximos",
+      "detalle": "El Brent tocó un máximo de más de cinco meses por ataques hutíes en Arabia Saudita y tensión en Ormuz. El reporte lo vincula con inflación y tasas altas por más tiempo.",
+      "fuente": "Reuters vía Kitco",
+      "url": "https://www.kitco.com/news/off-the-wire/2026-10-23/gold-three-month-lows-oil-rally-fans-inflation-worries"
+    },
+    {
+      "titulo": "Fed",
+      "detalle": "Para este día el log cita cerca de 9% de probabilidad de alza el 28 de octubre y cerca de 81% en diciembre.",
+      "fuente": "Reuters vía Kitco",
+      "url": "https://www.kitco.com/news/off-the-wire/2026-10-23/gold-three-month-lows-oil-rally-fans-inflation-worries"
+    },
+    {
+      "titulo": "Piso de 4,000 dólares",
+      "detalle": "En la madrugada el spot perforó los 4,000 y tocó 3,986 dólares, el nivel más bajo desde el 20 de julio. La semana iba en −3.5%.",
+      "fuente": "Reuters vía Kitco",
+      "url": "https://www.kitco.com/news/off-the-wire/2026-10-23/gold-three-month-lows-oil-rally-fans-inflation-worries"
+    },
+    {
+      "titulo": "Peso mexicano",
+      "detalle": "El FIX del 22 de octubre fue 18.7005. El peso más débil amortigua parte de la baja en pesos por gramo.",
+      "fuente": "Banxico",
+      "url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do"
+    }
+  ],
+  "lectura": "Prueba del piso de $4,000; si no aguanta puede bajar más. Sin prisas hasta la Fed (28 oct).",
+  "notion_url": "https://app.notion.com/p/402f98ae11128147b948e35862091a81",
+  "notas": "Cifras del log de Notion (Log del Oro), entrada del 23 de octubre de 2026. El mínimo de 3,986 dólares está en el texto del cambio, no se usa como cierre. No es asesoría financiera."
+}
