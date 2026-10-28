@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { GraficaAcierto, GraficaPrecio } from "./Graficas";
+import { Historia } from "./Historia";
 import {
   cuentaGramos,
   fechaCorta,
@@ -42,10 +43,13 @@ export function Tablero({ reportes, snapshot }: Props) {
       </header>
 
       <nav className="anclas" aria-label="Secciones">
+        <a href="#historia">Historia</a>
         <a href="#reporte">Reporte</a>
         <a href="#pronostico">Pronóstico</a>
         <a href="#precision">Precisión</a>
       </nav>
+
+      <Historia relato={snapshot.relato ?? null} />
 
       <section id="reporte" aria-labelledby="titulo-reporte">
         <div className="seccion-head">

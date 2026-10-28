@@ -135,9 +135,56 @@ export type Modelo = {
   avisos: string[];
 };
 
+export type NotaRelato = { texto: string; valor: string };
+
+export type EnlaceRelato = {
+  texto: string;
+  detalle: string;
+  fuente: string;
+  url: string | null;
+  fecha: string;
+};
+
+export type GraficaRelato =
+  | {
+      tipo: "linea";
+      titulo: string;
+      puntos: { fecha: string; valor: number }[];
+      marcas?: { fecha: string; etiqueta: string }[];
+    }
+  | {
+      tipo: "barras";
+      titulo: string;
+      puntos: { etiqueta: string; valor: number }[];
+    }
+  | {
+      tipo: "comparacion";
+      titulo: string;
+      filas: { etiqueta: string; modelo: number | null; base: number | null; acierto: number | null }[];
+    };
+
+export type SeccionRelato = {
+  id: string;
+  paso: string;
+  kicker: string;
+  titulo: string;
+  parrafos: string[];
+  notas: NotaRelato[];
+  enlaces: EnlaceRelato[];
+  grafica: GraficaRelato | null;
+};
+
+export type Relato = {
+  titulo: string;
+  fecha: string | null;
+  intro: string;
+  secciones: SeccionRelato[];
+};
+
 export type Snapshot = {
   generado_en: string | null;
   aviso: string;
   grafica_desde?: string;
   modelo: Modelo | null;
+  relato?: Relato | null;
 };
