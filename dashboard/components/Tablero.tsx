@@ -29,6 +29,7 @@ export function Tablero({ reportes, snapshot }: Props) {
   const inicial = useMemo(() => ultimoConRegistro(reportes), [reportes]);
   const [fecha, setFecha] = useState(inicial);
   const [mostrarAmpliado, setMostrarAmpliado] = useState(false);
+  const [mostrarNuevo, setMostrarNuevo] = useState(false);
   const reporte = reportes.find((item) => item.fecha === fecha) ?? reportes.at(-1) ?? null;
   const modelo = snapshot.modelo;
 
@@ -46,6 +47,7 @@ export function Tablero({ reportes, snapshot }: Props) {
         <a href="#historia">Historia</a>
         <a href="#reporte">Reporte</a>
         <a href="#pronostico">Pronóstico</a>
+        <a href="#direccion">Dirección</a>
         <a href="#precision">Precisión</a>
       </nav>
 
@@ -90,7 +92,13 @@ export function Tablero({ reportes, snapshot }: Props) {
             <p>Corre <code>python scripts/export_dashboard_data.py</code> y vuelve a construir el tablero.</p>
           </div>
         ) : (
-          <ModeloVista modelo={modelo} mostrarAmpliado={mostrarAmpliado} onAmpliado={setMostrarAmpliado} />
+          <ModeloVista
+            modelo={modelo}
+            mostrarAmpliado={mostrarAmpliado}
+            onAmpliado={setMostrarAmpliado}
+            mostrarNuevo={mostrarNuevo}
+            onNuevo={setMostrarNuevo}
+          />
         )}
       </section>
 
@@ -228,10 +236,14 @@ function ModeloVista({
   modelo,
   mostrarAmpliado,
   onAmpliado,
+  mostrarNuevo,
+  onNuevo,
 }: {
   modelo: Modelo;
   mostrarAmpliado: boolean;
   onAmpliado: (valor: boolean) => void;
+  mostrarNuevo: boolean;
+  onNuevo: (valor: boolean) => void;
 }) {
   const cinco = modelo.pronosticos["5"];
   const veinte = modelo.pronosticos["20"];
@@ -260,14 +272,22 @@ function ModeloVista({
           )}
         </article>
         <article>
-          <p className="kicker">Valor justo, solo el pasado</p>
+          <p className="kicker">
+            {modelo.valor_justo_modelo === "ols_nuevo" ? "Valor justo nuevo, solo el pasado" : "Valor justo, solo el pasado"}
+          </p>
           <p className="grande">{modelo.valor_justo_usd == null ? "Sin dato" : usd(modelo.valor_justo_usd, 0)}</p>
           <p className="unidad">
             {modelo.brecha_pct == null ? "Sin dato" : textoBrecha(modelo.brecha_pct)}
           </p>
+          {modelo.valor_justo_modelo === "ols_nuevo" && modelo.valor_justo_base_usd != null && (
+            <p className="detalle-cifra">
+              La recta base, también solo con el pasado: {usd(modelo.valor_justo_base_usd, 0)}
+              {modelo.brecha_base_pct == null ? "" : `, brecha ${puntos(modelo.brecha_base_pct, 1)}`}.
+            </p>
+          )}
           {modelo.valor_justo_muestra_usd != null && modelo.brecha_muestra_pct != null && (
             <p className="detalle-cifra">
-              Con toda la historia: {usd(modelo.valor_justo_muestra_usd, 0)}, brecha {puntos(modelo.brecha_muestra_pct, 1)}.
+              Con toda la historia, la recta base: {usd(modelo.valor_justo_muestra_usd, 0)}, brecha {puntos(modelo.brecha_muestra_pct, 1)}.
             </p>
           )}
         </article>
@@ -292,16 +312,27 @@ function ModeloVista({
         <TarjetaPronostico pronostico={cinco} />
         <TarjetaPronostico pronostico={veinte} />
       </div>
+      <Direccion modelo={modelo} />
       <div className="grafica-head">
         <h3>Precio, valor justo y a dónde apuntaba el pronóstico</h3>
-        <label>
-          <input
-            type="checkbox"
-            checked={mostrarAmpliado}
-            onChange={(evento) => onAmpliado(evento.target.checked)}
-          />
-          Ver el valor justo ampliado
-        </label>
+        <div className="toggles">
+          <label>
+            <input
+              type="checkbox"
+              checked={mostrarAmpliado}
+              onChange={(evento) => onAmpliado(evento.target.checked)}
+            />
+            Ver el valor justo ampliado
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={mostrarNuevo}
+              onChange={(evento) => onNuevo(evento.target.checked)}
+            />
+            Ver el valor justo Kalman
+          </label>
+        </div>
       </div>
       <GraficaPrecio
         puntos={modelo.historia}
@@ -310,11 +341,271 @@ function ModeloVista({
           { horizonte: 20, nivel: veinte.nivel_objetivo_usd, direccion: veinte.direccion },
         ]}
         mostrarAmpliado={mostrarAmpliado}
+        mostrarNuevo={mostrarNuevo}
         desde={modelo.historia[0]?.fecha ?? modelo.fecha}
+        nombresRegimen={modelo.estudio?.regimen?.nombres ?? []}
       />
       <p className="nota">
         La línea punteada es el nivel que el pronóstico de 20 días, hecho 20 sesiones antes, apuntaba para ese día. Los puntos de la derecha son el pronóstico que todavía no vence. La gráfica empieza en {modelo.historia[0] ? fechaMedia(modelo.historia[0].fecha) : "la muestra exportada"}; las métricas usan toda la prueba fuera de muestra.
       </p>
+    </>
+  );
+}
+
+function Direccion({ modelo }: { modelo: Modelo }) {
+  const estudio = modelo.estudio;
+  const cinco = estudio?.clasificacion?.["5"];
+  const veinte = estudio?.clasificacion?.["20"];
+  if (!cinco && !veinte && !estudio?.regimen?.disponible) return null;
+  return (
+    <div className="direccion" id="direccion">
+      <h3>Probabilidad de alza, con banda plana</h3>
+      <p className="nota">
+        Alza, plano o baja según una banda de media desviación de la volatilidad ya conocida. La probabilidad de alza se calibra con el tramo final del entrenamiento. No es una orden.
+      </p>
+      <div className="medidores">
+        {cinco && <Medidor titulo="5 días" arriba={cinco.prob_up} plano={cinco.prob_plano} abajo={cinco.prob_baja} modelo={cinco.modelo} />}
+        {veinte && <Medidor titulo="20 días" arriba={veinte.prob_up} plano={veinte.prob_plano} abajo={veinte.prob_baja} modelo={veinte.modelo} />}
+      </div>
+      {estudio?.regimen?.disponible && (
+        <p>
+          Régimen de hoy, por el filtro del HMM: <strong>{estudio.regimen.nombre}</strong>. {estudio.regimen.nota}
+        </p>
+      )}
+      {estudio?.valor && (
+        <p className="nota">
+          La recta nueva (breakeven, bancos centrales, GPR y la dummie desde el 24 de febrero de 2022)
+          {estudio.valor.valor_ols == null ? " no tiene valor." : ` da ${usd(estudio.valor.valor_ols, 0)}`}
+          {estudio.valor.brecha_ols_pct == null ? "" : `, brecha ${puntos(estudio.valor.brecha_ols_pct, 1)}`}.
+          {" "}
+          {estudio.valor.promovido
+            ? "Es el valor justo titular: el RMSE fuera de muestra, una observación cada 20 sesiones, quedó por debajo del modelo base."
+            : "No reemplaza al valor justo base: no le bajó ese RMSE."}
+          {estudio.valor.rmse_log_ols != null && estudio.valor.rmse_log_base != null
+            ? ` RMSE del log: ${numero(estudio.valor.rmse_log_ols, 3)} contra ${numero(estudio.valor.rmse_log_base, 3)} de la recta base.`
+            : ""}
+          {estudio.valor.valor_kalman == null
+            ? ""
+            : ` El Kalman, que no compite porque persigue el precio, marca ${usd(estudio.valor.valor_kalman, 0)}.`}
+          {estudio.valor.valor_markov == null
+            ? ""
+            : ` Markov ${usd(estudio.valor.valor_markov, 0)}${estudio.valor.brecha_markov_pct == null ? "" : `, brecha ${puntos(estudio.valor.brecha_markov_pct, 1)}`}. La muestra en la que existe no alcanza para ser titular.`}
+        </p>
+      )}
+      <Analogos modelo={modelo} />
+    </div>
+  );
+}
+
+function Medidor({
+  titulo,
+  arriba,
+  plano,
+  abajo,
+  modelo,
+}: {
+  titulo: string;
+  arriba: number | null;
+  plano: number | null;
+  abajo: number | null;
+  modelo: string | null;
+}) {
+  const a = arriba ?? 0;
+  const p = plano ?? 0;
+  const b = abajo ?? 0;
+  const etiqueta = `Probabilidad a ${titulo}: alza ${fraccion(arriba)}, plano ${fraccion(plano)}, baja ${fraccion(abajo)}.`;
+  return (
+    <article className="tarjeta">
+      <p className="kicker">{titulo} de mercado</p>
+      <p className="retorno">{fraccion(arriba)}</p>
+      <p className="unidad">P(alza){modelo ? ` · ${modelo}` : ""}</p>
+      <div className="medidor" role="img" aria-label={etiqueta}>
+        <span className="med-alza" style={{ width: `${a * 100}%` }} />
+        <span className="med-plano" style={{ width: `${p * 100}%` }} />
+        <span className="med-baja" style={{ width: `${b * 100}%` }} />
+      </div>
+      <p className="detalle-cifra">Plano {fraccion(plano)} · baja {fraccion(abajo)}</p>
+    </article>
+  );
+}
+
+function Analogos({ modelo }: { modelo: Modelo }) {
+  const analogos = modelo.estudio?.analogos;
+  if (!analogos?.disponible || !analogos.periodos?.length) return null;
+  return (
+    <>
+      <h3>Periodos parecidos</h3>
+      <p className="nota">{analogos.nota}</p>
+      <ul>
+        {analogos.periodos.map((periodo) => (
+          <li key={`${periodo.desde}-${periodo.hasta}`}>
+            {fechaMedia(periodo.desde)} a {fechaMedia(periodo.hasta)}
+            {periodo.retorno_20 == null ? "" : ` · los 20 días siguientes ${puntos(periodo.retorno_20 * 100, 1)}`}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+function TablaAntesDespues({ modelo }: { modelo: Modelo }) {
+  const filas = modelo.estudio?.comparacion?.filas ?? [];
+  if (filas.length === 0) return null;
+  return (
+    <>
+      <div className="tabla-wrap">
+        <table>
+          <caption>
+            Antes y después, en las mismas fechas y sin solapar el horizonte. El titular de cada horizonte es el de menor RMSE. {modelo.estudio?.comparacion?.criterio}
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Horizonte</th>
+              <th scope="col">Modelo</th>
+              <th scope="col">n</th>
+              <th scope="col">RMSE</th>
+              <th scope="col">RMSE sin cambio</th>
+              <th scope="col">R² contra cero</th>
+              <th scope="col">Acierto</th>
+              <th scope="col">Siempre alza</th>
+              <th scope="col">Titular</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filas.map((fila) => (
+              <tr key={`${fila.horizonte}-${fila.modelo}`}>
+                <th scope="row">{fila.horizonte} días</th>
+                <td>{fila.modelo === "ridge" ? "Ridge (antes)" : "Mediana cuantílica (después)"}</td>
+                <td>{fila.n}</td>
+                <td>{fila.rmse_mismas_fechas == null ? "Sin dato" : `${numero(fila.rmse_mismas_fechas * 100, 2)}%`}</td>
+                <td>{fila.rmse_cero == null ? "Sin dato" : `${numero(fila.rmse_cero * 100, 2)}%`}</td>
+                <td>{r2(fila.r2_cero)}</td>
+                <td>{fraccion(fila.acierto)}</td>
+                <td>{fraccion(fila.acierto_siempre_alza)}</td>
+                <td>{fila.es_titular ? "sí" : "no"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <TablaClase modelo={modelo} />
+      <Cobertura modelo={modelo} />
+      <Dca modelo={modelo} />
+      <Diebold modelo={modelo} />
+    </>
+  );
+}
+
+function TablaClase({ modelo }: { modelo: Modelo }) {
+  const clasificacion = modelo.estudio?.clasificacion;
+  if (!clasificacion) return null;
+  const filas = (["5", "20"] as const).flatMap((horizonte) => {
+    const bloque = clasificacion[horizonte];
+    const elegido = bloque?.metricas?.elegido;
+    if (!bloque || !elegido) return [];
+    return [{ horizonte, modelo: bloque.modelo, ...elegido }];
+  });
+  if (filas.length === 0) return null;
+  return (
+    <div className="tabla-wrap">
+      <table>
+        <caption>
+          Clasificación fuera de muestra, una observación cada horizonte. La balanced accuracy de siempre alza reparte el acierto entre alza, plano y baja. El Brier de la tasa base es el punto de comparación de la probabilidad.
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Horizonte</th>
+            <th scope="col">Modelo</th>
+            <th scope="col">n</th>
+            <th scope="col">Balanced accuracy</th>
+            <th scope="col">Siempre alza</th>
+            <th scope="col">ROC-AUC</th>
+            <th scope="col">Brier</th>
+            <th scope="col">Brier siempre alza</th>
+            <th scope="col">Brier tasa base</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filas.map((fila) => (
+            <tr key={fila.horizonte}>
+              <th scope="row">{fila.horizonte} días</th>
+              <td>{fila.modelo ?? "Sin dato"}</td>
+              <td>{fila.n}</td>
+              <td>{fraccion(fila.balanced_accuracy)}</td>
+              <td>{fraccion(fila.balanced_accuracy_siempre_alza)}</td>
+              <td>{fila.roc_auc == null ? "Sin dato" : numero(fila.roc_auc, 3)}</td>
+              <td>{fila.brier == null ? "Sin dato" : numero(fila.brier, 3)}</td>
+              <td>{fila.brier_siempre_alza == null ? "Sin dato" : numero(fila.brier_siempre_alza, 3)}</td>
+              <td>{fila.brier_tasa_base == null ? "Sin dato" : numero(fila.brier_tasa_base, 3)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function Cobertura({ modelo }: { modelo: Modelo }) {
+  const intervalos = modelo.estudio?.intervalos;
+  if (!intervalos) return null;
+  const frases = (["5", "20"] as const).flatMap((horizonte) => {
+    const bloque = intervalos[horizonte];
+    const cob = bloque?.cobertura?.sin_solapar;
+    if (!bloque || cob?.cobertura == null) return [];
+    const nominal = bloque.nivel == null ? "la banda" : `la banda del ${numero(bloque.nivel * 100, 0)}%`;
+    const garch = bloque.garch?.cobertura?.sin_solapar;
+    const extra = garch?.cobertura == null ? "" : ` GARCH cubrió ${fraccion(garch.cobertura)} (n=${garch.n}).`;
+    return [
+      `A ${horizonte} días ${nominal} cubrió ${fraccion(cob.cobertura)} de los retornos ya realizados (n=${cob.n}).${extra}`,
+    ];
+  });
+  if (frases.length === 0) return null;
+  return (
+    <>
+      {frases.map((frase) => (
+        <p key={frase} className="nota">{frase}</p>
+      ))}
+    </>
+  );
+}
+
+function Dca({ modelo }: { modelo: Modelo }) {
+  const dca = modelo.estudio?.dca;
+  if (!dca?.disponible || dca.ventaja_onzas_pct == null) return null;
+  return (
+    <p className="nota">
+      Compra en partes contra un DCA plano, con la misma caja y la P(alza) a 20 días: {puntos(dca.ventaja_onzas_pct, 2)} onzas
+      ({numero(dca.onzas_partes ?? 0, 2)} contra {numero(dca.onzas_dca ?? 0, 2)}). Adelantó {dca.adelantos ?? 0} tramos y aplazó {dca.aplazos ?? 0}. {dca.nota}
+    </p>
+  );
+}
+
+function Diebold({ modelo }: { modelo: Modelo }) {
+  const dm = modelo.estudio?.comparacion?.diebold_mariano;
+  if (!dm) return null;
+  const frases = (["5", "20"] as const).flatMap((horizonte) => {
+    const bloque = dm[horizonte]?.nuevo_vs_ridge?.sin_solapar;
+    const contraCero = dm[horizonte]?.nuevo_vs_cero?.sin_solapar;
+    if (!bloque && !contraCero) return [];
+    const partes = [`A ${horizonte} días, Diebold-Mariano sin solapar.`];
+    if (contraCero?.p != null) {
+      partes.push(
+        `Contra el precio quieto, p=${numero(contraCero.p, 3)} (${contraCero.modelo_mejor ? "el modelo se equivoca menos" : "no se equivoca menos"}).`,
+      );
+    }
+    if (bloque?.p != null) {
+      partes.push(
+        `Contra el Ridge, p=${numero(bloque.p, 3)} (${bloque.modelo_mejor ? "la mediana se equivoca menos" : "la mediana no se equivoca menos"}).`,
+      );
+    }
+    return [partes.join(" ")];
+  });
+  if (frases.length === 0) return null;
+  return (
+    <>
+      {frases.map((frase) => (
+        <p key={frase} className="nota">{frase}</p>
+      ))}
     </>
   );
 }
@@ -354,10 +645,11 @@ function TarjetaPronostico({ pronostico }: { pronostico: Pronostico }) {
 function Precision({ modelo }: { modelo: Modelo }) {
   return (
     <>
+      <TablaAntesDespues modelo={modelo} />
       <div className="tabla-wrap">
         <table>
           <caption>
-            MAE y RMSE en puntos porcentuales aproximados del retorno logarítmico (el error × 100). El acierto es la fracción de signos que coinciden.
+            Métricas del pronóstico titular. MAE y RMSE en puntos porcentuales aproximados del retorno logarítmico (el error × 100). El acierto es la fracción de signos que coinciden.
           </caption>
           <thead>
             <tr>

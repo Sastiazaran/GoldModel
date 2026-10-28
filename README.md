@@ -2,11 +2,15 @@
 
 A small Python study of the gold price. It is not financial advice.
 
-**What it does.** A fair-value regression of log(gold) on the 10-year real yield, log(USD index), log(Brent), VIX, and inflation, with Newey–West errors. An extended fair value adds central-bank net gold purchases, log(GLD holdings), and the Caldara–Iacoviello geopolitical risk index, each lagged so it is not used before it is public. The same equation is re-estimated on rolling 2-year and 3-year windows. Engle–Granger and Johansen tests look for cointegration on weekly data, and an error-correction half-life is reported only when a relation is found. Walk-forward Ridge and gradient-boosting forecasts of 5-day and 20-day returns are compared with a random walk and with the training-window mean; those forecasts also use CFTC COT positioning and the 2-year nominal yield. A separate regression and forecast covers gold in Mexican pesos per gram. The sample is about 20 years of daily data from yfinance, FRED, and the public backups those series use.
+**What it does.** A fair-value regression of log(gold) on the 10-year real yield, log(USD index), log(Brent), VIX, and inflation, with Newey–West errors. That regression stays as the baseline. A second fair value adds the 10-year breakeven, central-bank purchases, the geopolitical risk index and a post-24 February 2022 dummy, with Kalman and Markov time-varying betas. Direction (up, flat, down), regimes and conformal intervals are scored out of sample and replace the headline only when they beat this baseline. An extended fair value adds central-bank net gold purchases, log(GLD holdings), and the Caldara–Iacoviello geopolitical risk index, each lagged so it is not used before it is public. The same equation is re-estimated on rolling 2-year and 3-year windows. Engle–Granger and Johansen tests look for cointegration on weekly data, and an error-correction half-life is reported only when a relation is found. Walk-forward Ridge and gradient-boosting forecasts of 5-day and 20-day returns are compared with a random walk and with the training-window mean; those forecasts also use CFTC COT positioning and the 2-year nominal yield. A separate regression and forecast covers gold in Mexican pesos per gram. The sample is about 20 years of daily data from yfinance, FRED, and the public backups those series use.
 
 **Dashboard.** `dashboard/` is a Next.js app with a Spanish (es-MX) interface. It reads JSON committed under `dashboard/data/`: the daily note (spot, change, pesos per gram, drivers with links, hedged takeaway), the model's fair value and 5- and 20-day forecasts, accuracy against a no-change baseline, and a plain-language story (`La historia del oro`) that the export writes from those numbers. Refresh with `python scripts/export_dashboard_data.py`, then commit `dashboard/data/snapshot.json` and `dashboard/data/reportes.json`. Daily notes are `data/reports/YYYY-MM-DD.json`. On Vercel, set the root directory to `dashboard`, framework Next.js, build command `npm run build`. No environment variables. The longer instructions are in the Spanish section below.
 
-**Results, as of 19 October 2026.** COMEX gold at $4,146.80/oz sits about +35% above the base walk-forward fair value. Adding central-bank purchases, GLD holdings, and geopolitical risk closes about 17 percentage points of that gap and leaves it near +18%. The latest 2-year and 3-year windows put the price about 11% and 8% below those shorter-sample values. Engle–Granger (p = 0.87) and Johansen (trace 18.8 against a 5% critical value of 29.8) do not find cointegration, so no equilibrium half-life is reported. Out-of-sample R² is negative for both Ridge and gradient boosting: about −0.02 and −0.05 for Ridge at 5 and 20 days against a random walk, and about −0.04 and −0.04 for boosting. Neither beats a random walk or the training-window mean. The signs on the real yield and the USD index flipped after 2022. In pesos per gram the metal is about +11% above its own fair value.
+**Results, as of 28 October 2026.** COMEX gold (`GC=F`) closed at $4,063.90/oz. The base walk-forward fair value is $2,935.61 (gap +38.4%). The new expanding-window regression, which adds the 10-year breakeven, lagged central-bank purchases, the GPR index and a dummy from 24 February 2022, is the headline fair value because its out-of-sample log RMSE is lower: 0.238 against 0.341 for the base, on 225 non-overlapping dates. That headline value is $2,316.12, so today's gap is wider, +75.5%, not narrower. A Kalman filter sits at $4,045.0 and is not promoted: its one-step error tracks the price. Markov regression only produces a value from late 2024 ($1,967, n=25) and stays off the headline.
+
+The 5- and 20-day return forecasts stay with the old Ridge. On the same non-overlapping dates the new quantile median has a higher RMSE (5-day 0.0241 vs 0.0236, n=742; 20-day 0.0498 vs 0.0476, n=184). Diebold-Mariano against no-change does not find that Ridge is better than a flat forecast (5-day p=0.31, 20-day p=0.49). The quantile model is worse than no-change (5-day p=0.008, 20-day p=0.043). Direction classification does not beat the base-rate Brier score (5-day 0.225 vs 0.217; 20-day 0.262 vs 0.228). The 80% conformal band covered 78.7% of 5-day outcomes (n=742) and 76.1% of 20-day outcomes (n=184). The filtered regime on 28 October is "tasas reales altas". A front-loaded DCA rule bought 0.26% fewer ounces than plain DCA.
+
+**Earlier results, as of 19 October 2026.** COMEX gold at $4,146.80/oz sits about +35% above the base walk-forward fair value. Adding central-bank purchases, GLD holdings, and geopolitical risk closes about 17 percentage points of that gap and leaves it near +18%. The latest 2-year and 3-year windows put the price about 11% and 8% below those shorter-sample values. Engle–Granger (p = 0.87) and Johansen (trace 18.8 against a 5% critical value of 29.8) do not find cointegration, so no equilibrium half-life is reported. Out-of-sample R² is negative for both Ridge and gradient boosting: about −0.02 and −0.05 for Ridge at 5 and 20 days against a random walk, and about −0.04 and −0.04 for boosting. Neither beats a random walk or the training-window mean. The signs on the real yield and the USD index flipped after 2022. In pesos per gram the metal is about +11% above its own fair value.
 
 **How to run.**
 
@@ -16,7 +20,7 @@ python pruebas.py
 python main.py
 ```
 
-`pruebas.py` is the offline check (34 tests). `main.py` downloads the data and writes the report and the charts below.
+`pruebas.py` is the offline check. `main.py` downloads the data and writes the report and the charts below.
 
 ![Gold price and walk-forward fair value](outputs/precio_vs_valor_justo.png)
 
@@ -123,7 +127,13 @@ fecha de publicación, y que el entrenamiento del pronóstico no vea el futuro.
 | --- | --- |
 | `main.py` | Corre el modelo y escribe el informe. |
 | `datos.py` | Descarga, alinea los días y aplica la regla del IPC. |
-| `modelos.py` | Las dos regresiones y las métricas fuera de muestra. |
+| `modelos.py` | Las dos regresiones y las métricas fuera de muestra. El modelo viejo se queda aquí. |
+| `evaluacion.py` | Caminata expansiva, purga, embargo y Diebold-Mariano. |
+| `valor_nuevo.py` | Valor justo con breakeven, dummie de 2022, Kalman y Markov. |
+| `regimes.py` | Regímenes con HMM filtrado, k-means, mezcla y análogos. |
+| `classify.py` | Alza, plano o baja, con logística, bosque y LightGBM. |
+| `intervalos.py` | Cuantiles de LightGBM, conformal con MAPIE y GARCH. |
+| `estudio.py` | Junta lo nuevo y solo lo promueve si le gana al modelo viejo fuera de muestra. |
 | `reporte.py` | El texto del informe y las gráficas. |
 | `pruebas.py` | Pruebas pequeñas, sin red. |
 | `requirements.txt` | Librerías. `pip` las instala. |

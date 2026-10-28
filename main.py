@@ -13,6 +13,7 @@ import sys
 from pathlib import Path
 
 from datos import actualizar_datos
+from estudio import correr_estudio
 from modelos import ajustar_oro_mxn, ajustar_pronosticos, ajustar_valor_justo, preparar_muestra
 from reporte import construir_informe, guardar_graficas, guardar_tablas
 
@@ -41,7 +42,8 @@ def main() -> None:
     valor = ajustar_valor_justo(muestra)
     pronostico = ajustar_pronosticos(valor["df"])
     mxn = ajustar_oro_mxn(pronostico["df"])
-    texto = construir_informe(datos, valor, pronostico, mxn)
+    estudio = correr_estudio(pronostico["df"])
+    texto = construir_informe(datos, valor, pronostico, mxn, estudio)
     print(texto, end="")
 
     CARPETA_SALIDAS.mkdir(parents=True, exist_ok=True)

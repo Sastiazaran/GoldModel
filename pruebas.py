@@ -689,6 +689,186 @@ def probar_relato_cierra_sin_venderlo_como_consejo() -> None:
     assert "no le gana a pensar que el precio no cambia" in cierre
 
 
+def probar_purga_deja_un_horizonte_de_embargo() -> None:
+    from evaluacion import bloques_cv_purgada, indices_purgados, limite_pasado, mascara_entrenamiento_ambos_lados
+
+    assert limite_pasado(50, 20, 20) == 9
+    indices = indices_purgados(100, t=50, horizonte=20, fila_valida=np.ones(100, dtype=bool), embargo=20)
+    assert indices.max() == 9
+    assert 10 not in indices
+    bloques = bloques_cv_purgada(400, horizonte=10, n_bloques=4, embargo=10, min_entrenamiento=80)
+    assert bloques
+    for bloque in bloques:
+        assert bloque["train"].max() <= limite_pasado(bloque["test_inicio"], 10, 10)
+        assert bloque["train"].max() < bloque["test"][0]
+    mascara = mascara_entrenamiento_ambos_lados(200, 80, 99, horizonte=5, embargo=5)
+    assert not mascara[90]
+    assert mascara[0]
+    assert mascara[199]
+    # 109 todavía está dentro del embargo; 110 ya quedó del otro lado.
+    assert not mascara[109]
+    assert mascara[110]
+
+
+def probar_diebold_mariano_prefiere_al_pronostico_perfecto() -> None:
+    from evaluacion import diebold_mariano
+
+    y = np.array([0.2, -0.1, 0.05, -0.3, 0.15, 0.4, -0.2, 0.1, -0.05, 0.3, 0.12, -0.18])
+    perfecto = diebold_mariano(y, y.copy(), np.zeros(len(y)), horizonte=1)
+    assert perfecto["sin_solapar"]["modelo_mejor"] is True
+    assert perfecto["sin_solapar"]["p"] is not None and perfecto["sin_solapar"]["p"] < 0.05
+    igual = diebold_mariano(y, np.zeros(len(y)), np.zeros(len(y)), horizonte=1)
+    assert abs(igual["sin_solapar"]["media_diferencial"]) < 1e-12
+    # Con horizonte 5 la varianza de Newey-West tiene que salir un número, no tronar.
+    largo = np.linspace(-0.02, 0.03, 40)
+    solapado = diebold_mariano(largo, largo * 0.2, np.zeros(len(largo)), horizonte=5)
+    assert solapado["solapado"]["n"] == 40
+    assert solapado["solapado"]["estadistico"] is not None
+
+
+def probar_dummie_de_febrero_2022_no_se_adelanta() -> None:
+    from evaluacion import fecha_no_adelanta
+    from valor_nuevo import FECHA_QUIEBRE, dummy_post_feb2022
+
+    fechas = pd.to_datetime(["2022-02-23", "2022-02-24", "2022-03-01"])
+    dummie = dummy_post_feb2022(fechas)
+    assert list(dummie) == [0.0, 1.0, 1.0]
+    assert FECHA_QUIEBRE == pd.Timestamp("2022-02-24")
+    assert fecha_no_adelanta("2026-07-31", "2026-07-31")
+    assert not fecha_no_adelanta("2026-07-30", "2026-07-31")
+
+
+def probar_kalman_no_usa_el_precio_de_hoy_ni_el_futuro() -> None:
+    from valor_nuevo import filtrar_kalman
+
+    azar = np.random.default_rng(7)
+    n = 420
+    x = np.column_stack([np.ones(n), azar.normal(size=(n, 3))])
+    y = x @ np.array([1.0, -0.4, 0.2, 0.1]) + azar.normal(0, 0.05, n)
+    base = filtrar_kalman(x, y, min_obs=80)
+    futuro = y.copy()
+    futuro[300:] += 1.5
+    con_futuro = filtrar_kalman(x, futuro, min_obs=80)
+    assert np.isfinite(base["yhat"][200])
+    assert abs(base["yhat"][200] - con_futuro["yhat"][200]) < 1e-8
+    hoy = y.copy()
+    hoy[200] += 4.0
+    con_hoy = filtrar_kalman(x, hoy, min_obs=80)
+    assert abs(base["yhat"][200] - con_hoy["yhat"][200]) < 1e-8
+    assert abs(base["yhat"][230] - con_hoy["yhat"][230]) > 1e-4
+
+
+def probar_markov_no_usa_el_futuro() -> None:
+    from valor_nuevo import camino_markov
+
+    azar = np.random.default_rng(8)
+    n = 260
+    x = np.column_stack([azar.normal(size=n), azar.normal(size=n), np.linspace(0, 1, n)])
+    y = 0.4 * x[:, 0] - 0.2 * x[:, 1] + azar.normal(0, 0.15, n)
+    y[180:] += 0.3
+    nombres = ["real", "dolar", "post_feb2022"]
+    base = camino_markov(x, y, nombres, min_obs=90, paso=200)
+    futuro = y.copy()
+    futuro[200:] += 2.0
+    con_futuro = camino_markov(x, futuro, nombres, min_obs=90, paso=200)
+    assert base["n_ajustes"] >= 1
+    assert np.isfinite(base["yhat"][120])
+    assert abs(base["yhat"][120] - con_futuro["yhat"][120]) < 1e-8
+
+
+def probar_regimen_filtrado_ignora_el_futuro() -> None:
+    from regimes import asignar_regimenes
+
+    azar = np.random.default_rng(9)
+    n = 360
+    x = azar.normal(size=(n, 5))
+    x[200:, 1] += 2.5
+    chocante = x.copy()
+    chocante[250:] += 4.0
+    base = asignar_regimenes(x, min_obs=80, paso=60, ventana=160, semilla=0)
+    otro = asignar_regimenes(chocante, min_obs=80, paso=60, ventana=160, semilla=0)
+    assert np.allclose(base["estado"][:240], otro["estado"][:240], equal_nan=True)
+    assert np.isfinite(base["estado"][200:240]).mean() > 0.8
+    assert len(base["nombres"]) == 3
+
+
+def probar_clasificador_no_entrena_con_la_etiqueta_abierta() -> None:
+    from classify import clasificar_walk_forward, etiquetar_direccion
+    from evaluacion import limite_pasado
+
+    azar = np.random.default_rng(10)
+    n = 360
+    x = azar.normal(size=(n, 4))
+    y = azar.normal(0, 0.02, n)
+    vol = np.full(n, 0.01)
+    corrida = clasificar_walk_forward(x, y, vol, horizonte=5, min_entrenamiento=80, paso=120, embargo=5)
+    assert corrida["indice_max_entreno"] is not None
+    assert corrida["indice_max_entreno"] <= limite_pasado(corrida["t_ultimo_ajuste"], 5, 5)
+    futuro = y.copy()
+    futuro[300:] += 0.2
+    otra = clasificar_walk_forward(x, futuro, vol, horizonte=5, min_entrenamiento=80, paso=120, embargo=5)
+    assert np.allclose(corrida["prob_up"][:280], otra["prob_up"][:280], equal_nan=True)
+    clase, banda = etiquetar_direccion(np.array([0.05, 0.001, -0.05]), np.array([0.01, 0.01, 0.01]), horizonte=4)
+    # Banda = 0.5 * 0.01 * 2 = 0.01. 0.05 alza, 0.001 plano, -0.05 baja.
+    assert list(clase) == [1, 0, -1]
+    assert abs(banda[0] - 0.01) < 1e-12
+
+
+def probar_intervalo_conformal_no_entrena_con_el_futuro() -> None:
+    from evaluacion import cobertura_intervalo, limite_pasado
+    from intervalos import caminar_intervalos
+
+    azar = np.random.default_rng(11)
+    n = 320
+    x = azar.normal(size=(n, 3))
+    y = 0.1 * x[:, 0] + azar.normal(0, 0.05, n)
+    banda = caminar_intervalos(x, y, horizonte=5, min_entrenamiento=90, paso=140, embargo=5)
+    assert banda["indice_max_entreno"] is not None
+    assert banda["indice_max_entreno"] <= limite_pasado(banda["t_ultimo_ajuste"], 5, 5)
+    assert np.isfinite(banda["bajo"]).sum() > 20
+    futuro = y.copy()
+    futuro[280:] += 1.0
+    otra = caminar_intervalos(x, futuro, horizonte=5, min_entrenamiento=90, paso=140, embargo=5)
+    assert np.allclose(banda["mediana"][:260], otra["mediana"][:260], equal_nan=True)
+    cob = cobertura_intervalo(y, banda["bajo"], banda["alto"], horizonte=5)
+    assert cob["sin_solapar"]["n"] > 5
+    assert 0.0 <= cob["sin_solapar"]["cobertura"] <= 1.0
+
+
+def probar_compra_en_partes_adelanta_la_caja() -> None:
+    from classify import backtest_compra_en_partes
+
+    precios = np.array([100.0, 200.0])
+    alta = np.array([0.9, 0.9])
+    partes = backtest_compra_en_partes(precios, alta, paso=1, umbral_alto=0.6, umbral_bajo=0.35)
+    assert partes["disponible"]
+    assert abs(partes["dolares"] - 2) < 1e-9
+    assert abs(partes["dolares_partes"] - 2) < 1e-9
+    assert abs(partes["onzas_partes"] - 0.02) < 1e-9
+    assert partes["onzas_partes"] > partes["onzas_dca"]
+    baja = backtest_compra_en_partes(precios, np.array([0.1, 0.1]), paso=1, umbral_alto=0.6, umbral_bajo=0.35)
+    assert baja["onzas_partes"] < baja["onzas_dca"]
+
+
+def probar_snapshot_publico_trae_probabilidades() -> None:
+    modulo = _modulo_export()
+    estudio = {
+        "esquema": "prueba",
+        "avisos": [],
+        "clasificacion": {5: {"prob_up": 0.42, "prob_plano": 0.2, "prob_baja": 0.38, "modelo": "logistica", "metricas": {}}},
+        "comparacion": {"promovido": {"5": False, "20": False}, "filas": []},
+        "valor": {"promovido": False},
+        "intervalos": {},
+        "regimen": {"disponible": False},
+        "analogos": {"disponible": False, "periodos": []},
+        "dca": {"disponible": False},
+    }
+    publico = modulo._estudio_publico(estudio)
+    assert publico["clasificacion"]["5"]["prob_up"] == 0.42
+    assert modulo._prob_publica(estudio, 5) == 0.42
+    assert modulo._valor_titular({"valor_justo_vf": 100.0, "brecha_vf_pct": 1.0}, estudio)[2] == "base"
+
+
 def main() -> None:
     funciones = [valor for nombre, valor in sorted(globals().items()) if nombre.startswith("probar_")]
     fallos = 0

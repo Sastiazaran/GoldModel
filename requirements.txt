@@ -7,3 +7,7 @@ requests>=2.31
 yfinance>=0.2.50
 xlrd>=2.0.1
 openpyxl>=3.1
+lightgbm>=4.3
+hmmlearn>=0.3
+mapie>=1.0
+arch>=7.0

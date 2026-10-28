@@ -56,6 +56,9 @@ TICKERS_YAHOO = {
     "sp500": "^GSPC",
     "plata": "SI=F",
     "usd_mxn": "MXN=X",
+    # GVZ: volatilidad implícita del oro en el CBOE. Es un cierre de mercado,
+    # usable el mismo día, igual que el VIX. Si Yahoo no lo trae, el modelo sigue.
+    "gvz": "^GVZ",
 }
 
 SERIES_FRED = {
@@ -86,6 +89,7 @@ SERIES_POSITIVAS = {
     "usd_mxn_fred",
     "vix",
     "vix_yahoo",
+    "gvz",
     "cpi",
 }
 
@@ -611,13 +615,19 @@ def pegar_publicado(fechas, tabla: pd.DataFrame, columnas: list[str]) -> pd.Data
     )
 
 
+CARPETA_SNAPSHOTS = CARPETA_DATOS / "snapshots"
+
+
 def _guardar_tabla(nombre: str, tabla: pd.DataFrame) -> None:
     CARPETA_CRUDOS.mkdir(parents=True, exist_ok=True)
     tabla.to_csv(CARPETA_CRUDOS / f"{nombre}.csv", index=False)
+    # Copia en el repositorio. data/raw está ignorado; si la fuente falla
+    # la próxima vez, esta copia (con fecha y URL en MANIFEST.json) es el respaldo.
+    CARPETA_SNAPSHOTS.mkdir(parents=True, exist_ok=True)
+    tabla.to_csv(CARPETA_SNAPSHOTS / f"{nombre}.csv", index=False)
 
 
-def _leer_tabla_cache(nombre: str) -> pd.DataFrame | None:
-    ruta = CARPETA_CRUDOS / f"{nombre}.csv"
+def _leer_tabla_en(ruta: Path) -> pd.DataFrame | None:
     if not ruta.exists():
         return None
     tabla = pd.read_csv(ruta)
@@ -625,6 +635,13 @@ def _leer_tabla_cache(nombre: str) -> pd.DataFrame | None:
         return None
     tabla["fecha_disponible"] = pd.to_datetime(tabla["fecha_disponible"])
     return tabla
+
+
+def _leer_tabla_cache(nombre: str) -> pd.DataFrame | None:
+    tabla = _leer_tabla_en(CARPETA_CRUDOS / f"{nombre}.csv")
+    if tabla is not None:
+        return tabla
+    return _leer_tabla_en(CARPETA_SNAPSHOTS / f"{nombre}.csv")
 
 
 def _get_bytes(sesion: requests.Session, url: str, segundos: int = 60) -> bytes:
@@ -1162,6 +1179,13 @@ def actualizar_datos() -> dict:
     if fred.get("vix") is None and vix is yahoo.get("vix_yahoo"):
         vix_etiqueta = "Yahoo Finance ^VIX"
     poner("vix", vix, vix_etiqueta, "https://www.cboe.com/tradable_products/vix/")
+    if "gvz" in yahoo:
+        poner(
+            "gvz",
+            yahoo.get("gvz"),
+            "Yahoo Finance ^GVZ (volatilidad implícita del oro, CBOE)",
+            "https://www.cboe.com/us/indices/dashboard/gvz/",
+        )
 
     if fred.get("brent_spot") is not None:
         poner("brent", fred["brent_spot"], "FRED DCOILBRENTEU (Brent spot)", "https://fred.stlouisfed.org/series/DCOILBRENTEU")
@@ -1250,6 +1274,24 @@ def actualizar_datos() -> dict:
         fechas[nombre] = str(pd.Timestamp(tabla["fecha_disponible"].max()).date())
 
     panel.to_csv(CARPETA_DATOS / "panel_diario.csv", index_label="fecha")
+    if CARPETA_SNAPSHOTS.exists():
+        manifest = {
+            "nota": (
+                "Copias de series que a veces no responden (GPR, GLD, COT, bancos centrales). "
+                "No son datos inventados: salen de la descarga de esta corrida. "
+                "La fecha de cada fila es fecha_disponible, no la fecha de corte."
+            ),
+            "generado_en": pd.Timestamp.now(tz="UTC").strftime("%Y-%m-%d"),
+            "fuentes": {
+                nombre: fuentes[nombre]
+                for nombre in ("gpr", "gld_toneladas", "cot_neto", "compras_bc_ton", "gvz")
+                if nombre in fuentes
+            },
+        }
+        (CARPETA_SNAPSHOTS / "MANIFEST.json").write_text(
+            json.dumps(manifest, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
     (CARPETA_DATOS / "fuentes.json").write_text(
         json.dumps({"fuentes": fuentes, "fechas": fechas, "avisos": avisos}, ensure_ascii=False, indent=2),
         encoding="utf-8",

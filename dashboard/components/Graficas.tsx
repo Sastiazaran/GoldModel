@@ -18,10 +18,14 @@ type Props = {
   puntos: Punto[];
   marcas: Marca[];
   mostrarAmpliado: boolean;
+  mostrarNuevo: boolean;
   desde: string;
+  nombresRegimen?: string[];
 };
 
-export function GraficaPrecio({ puntos, marcas, mostrarAmpliado, desde }: Props) {
+const CLASE_REGIMEN = ["linea-reg-0", "linea-reg-1", "linea-reg-2"];
+
+export function GraficaPrecio({ puntos, marcas, mostrarAmpliado, mostrarNuevo, desde, nombresRegimen = [] }: Props) {
   const tituloId = useId();
   const [hover, setHover] = useState<number | null>(null);
   const n = puntos.length;
@@ -36,6 +40,9 @@ export function GraficaPrecio({ puntos, marcas, mostrarAmpliado, desde }: Props)
     if (punto.valor_justo != null) valores.push(punto.valor_justo);
     if (mostrarAmpliado && punto.valor_ampliado != null) valores.push(punto.valor_ampliado);
     if (punto.pronostico_20 != null) valores.push(punto.pronostico_20);
+    if (punto.intervalo_bajo != null) valores.push(punto.intervalo_bajo);
+    if (punto.intervalo_alto != null) valores.push(punto.intervalo_alto);
+    if (mostrarNuevo && punto.valor_nuevo != null) valores.push(punto.valor_nuevo);
   }
   for (const marca of marcas) {
     if (marca.nivel != null) valores.push(marca.nivel);
@@ -49,7 +56,7 @@ export function GraficaPrecio({ puntos, marcas, mostrarAmpliado, desde }: Props)
   const xDe = (indice: number) => PAD.l + (indice / xMax) * (ANCHO - PAD.l - PAD.r);
   const yDe = (valor: number) => PAD.t + (1 - (valor - min) / (max - min)) * (ALTO - PAD.t - PAD.b);
 
-  const trazos = (clave: "precio" | "valor_justo" | "valor_ampliado" | "pronostico_20") => {
+  const trazos = (clave: "precio" | "valor_justo" | "valor_ampliado" | "valor_nuevo" | "pronostico_20") => {
     const trozos: string[] = [];
     let actual: string[] = [];
     puntos.forEach((punto, indice) => {
@@ -64,6 +71,47 @@ export function GraficaPrecio({ puntos, marcas, mostrarAmpliado, desde }: Props)
     if (actual.length > 1) trozos.push(actual.join(" "));
     return trozos;
   };
+
+  const precioPorRegimen = () => {
+    const trozos: { clase: string; puntos: string }[] = [];
+    let actual: string[] = [];
+    let clase = "";
+    const cerrar = () => {
+      if (actual.length > 1) trozos.push({ clase, puntos: actual.join(" ") });
+      actual = [];
+    };
+    puntos.forEach((punto, indice) => {
+      if (punto.precio == null) {
+        cerrar();
+        clase = "";
+        return;
+      }
+      const siguiente = punto.regimen == null ? "linea-precio" : CLASE_REGIMEN[punto.regimen] ?? "linea-precio";
+      const coord = `${xDe(indice).toFixed(1)},${yDe(punto.precio).toFixed(1)}`;
+      if (clase && siguiente !== clase) {
+        actual.push(coord);
+        cerrar();
+      }
+      clase = siguiente;
+      actual.push(coord);
+    });
+    cerrar();
+    return trozos;
+  };
+
+  const bandaIntervalo = () => {
+    const altos: string[] = [];
+    const bajos: string[] = [];
+    puntos.forEach((punto, indice) => {
+      if (punto.intervalo_bajo == null || punto.intervalo_alto == null) return;
+      const x = xDe(indice).toFixed(1);
+      altos.push(`${x},${yDe(punto.intervalo_alto).toFixed(1)}`);
+      bajos.push(`${x},${yDe(punto.intervalo_bajo).toFixed(1)}`);
+    });
+    if (altos.length < 2) return null;
+    return [...altos, ...bajos.reverse()].join(" ");
+  };
+  const banda = bandaIntervalo();
 
   const ticks = [0, 0.33, 0.66, 1].map((parte) => min + (max - min) * (1 - parte));
   const ultimo = puntos[n - 1];
@@ -106,6 +154,7 @@ export function GraficaPrecio({ puntos, marcas, mostrarAmpliado, desde }: Props)
           </g>
         ))}
         <line className="hoy" x1={xDe(n - 1)} x2={xDe(n - 1)} y1={PAD.t} y2={ALTO - PAD.b} />
+        {banda && <polygon className="banda-intervalo" points={banda} />}
         {trazos("pronostico_20").map((puntosLinea) => (
           <polyline key={puntosLinea.slice(0, 24)} className="linea-pronostico" points={puntosLinea} />
         ))}
@@ -113,11 +162,15 @@ export function GraficaPrecio({ puntos, marcas, mostrarAmpliado, desde }: Props)
           trazos("valor_ampliado").map((puntosLinea) => (
             <polyline key={puntosLinea.slice(0, 24)} className="linea-ampliada" points={puntosLinea} />
           ))}
+        {mostrarNuevo &&
+          trazos("valor_nuevo").map((puntosLinea) => (
+            <polyline key={puntosLinea.slice(0, 24)} className="linea-nueva" points={puntosLinea} />
+          ))}
         {trazos("valor_justo").map((puntosLinea) => (
           <polyline key={puntosLinea.slice(0, 24)} className="linea-justo" points={puntosLinea} />
         ))}
-        {trazos("precio").map((puntosLinea) => (
-          <polyline key={puntosLinea.slice(0, 24)} className="linea-precio" points={puntosLinea} />
+        {precioPorRegimen().map((trazo, indice) => (
+          <polyline key={`${trazo.clase}-${indice}`} className={trazo.clase} points={trazo.puntos} />
         ))}
         {ultimo.precio != null &&
           marcas.map((marca) => {
@@ -154,10 +207,17 @@ export function GraficaPrecio({ puntos, marcas, mostrarAmpliado, desde }: Props)
         </text>
       </svg>
       <div className="leyenda" aria-hidden="true">
-        <span><i className="muestra precio" /> Precio GC=F</span>
-        <span><i className="muestra justo" /> Valor justo</span>
+        <span><i className="muestra precio" /> Precio GC=F, color del régimen</span>
+        {nombresRegimen.map((nombre, indice) => (
+          <span key={nombre}>
+            <i className={`muestra reg-${indice}`} /> {nombre}
+          </span>
+        ))}
+        <span><i className="muestra justo" /> Valor justo titular</span>
+        <span><i className="muestra intervalo" /> Banda de 20 días</span>
         <span><i className="muestra pronostico" /> Pronóstico de 20 días, en el día que vence</span>
         {mostrarAmpliado && <span><i className="muestra ampliado" /> Valor justo ampliado</span>}
+        {mostrarNuevo && <span><i className="muestra nuevo" /> Valor justo Kalman</span>}
       </div>
       <p className="lectura-grafica">
         {fechaCorta(activo.fecha)}

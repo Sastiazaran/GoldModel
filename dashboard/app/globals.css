@@ -241,7 +241,11 @@ section { margin-top: 42px; }
 .grafica svg { width: 100%; height: auto; display: block; touch-action: none; }
 .guia { stroke: #eadfce; stroke-width: 1; }
 .eje { fill: var(--suave); font-size: 12px; font-family: var(--sans); }
-.linea-precio { fill: none; stroke: var(--oro); stroke-width: 2.2; }
+.linea-precio, .linea-reg-0 { fill: none; stroke: var(--oro); stroke-width: 2.2; }
+.linea-reg-1 { fill: none; stroke: var(--modelo); stroke-width: 2.2; }
+.linea-reg-2 { fill: none; stroke: var(--baja); stroke-width: 2.2; }
+.linea-nueva { fill: none; stroke: #2f6f6a; stroke-width: 1.4; }
+.banda-intervalo { fill: #1d4e89; opacity: 0.12; stroke: none; }
 .linea-justo { fill: none; stroke: var(--modelo); stroke-width: 1.7; }
 .linea-ampliada { fill: none; stroke: var(--ampliado); stroke-width: 1.4; }
 .linea-pronostico { fill: none; stroke: var(--baja); stroke-width: 1.3; stroke-dasharray: 4 4; opacity: 0.85; }
@@ -269,6 +273,30 @@ section { margin-top: 42px; }
 .muestra.justo { background: var(--modelo); }
 .muestra.pronostico { background: var(--baja); }
 .muestra.ampliado { background: var(--ampliado); }
+.muestra.nuevo { background: #2f6f6a; }
+.muestra.intervalo { background: rgba(29, 78, 137, 0.35); height: 8px; }
+.muestra.reg-0 { background: var(--oro); }
+.muestra.reg-1 { background: var(--modelo); }
+.muestra.reg-2 { background: var(--baja); }
+
+.toggles { display: flex; flex-wrap: wrap; gap: 14px; }
+.medidores { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+.medidor {
+  display: flex;
+  height: 16px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--linea);
+  margin: 10px 0;
+}
+.med-alza { background: var(--alza); }
+.med-plano { background: #c4b49a; }
+.med-baja { background: var(--baja); }
+.direccion h3 { margin: 22px 0 0; }
+
+@media (max-width: 860px) {
+  .medidores { grid-template-columns: 1fr; }
+}
 
 .tabla-wrap { overflow-x: auto; margin-top: 16px; max-width: 100%; }
 .vivo { max-width: 100%; }

@@ -650,7 +650,95 @@ def _seccion_papa(valor: dict, pronostico: dict, mxn: dict | None) -> list[str]:
     return lineas
 
 
-def construir_informe(datos: dict, valor: dict, pronostico: dict, mxn: dict | None = None) -> str:
+def _seccion_estudio(estudio: dict | None) -> list[str]:
+    """Cuenta el modelo nuevo con los números de esta corrida. No rellena huecos."""
+    lineas = ["", "13) Modelo nuevo: evaluación, regímenes y dirección"]
+    if not estudio:
+        lineas.append("No se corrió el modelo nuevo.")
+        return lineas
+    lineas.append(parrafo(estudio.get("esquema") or ""))
+    valor = estudio.get("valor") or {}
+    if valor:
+        lineas.append(
+            f"Valor justo de Kalman: {num(valor.get('valor_kalman'))} USD/oz, "
+            f"brecha {pct(valor.get('brecha_kalman_pct'), 1, signo=True)}. "
+            f"RMSE del log, una observación cada 20 sesiones: "
+            f"base {num(valor.get('rmse_log_base'), 4)}, "
+            f"Kalman {num(valor.get('rmse_log_kalman'), 4)}, "
+            f"Markov {num(valor.get('rmse_log_markov'), 4)}."
+        )
+        if valor.get("promovido"):
+            lineas.append(f"El valor justo titular pasa a {valor.get('titular')}: le bajó el RMSE a la base.")
+        else:
+            lineas.append("El valor justo titular se queda en el modelo base: el nuevo no le bajó el RMSE.")
+        if valor.get("markov_convergio") is False:
+            lineas.append("El Markov no llegó a converger. El número es el último intento, no una solución cerrada.")
+        lineas.append("Variables del valor nuevo: " + ", ".join(valor.get("variables") or []) + ".")
+    comp = estudio.get("comparacion") or {}
+    if comp.get("criterio"):
+        lineas.append(parrafo(comp["criterio"]))
+    for fila in comp.get("filas") or []:
+        lineas.append(
+            f"  {fila['modelo']} a {fila['horizonte']} días, n={fila['n']}: "
+            f"RMSE {pct((fila.get('rmse_mismas_fechas') or float('nan')) * 100, 2)} "
+            f"en las mismas fechas, R² contra cero {r2_txt(fila.get('r2_cero'))}, "
+            f"acierto {pct((fila.get('acierto') or float('nan')) * 100, 1)}. "
+            f"{'Titular.' if fila.get('es_titular') else 'Comparación.'}"
+        )
+    for horizonte, bloque in (estudio.get("clasificacion") or {}).items():
+        elegido = (bloque.get("metricas") or {}).get("elegido") or {}
+        lineas.append(
+            f"Dirección a {horizonte} días ({bloque.get('modelo') or 'sin modelo'}): "
+            f"P(alza) {pct((bloque.get('prob_up') or float('nan')) * 100, 1)}. "
+            f"Balanced accuracy {pct((elegido.get('balanced_accuracy') or float('nan')) * 100, 1)} "
+            f"frente a siempre alza {pct((elegido.get('balanced_accuracy_siempre_alza') or float('nan')) * 100, 1)}. "
+            f"ROC-AUC {num(elegido.get('roc_auc'), 3)}. "
+            f"Brier {num(elegido.get('brier'), 3)} "
+            f"(siempre alza {num(elegido.get('brier_siempre_alza'), 3)}, "
+            f"tasa base {num(elegido.get('brier_tasa_base'), 3)})."
+        )
+    for horizonte, bloque in (estudio.get("intervalos") or {}).items():
+        cob = (bloque.get("cobertura") or {}).get("sin_solapar") or {}
+        lineas.append(
+            f"Intervalo {int((bloque.get('nivel') or 0) * 100)}% a {horizonte} días "
+            f"({bloque.get('metodo')}): cobertura fuera de muestra "
+            f"{pct((cob.get('cobertura') or float('nan')) * 100, 1)} con n={cob.get('n')}."
+        )
+        garch = bloque.get("garch") or {}
+        cob_g = (garch.get("cobertura") or {}).get("sin_solapar") or {}
+        if cob_g.get("cobertura") is not None:
+            lineas.append(
+                f"  GARCH(1,1), misma cobertura nominal: {pct(cob_g['cobertura'] * 100, 1)} con n={cob_g.get('n')}."
+            )
+    regimen = estudio.get("regimen") or {}
+    if regimen.get("disponible"):
+        lineas.append(
+            f"Régimen de hoy, filtro HMM: {regimen.get('nombre')} "
+            f"(estado {regimen.get('id')})."
+        )
+    dca = estudio.get("dca") or {}
+    if dca.get("disponible"):
+        lineas.append(
+            f"Compra en partes contra DCA plano, misma caja: "
+            f"{dca.get('onzas_partes'):.4f} onzas contra {dca.get('onzas_dca'):.4f} "
+            f"({pct(dca.get('ventaja_onzas_pct'), 2, signo=True)}). "
+            f"Adelantos {dca.get('adelantos')}, aplazos {dca.get('aplazos')}."
+        )
+    elif dca.get("nota"):
+        lineas.append(dca["nota"])
+    for aviso in estudio.get("avisos") or []:
+        lineas.append(parrafo(f"- {aviso}"))
+    lineas.append("Nada de esto es una orden de comprar o vender.")
+    return lineas
+
+
+def construir_informe(
+    datos: dict,
+    valor: dict,
+    pronostico: dict,
+    mxn: dict | None = None,
+    estudio: dict | None = None,
+) -> str:
     df = pronostico["df"]
     fecha_modelo = pd.Timestamp(valor["fecha"])
     fila = df.loc[fecha_modelo]
@@ -904,6 +992,7 @@ def construir_informe(datos: dict, valor: dict, pronostico: dict, mxn: dict | No
         ))
     lineas.extend(_seccion_mxn(mxn))
     lineas.extend(_seccion_papa(valor, pronostico, mxn))
+    lineas.extend(_seccion_estudio(estudio))
     lineas.append("")
     lineas.append("11) Chequeo contra la nota del 5 de octubre de 2026")
     lineas.extend(_bloque_snapshot(df, datos))

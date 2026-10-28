@@ -449,12 +449,26 @@ def bloque_pronostico_actual(precio: float, info: dict, horizonte: int) -> dict:
 
 
 def serie_grafica(df: pd.DataFrame, desde: str = DESDE_GRAFICA) -> list[dict]:
-    """Precio, valor justo y el pronóstico de 20 días ya alineado a su vencimiento."""
+    """Precio, valor justo, banda de 20 días y régimen. El pronóstico va en el día que vence."""
     precios = df["oro_usd"].to_numpy(dtype=float)
     pred_20 = df["pred_20"].to_numpy(dtype=float) if "pred_20" in df.columns else np.full(len(df), np.nan)
+    if "pred_mediana_20" in df.columns and "es_titular_20" in df.attrs and df.attrs.get("es_titular_20"):
+        pred_20 = df["pred_mediana_20"].to_numpy(dtype=float)
     alineado = niveles_alineados(precios, pred_20, 20)
-    justo = df["valor_justo_vf"].to_numpy(dtype=float) if "valor_justo_vf" in df.columns else np.full(len(df), np.nan)
+    bajo = df["banda_baja_20"].to_numpy(dtype=float) if "banda_baja_20" in df.columns else np.full(len(df), np.nan)
+    alto = df["banda_alta_20"].to_numpy(dtype=float) if "banda_alta_20" in df.columns else np.full(len(df), np.nan)
+    banda_baja = niveles_alineados(precios, bajo, 20)
+    banda_alta = niveles_alineados(precios, alto, 20)
+    if "valor_titular" in df.columns:
+        justo = df["valor_titular"].to_numpy(dtype=float)
+    elif "valor_justo_vf" in df.columns:
+        justo = df["valor_justo_vf"].to_numpy(dtype=float)
+    else:
+        justo = np.full(len(df), np.nan)
     ampliado = df["valor_ext"].to_numpy(dtype=float) if "valor_ext" in df.columns else np.full(len(df), np.nan)
+    nuevo = df["valor_kalman"].to_numpy(dtype=float) if "valor_kalman" in df.columns else np.full(len(df), np.nan)
+    base = df["valor_justo_vf"].to_numpy(dtype=float) if "valor_justo_vf" in df.columns else np.full(len(df), np.nan)
+    regimen = df["regimen"].to_numpy(dtype=float) if "regimen" in df.columns else np.full(len(df), np.nan)
     limite = pd.Timestamp(desde)
     puntos = []
     for i, fecha in enumerate(df.index):
@@ -462,13 +476,19 @@ def serie_grafica(df: pd.DataFrame, desde: str = DESDE_GRAFICA) -> list[dict]:
             continue
         if not np.isfinite(precios[i]):
             continue
+        regimen_i = int(regimen[i]) if np.isfinite(regimen[i]) else None
         puntos.append(
             {
                 "fecha": _fecha_texto(fecha),
                 "precio": _redondear(precios[i], 2),
                 "valor_justo": _redondear(justo[i], 2),
                 "valor_ampliado": _redondear(ampliado[i], 2),
+                "valor_nuevo": _redondear(nuevo[i], 2),
+                "valor_base": _redondear(base[i], 2),
                 "pronostico_20": _redondear(alineado[i], 2),
+                "intervalo_bajo": _redondear(banda_baja[i], 2),
+                "intervalo_alto": _redondear(banda_alta[i], 2),
+                "regimen": regimen_i,
             }
         )
     return puntos
@@ -717,11 +737,30 @@ def _parrafos_modelo(modelo: dict | None) -> tuple[list[str], dict | None, list[
             "No tengo la brecha en porcentaje."
         )
     else:
-        parrafos.append(
-            f"El cierre del futuro está en {_usd_texto(precio)}. El valor justo, armado solo con lo ya conocido "
-            f"(tasas, dólar, petróleo, nerviosismo e inflación), queda en {_usd_texto(justo)}. "
-            f"El precio {brecha} de esa cuenta."
-        )
+        if modelo.get("valor_justo_modelo") == "ols_nuevo":
+            parrafos.append(
+                f"El cierre del futuro está en {_usd_texto(precio)}. El valor justo titular, "
+                f"armado solo con lo ya conocido, queda en {_usd_texto(justo)}. "
+                f"El precio {brecha} de esa cuenta."
+            )
+            base = _usd_texto(modelo.get("valor_justo_base_usd"))
+            extra = (
+                f"La recta base, también solo con el pasado, queda en {base}. "
+                if base
+                else ""
+            )
+            parrafos.append(
+                "Ese titular no es la recta de siempre. Suma el breakeven, las compras de bancos centrales, "
+                "el índice GPR y una dummie desde el 24 de febrero de 2022. "
+                + extra
+                + "Se usa como titular porque su error fuera de muestra es menor, aunque hoy la brecha sea más ancha."
+            )
+        else:
+            parrafos.append(
+                f"El cierre del futuro está en {_usd_texto(precio)}. El valor justo, armado solo con lo ya conocido "
+                f"(tasas, dólar, petróleo, nerviosismo e inflación), queda en {_usd_texto(justo)}. "
+                f"El precio {brecha} de esa cuenta."
+            )
         if _num(modelo.get("brecha_pct")) is not None and abs(float(modelo["brecha_pct"])) > 15:
             parrafos.append("Una brecha así de ancha puede durar. No es una orden de vender ni de comprar.")
     notas.append({"texto": "Valor justo", "valor": _usd_texto(justo)})
@@ -1025,7 +1064,85 @@ def construir_relato(modelo: dict | None, reportes: list[dict] | None) -> dict:
     }
 
 
-def construir_snapshot(datos: dict, valor: dict, pronostico: dict, reportes: list[dict]) -> dict:
+def _bloque_desde_cuantil(precio: float, fecha, retorno: float, bajo, alto, horizonte: int) -> dict:
+    """Tarjeta del pronóstico nuevo: mediana y banda conformal, no el RMSE del Ridge."""
+    banda_baja = None if bajo is None else (math.exp(bajo) - 1.0) * 100.0
+    banda_alta = None if alto is None else (math.exp(alto) - 1.0) * 100.0
+    senal_debil = (
+        bajo is None
+        or alto is None
+        or (banda_baja is not None and banda_alta is not None and banda_baja < 0 < banda_alta and abs(retorno) < 0.25 * max(abs(bajo), abs(alto)))
+    )
+    return {
+        "horizonte_dias_mercado": horizonte,
+        "fecha": _fecha_texto(fecha),
+        "retorno_log": round(float(retorno), 6),
+        "retorno_pct": round((math.exp(retorno) - 1.0) * 100.0, 3),
+        "direccion": direccion_pronostico(float(retorno)),
+        "nivel_objetivo_usd": round(nivel_objetivo(precio, float(retorno)), 2) if precio and precio > 0 else None,
+        "banda_baja_pct": None if banda_baja is None else round(banda_baja, 2),
+        "banda_alta_pct": None if banda_alta is None else round(banda_alta, 2),
+        "sigma_log": None,
+        "senal_debil": senal_debil,
+        "modelo": "mediana_cuantil",
+    }
+
+
+def _prob_publica(estudio: dict | None, horizonte: int):
+    if not estudio:
+        return None
+    bloque = (estudio.get("clasificacion") or {}).get(horizonte)
+    if not bloque:
+        return None
+    return bloque.get("prob_up")
+
+
+def _valor_titular(valor: dict, estudio: dict | None) -> tuple[float | None, float | None, str]:
+    """Precio justo, brecha y nombre del modelo que se muestra como titular."""
+    base = valor.get("valor_justo_vf")
+    brecha = valor.get("brecha_vf_pct")
+    if not estudio or not (estudio.get("valor") or {}).get("promovido"):
+        return base, brecha, "base"
+    bloque = estudio["valor"]
+    if bloque.get("titular") == "markov" and bloque.get("valor_markov") is not None:
+        return bloque.get("valor_markov"), bloque.get("brecha_markov_pct"), "markov"
+    if bloque.get("titular") == "ols_nuevo" and bloque.get("valor_ols") is not None:
+        return bloque.get("valor_ols"), bloque.get("brecha_ols_pct"), "ols_nuevo"
+    return base, brecha, "base"
+
+
+def _estudio_publico(estudio: dict | None) -> dict | None:
+    """Quita las corridas internas y deja lo que el tablero puede enseñar."""
+    if not estudio:
+        return None
+    clasificacion = {}
+    for horizonte, bloque in (estudio.get("clasificacion") or {}).items():
+        clasificacion[str(horizonte)] = {
+            "fecha": bloque.get("fecha"),
+            "prob_up": bloque.get("prob_up"),
+            "prob_plano": bloque.get("prob_plano"),
+            "prob_baja": bloque.get("prob_baja"),
+            "modelo": bloque.get("modelo"),
+            "metricas": bloque.get("metricas"),
+        }
+    intervalos = {}
+    for horizonte, bloque in (estudio.get("intervalos") or {}).items():
+        intervalos[str(horizonte)] = bloque
+    return {
+        "esquema": estudio.get("esquema"),
+        "avisos": list(estudio.get("avisos") or []),
+        "valor": estudio.get("valor"),
+        "comparacion": estudio.get("comparacion"),
+        "clasificacion": clasificacion,
+        "intervalos": intervalos,
+        "regimen": estudio.get("regimen"),
+        "analogos": estudio.get("analogos"),
+        "dca": estudio.get("dca"),
+        "columnas": estudio.get("columnas_features"),
+    }
+
+
+def construir_snapshot(datos: dict, valor: dict, pronostico: dict, reportes: list[dict], estudio: dict | None = None) -> dict:
     """Junta el modelo ya estimado y los reportes diarios en un solo objeto."""
     df = pronostico["df"]
     fecha_modelo = pd.Timestamp(valor["fecha"])
@@ -1035,14 +1152,37 @@ def construir_snapshot(datos: dict, valor: dict, pronostico: dict, reportes: lis
     if tipo_cambio is not None and tipo_cambio > 0:
         mxn_gramo = onza_a_mxn_por_gramo(precio, tipo_cambio)
 
+    promovidos = {}
+    if estudio is not None:
+        promovidos = (estudio.get("comparacion") or {}).get("promovido") or {}
     pronosticos = {}
+    pronosticos_ridge = {}
     precision = {}
     for horizonte in (5, 20):
         info = pronostico["por_horizonte"][horizonte]
-        pronosticos[str(horizonte)] = bloque_pronostico_actual(precio, info, horizonte)
+        pronosticos_ridge[str(horizonte)] = bloque_pronostico_actual(precio, info, horizonte)
         y = df[f"y_{horizonte}"].to_numpy(dtype=float)
-        pred = df[f"pred_{horizonte}"].to_numpy(dtype=float)
-        media = df[f"media_{horizonte}"].to_numpy(dtype=float)
+        usa_nuevo = bool(promovidos.get(str(horizonte))) and f"pred_mediana_{horizonte}" in df.columns
+        if usa_nuevo:
+            df.attrs[f"es_titular_{horizonte}"] = True
+            pred = df[f"pred_mediana_{horizonte}"].to_numpy(dtype=float)
+            media = df[f"media_mediana_{horizonte}"].to_numpy(dtype=float)
+            fecha_pred = pd.Timestamp(info["fecha_ultimo"])
+            pos = int(df.index.get_indexer([fecha_pred])[0])
+            if pos < 0 or not np.isfinite(pred[pos]):
+                usa_nuevo = False
+            else:
+                bajo_v = df[f"banda_baja_{horizonte}"].to_numpy(dtype=float)[pos]
+                alto_v = df[f"banda_alta_{horizonte}"].to_numpy(dtype=float)[pos]
+                bajo = float(bajo_v) if np.isfinite(bajo_v) else None
+                alto = float(alto_v) if np.isfinite(alto_v) else None
+                pronosticos[str(horizonte)] = _bloque_desde_cuantil(
+                    precio, fecha_pred, float(pred[pos]), bajo, alto, horizonte
+                )
+        if not usa_nuevo:
+            pred = df[f"pred_{horizonte}"].to_numpy(dtype=float)
+            media = df[f"media_{horizonte}"].to_numpy(dtype=float)
+            pronosticos[str(horizonte)] = pronosticos_ridge[str(horizonte)]
         metricas = _bloque_metricas(metricas_pronostico(y, pred, media, horizonte))
         limpio = metricas["sin_solapar"]
         precision[str(horizonte)] = {
@@ -1051,6 +1191,7 @@ def construir_snapshot(datos: dict, valor: dict, pronostico: dict, reportes: lis
             "en_vivo": acierto_en_vivo(df.index, df["oro_usd"].to_numpy(dtype=float), y, pred, horizonte),
             "le_gana_al_cero": limpio.get("r2_cero") is not None and limpio["r2_cero"] > 0,
             "le_gana_al_promedio": limpio.get("r2_media") is not None and limpio["r2_media"] > 0,
+            "modelo": "mediana_cuantil" if usa_nuevo else "ridge",
         }
 
     extendido = valor.get("extendido") or {}
@@ -1098,8 +1239,11 @@ def construir_snapshot(datos: dict, valor: dict, pronostico: dict, reportes: lis
                 "no el FIX de Banxico del reporte diario."
             ),
             "mxn_por_gramo": None if mxn_gramo is None else round(mxn_gramo, 2),
-            "valor_justo_usd": _redondear(valor.get("valor_justo_vf"), 2),
-            "brecha_pct": _redondear(valor.get("brecha_vf_pct"), 2),
+            "valor_justo_usd": _redondear(_valor_titular(valor, estudio)[0], 2),
+            "brecha_pct": _redondear(_valor_titular(valor, estudio)[1], 2),
+            "valor_justo_modelo": _valor_titular(valor, estudio)[2],
+            "valor_justo_base_usd": _redondear(valor.get("valor_justo_vf"), 2),
+            "brecha_base_pct": _redondear(valor.get("brecha_vf_pct"), 2),
             "valor_justo_muestra_usd": _redondear(valor.get("valor_justo"), 2),
             "brecha_muestra_pct": _redondear(valor.get("brecha_pct"), 2),
             "n": valor.get("n"),
@@ -1107,7 +1251,11 @@ def construir_snapshot(datos: dict, valor: dict, pronostico: dict, reportes: lis
             "fin": valor.get("fin"),
             "ampliado": ampliado,
             "pronosticos": pronosticos,
+            "pronosticos_ridge": pronosticos_ridge,
             "precision": precision,
+            "prob_up_5d": _prob_publica(estudio, 5),
+            "prob_up_20d": _prob_publica(estudio, 20),
+            "estudio": _estudio_publico(estudio),
             "historia": serie_grafica(df),
             "fuentes": fuentes,
             "avisos": list(datos.get("avisos") or []),
@@ -1185,13 +1333,16 @@ def main(argv: list[str] | None = None) -> None:
         print("Descargando series y armando el panel.", file=sys.stderr)
         datos = actualizar_datos()
 
+    from estudio import correr_estudio
     from modelos import ajustar_pronosticos, ajustar_valor_justo, preparar_muestra
 
     print("Ajustando valor justo.", file=sys.stderr)
     valor = ajustar_valor_justo(preparar_muestra(datos["panel"]))
     print("Ajustando pronósticos a 5 y 20 días. Esta parte es la lenta.", file=sys.stderr)
     pronostico = ajustar_pronosticos(valor["df"])
-    snapshot = construir_snapshot(datos, valor, pronostico, reportes)
+    print("Ajustando regímenes, clasificación e intervalos.", file=sys.stderr)
+    estudio = correr_estudio(pronostico["df"])
+    snapshot = construir_snapshot(datos, valor, pronostico, reportes, estudio)
     ruta = escribir_snapshot(snapshot)
     modelo = snapshot["modelo"]
     print(

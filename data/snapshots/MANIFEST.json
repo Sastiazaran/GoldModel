@@ -1,0 +1,26 @@
+{
+  "nota": "Copias de series que a veces no responden (GPR, GLD, COT, bancos centrales). No son datos inventados: salen de la descarga de esta corrida. La fecha de cada fila es fecha_disponible, no la fecha de corte.",
+  "generado_en": "2026-10-28",
+  "fuentes": {
+    "gpr": {
+      "etiqueta": "GPR diario de Caldara-Iacoviello (GPRD), usable el mismo día",
+      "url": "https://www.matteoiacoviello.com/gpr.htm"
+    },
+    "gld_toneladas": {
+      "etiqueta": "SPDR Gold Shares, archivo histórico (toneladas en el fideicomiso), usable al día hábil siguiente",
+      "url": "https://www.spdrgoldshares.com/usa/historical-data/"
+    },
+    "cot_neto": {
+      "etiqueta": "CFTC COT legacy, futuros de oro COMEX (código 088691), neto no comercial, usable el viernes posterior al martes de corte",
+      "url": "https://publicreporting.cftc.gov/resource/6dca-aqww.json"
+    },
+    "compras_bc_ton": {
+      "etiqueta": "World Gold Council, suma de reservas oficiales en toneladas (API pública del tablero; el Excel de la página respondió 403), cambio trimestral solo entre países que reportaron los dos cortes, usable a fin del mes siguiente",
+      "url": "https://fsapi.gold.org/api/cbd/v11/charts/getPage"
+    },
+    "gvz": {
+      "etiqueta": "Yahoo Finance ^GVZ (volatilidad implícita del oro, CBOE)",
+      "url": "https://www.cboe.com/us/indices/dashboard/gvz/"
+    }
+  }
+}
