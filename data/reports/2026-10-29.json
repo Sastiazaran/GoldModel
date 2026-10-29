@@ -1,0 +1,43 @@
+{
+  "fecha": "2026-10-29",
+  "sesion": "con_registro",
+  "precio_usd_oz": 4031.3,
+  "precio_aproximado": false,
+  "precio_fuente": "Kitco, bid de la mañana (~7:37 AM, hora del centro de México)",
+  "precio_url": "https://www.kitco.com/charts/gold",
+  "cierre_previo_usd_oz": 4066.6,
+  "cierre_previo_aproximado": true,
+  "cambio_usd": -35.3,
+  "cambio_pct": -0.87,
+  "cambio_texto": "−$35.30 (−0.87%) vs cierre previo ~$4,066.60; bid $4,031.30, ask $4,033.30; rango del día $4,015.30–$4,069.90",
+  "usd_mxn": 18.6673,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-10-28",
+  "usd_mxn_fuente": "Banxico FIX",
+  "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do?idioma=es",
+  "mxn_por_gramo": 2419.5,
+  "mxn_por_gramo_aproximado": true,
+  "drivers": [
+    {
+      "titulo": "La Fed y la apuesta de diciembre",
+      "detalle": "El miércoles 28 de octubre la Fed dejó la tasa sin cambio, con voto 10-2. El presidente Kevin Warsh no dio una guía explícita. CME FedWatch pone cerca de 90% de probabilidad de alza en diciembre.",
+      "fuente": "Reuters vía Kitco y CNBC",
+      "url": "https://www.kitco.com/news/off-the-wire/2026-10-29/gold-slips-fed-hike-bets-linger-ahead-us-inflation-data"
+    },
+    {
+      "titulo": "PCE de septiembre",
+      "detalle": "El PCE de septiembre subió 0.5% en el mes y 3.6% anual, desde 3.4%. El subyacente subió 0.3% en el mes y 3.1% anual, en línea con lo esperado. Los bienes energéticos subieron 9.2% en el mes.",
+      "fuente": "BEA y CNBC",
+      "url": "https://www.bea.gov/news/2026/personal-income-and-outlays-september-2026"
+    },
+    {
+      "titulo": "PIB del tercer trimestre y el piso de 4,000",
+      "detalle": "El PIB avanzado del tercer trimestre creció 3.4% anualizado, frente a 2.2% en el segundo y por encima de un consenso de cerca de 3.1% a 3.2% (BEA). El oro va camino a su segundo mes seguido a la baja; el soporte clave está en 4,000 dólares. Las compras de bancos centrales (Goldman: 79 toneladas en agosto) son el soporte de más largo plazo. Se espera que el BCE deje la tasa sin cambio hoy.",
+      "fuente": "BEA e Investing.com",
+      "url": "https://www.bea.gov/news/2026/gdp-advance-estimate-3rd-quarter-2026"
+    }
+  ],
+  "lectura": "Presión a la baja de corto plazo: Fed con sesgo a subir en diciembre y PCE/PIB fuertes; soporte clave en $4,000.",
+  "notion_url": null,
+  "notas": "Lectura del 29 de octubre de 2026, cerca de las 7:37 AM, hora del centro de México (9:37 AM ET). El precio es el bid de Kitco (4031.30); el ask fue 4033.30. El cierre previo (~4066.60) está marcado como aproximado. El FIX de Banxico 18.6673 se determinó el 28 de octubre de 2026. El gramo (~2419.5 pesos) sale de 4031.30 / 31.1034768 × 18.6673. Próximos datos: decisión de Banxico el jueves 5 de noviembre de 2026 a las 13:00, hora del centro de México; empleo de octubre en Estados Unidos el viernes 6 de noviembre de 2026 a las 7:30. Otras fuentes: https://www.cnbc.com/2026/10/29/gold-slips-as-markets-assess-fed-signals-await-us-inflation-data.html ; https://www.cnbc.com/2026/10/29/pce-inflation-report-september-2026-.html ; https://au.investing.com/news/commodities-news/gold-slips-after-fed-holds-rates-pce-inflation-data-in-focus-4723641. No es asesoría financiera."
+}

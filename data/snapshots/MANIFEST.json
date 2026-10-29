@@ -1,6 +1,6 @@
 {
   "nota": "Copias de series que a veces no responden (GPR, GLD, COT, bancos centrales). No son datos inventados: salen de la descarga de esta corrida. La fecha de cada fila es fecha_disponible, no la fecha de corte.",
-  "generado_en": "2026-10-28",
+  "generado_en": "2026-10-29",
   "fuentes": {
     "gpr": {
       "etiqueta": "GPR diario de Caldara-Iacoviello (GPRD), usable el mismo día",
