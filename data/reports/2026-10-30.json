@@ -1,0 +1,43 @@
+{
+  "fecha": "2026-10-30",
+  "sesion": "con_registro",
+  "precio_usd_oz": 3932.5,
+  "precio_aproximado": false,
+  "precio_fuente": "Kitco, bid spot de la mañana (~7:40 AM, hora del centro de México)",
+  "precio_url": "https://www.kitco.com/charts/gold",
+  "cierre_previo_usd_oz": 4020.5,
+  "cierre_previo_aproximado": true,
+  "cambio_usd": -88.0,
+  "cambio_pct": -2.19,
+  "cambio_texto": "−$88.00 (−2.19%) vs cierre previo ~$4,020.50; bid $3,932.50, ask $3,934.50; rango del día $3,924.20–$4,027.30",
+  "usd_mxn": 18.8148,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-10-29",
+  "usd_mxn_fuente": "Banxico FIX",
+  "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do?idioma=sp",
+  "mxn_por_gramo": 2378.81,
+  "mxn_por_gramo_aproximado": false,
+  "drivers": [
+    {
+      "titulo": "Datos fuertes de EE.UU. y la Fed",
+      "detalle": "Datos fuertes de EE.UU. el 29 oct (PIB Q3 +3.4%, PCE septiembre 3.6% a/a, subyacente 3.1%) refuerzan apuestas de alza de la Fed en diciembre (~75% CME FedWatch).",
+      "fuente": "Kitco",
+      "url": "https://www.kitco.com/news/off-the-wire/2026-10-30/gold-hits-3-12-month-low-fed-hike-fears-set-monthly-loss"
+    },
+    {
+      "titulo": "Petróleo al alza",
+      "detalle": "Petróleo al alza por ataque a un buque en el estrecho de Ormuz y ataques hutíes a Arabia Saudita; más inflación esperada.",
+      "fuente": "The Hindu Business Line",
+      "url": "https://www.thehindubusinessline.com/markets/gold/gold-slips-as-higher-oil-us-inflation-data-bolster-fed-hike-bets/article71643522.ece"
+    },
+    {
+      "titulo": "Dólar, peso y octubre",
+      "detalle": "Dólar: DXY ~101.90 rebotando desde 101.59; el peso se debilitó a FIX 18.8148, máximo de 2026. Oro va ~-4.3% en octubre, segundo mes a la baja.",
+      "fuente": "Banxico",
+      "url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do?idioma=sp"
+    }
+  ],
+  "lectura": "Tendencia bajista de corto plazo: perdió los $4,000 y tocó su mínimo desde noviembre de 2025; si rompe ~$3,940 podría bajar más. A largo plazo hay analistas (UBS) que lo ven más alto en 2027. No es consejo financiero.",
+  "notion_url": null,
+  "notas": "Lectura del 30 de octubre de 2026, cerca de las 7:40 AM, hora del centro de México (9:39 AM ET). El precio es el bid de Kitco (3932.50); el ask fue 3934.50. El cierre previo (~4020.50) está marcado como aproximado. El rango del día fue 3924.20–4027.30. El FIX de Banxico 18.8148 se determinó el 29 de octubre de 2026. El gramo (2378.81 pesos) sale de 3932.50 / 31.1034768 × 18.8148. Próximos datos: decisión de Banxico el jueves 5 de noviembre de 2026 a las 13:00, hora del centro de México; empleo de octubre en Estados Unidos el viernes 6 de noviembre de 2026 a las 7:30. Otra fuente: https://www.fxstreet.com/news/gold-slips-below-4-000-despite-risk-off-mood-as-hawkish-fed-expectations-weigh-202610301110. No es asesoría financiera."
+}
