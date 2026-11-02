@@ -1,0 +1,43 @@
+{
+  "fecha": "2026-11-02",
+  "sesion": "con_registro",
+  "precio_usd_oz": 3912.2,
+  "precio_aproximado": false,
+  "precio_fuente": "Kitco, bid spot de la mañana (~7:35 AM, hora del centro de México)",
+  "precio_url": "https://www.kitco.com/charts/gold",
+  "cierre_previo_usd_oz": 3874.4,
+  "cierre_previo_aproximado": true,
+  "cambio_usd": 37.8,
+  "cambio_pct": 0.98,
+  "cambio_texto": "+$37.80 (+0.98%) vs cierre del viernes ~$3,874.40; rango del día $3,879.40–$3,920.10",
+  "usd_mxn": 18.7962,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-10-30",
+  "usd_mxn_fuente": "Banxico FIX",
+  "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do?idioma=es",
+  "mxn_por_gramo": 2364.18,
+  "mxn_por_gramo_aproximado": false,
+  "drivers": [
+    {
+      "titulo": "Rebote tras mínimo de un año",
+      "detalle": "El viernes cayó 3.6% a su nivel más bajo desde octubre de 2025 por ventas forzadas tras el desplome de acciones tecnológicas/IA; octubre fue su peor mes desde 2008.",
+      "fuente": "CNBC/Reuters",
+      "url": "https://www.cnbc.com/2026/11/02/gold-rises-on-softer-oil-markets-parse-fed-signals.html"
+    },
+    {
+      "titulo": "Petróleo a la baja por pláticas con Irán",
+      "detalle": "El petróleo baja más de 3% tras un tercer día de pláticas Irán-Qatar para terminar la guerra; menos presión de inflación y de tasas altas.",
+      "fuente": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/02/gold-rises-on-softer-oil-markets-parse-fed-signals.html"
+    },
+    {
+      "titulo": "Dólar más débil y compradores en baja",
+      "detalle": "DXY −0.4% a 101.45; compradores aprovechan precios bajos.",
+      "fuente": "Investing.com",
+      "url": "https://ng.investing.com/news/commodities-news/gold-rebounds-toward-3900-as-dip-buyers-emerge-iran-risks-persist-2773258"
+    }
+  ],
+  "lectura": "Rebote tras su peor octubre desde 2008, pero 10 de 16 analistas de Wall Street (encuesta Kitco) esperan más baja esta semana; soporte de referencia ~$3,750–$3,850 y resistencia en $4,000. Si se compra, mejor en partes. No es consejo financiero.",
+  "notion_url": null,
+  "notas": "Lectura del 2 de noviembre de 2026, cerca de las 7:35 AM, hora del centro de México (8:35 AM ET). El precio es el bid de Kitco (3912.20), no aproximado. El cierre del viernes (~3874.40) sale del cambio de Kitco de +37.80 y está marcado como aproximado. El rango del día fue 3879.40–3920.10. El 2 de noviembre es día inhábil bancario en México, así que no hay FIX de hoy; el FIX de Banxico 18.7962 se determinó el 30 de octubre de 2026. El gramo (2364.18 pesos) sale de 3912.20 / 31.1034768 × 18.7962. Próximos datos: elecciones de medio término en Estados Unidos el martes 3 de noviembre de 2026; decisión de Banxico el jueves 5 de noviembre de 2026 a las 13:00, hora del centro de México; empleo de octubre en Estados Unidos el viernes 6 de noviembre de 2026 a las 7:30. No es asesoría financiera."
+}
