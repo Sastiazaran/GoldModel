@@ -447,6 +447,7 @@ def probar_reportes_de_octubre_no_inventan_huecos() -> None:
         "2026-10-29",
         "2026-10-30",
         "2026-11-02",
+        "2026-11-03",
     ]
     hoy = por_fecha["2026-10-28"]
     assert hoy["precio_usd_oz"] == 4047
@@ -501,6 +502,21 @@ def probar_reportes_de_octubre_no_inventan_huecos() -> None:
     assert hoy02["notion_url"] is None
     assert hoy02["lectura"]
     assert hoy02["drivers"][0]["url"].startswith("https://")
+    hoy03 = por_fecha["2026-11-03"]
+    assert hoy03["sesion"] == "con_registro"
+    assert hoy03["precio_usd_oz"] == 3963.8
+    assert hoy03["precio_aproximado"] is False
+    assert hoy03["cierre_previo_usd_oz"] == 3945.7
+    assert hoy03["cierre_previo_aproximado"] is True
+    assert hoy03["cambio_usd"] == 18.1
+    assert hoy03["cambio_pct"] == 0.46
+    assert hoy03["usd_mxn"] == 18.7962
+    assert hoy03["usd_mxn_fecha"] == "2026-10-30"
+    assert hoy03["mxn_por_gramo"] == 2395.37
+    assert hoy03["mxn_por_gramo_aproximado"] is False
+    assert hoy03["notion_url"] == "https://app.notion.com/p/40df98ae11128135ab58ee4a92d4d7a4"
+    assert hoy03["lectura"]
+    assert hoy03["drivers"][0]["url"].startswith("https://")
     for fecha in ("2026-10-24", "2026-10-25"):
         vacio = por_fecha[fecha]
         assert vacio["sesion"] == "sin_registro"

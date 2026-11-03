@@ -1,0 +1,43 @@
+{
+  "fecha": "2026-11-03",
+  "sesion": "con_registro",
+  "precio_usd_oz": 3963.8,
+  "precio_aproximado": false,
+  "precio_fuente": "Kitco (bid, 8:31 AM ET / 7:31 AM CDMX)",
+  "precio_url": "https://www.kitco.com/charts/gold",
+  "cierre_previo_usd_oz": 3945.7,
+  "cierre_previo_aproximado": true,
+  "cambio_usd": 18.1,
+  "cambio_pct": 0.46,
+  "cambio_texto": "+$18.10 (+0.46%)",
+  "usd_mxn": 18.7962,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-10-30",
+  "usd_mxn_fuente": "Banxico FIX",
+  "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do?idioma=es",
+  "mxn_por_gramo": 2395.37,
+  "mxn_por_gramo_aproximado": false,
+  "drivers": [
+    {
+      "titulo": "Petróleo y Medio Oriente",
+      "detalle": "El petróleo subió más de $1 tras decir un funcionario iraní que un acuerdo para terminar la guerra está lejos y un ataque de EE.UU. a la isla Qeshm; CME FedWatch ~75% de alza de la Fed en diciembre.",
+      "fuente": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/03/gold-eases-ahead-of-us-midterm-elections.html"
+    },
+    {
+      "titulo": "Elecciones intermedias en EE.UU.",
+      "detalle": "Hoy son las midterms; un barrido demócrata podría golpear a tecnológicas y provocar ventas de oro para cubrir pérdidas. El rebote vino tras caer el petróleo de $115 a menos de $105 el lunes.",
+      "fuente": "ET Now",
+      "url": "https://www.etnownews.com/markets/gold-price-today-yellow-metal-extends-recovery-from-1-year-low-climbs-to-3955-us-iran-tensions-fed-outlook-in-focus-article-156455161"
+    },
+    {
+      "titulo": "Compras de bancos centrales (WGC Q3)",
+      "detalle": "Bancos centrales compraron 321 t en Q3 (+42% a/a), 675 t en el año; ETFs sumaron 211 t a un récord de 4,256 t; el WGC recortó su previsión de inversión 2026.",
+      "fuente": "World Gold Council",
+      "url": "https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-q3-2026/central-banks"
+    }
+  ],
+  "lectura": "Sigue el rebote, pero el petróleo y la Fed le ponen techo, y hoy puede haber movimientos bruscos por las elecciones. Si piensan comprar, mejor en partes y sin prisa.",
+  "notion_url": "https://app.notion.com/p/40df98ae11128135ab58ee4a92d4d7a4",
+  "notas": "Rango del día $3,894.80–$3,965.50 (Kitco). FIX de hoy sale después de las 12:00; 2 nov fue feriado bancario."
+}
