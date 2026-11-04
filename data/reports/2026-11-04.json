@@ -1,0 +1,43 @@
+{
+  "fecha": "2026-11-04",
+  "sesion": "con_registro",
+  "precio_usd_oz": 4037.9,
+  "precio_aproximado": false,
+  "precio_fuente": "Kitco (bid, 8:28 AM ET / ~7:28 AM CDMX)",
+  "precio_url": "https://www.kitco.com/charts/gold",
+  "cierre_previo_usd_oz": 3929.4,
+  "cierre_previo_aproximado": true,
+  "cambio_usd": 108.5,
+  "cambio_pct": 2.76,
+  "cambio_texto": "+$108.50 (+2.76%)",
+  "usd_mxn": 18.7592,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-11-03",
+  "usd_mxn_fuente": "Banxico FIX",
+  "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do?idioma=es",
+  "mxn_por_gramo": 2435.35,
+  "mxn_por_gramo_aproximado": false,
+  "drivers": [
+    {
+      "titulo": "Barrido demócrata en las midterms",
+      "detalle": "Los demócratas tomaron Senado y Cámara; el spot llegó a $4,050.99, máximo desde el 29 oct, rumbo a su mayor alza diaria desde el 19 de agosto, por preocupación fiscal (Capital Economics).",
+      "fuente": "Reuters",
+      "url": "https://www.streetinsider.com/Reuters/Gold+jumps+more+than+2%25+on+softer+dollar+after+Democratic+midterm+sweep/27284030.html"
+    },
+    {
+      "titulo": "Dólar a la baja",
+      "detalle": "El dólar se desplomó ante la posibilidad de más regulación a la IA; plata +4.8% a $52.13, platino +3.6%, paladio +6.5%.",
+      "fuente": "CNBC/Reuters",
+      "url": "https://www.cnbc.com/2026/11/04/gold-silver-platinum-dollar-midterms.html"
+    },
+    {
+      "titulo": "Fed y Medio Oriente",
+      "detalle": "CME FedWatch ve 82% de probabilidad de alza en diciembre, lo que limita las ganancias; Irán y EE.UU. siguen lejos de un acuerdo. Empleo de EE.UU. el viernes 6 nov.",
+      "fuente": "Reuters",
+      "url": "https://www.streetinsider.com/Reuters/Gold+jumps+more+than+2%25+on+softer+dollar+after+Democratic+midterm+sweep/27284030.html"
+    }
+  ],
+  "lectura": "Buen rebote, pero con una Fed dura puede seguir muy movido. Si piensan comprar, mejor en partes y sin prisa.",
+  "notion_url": "https://app.notion.com/p/40ef98ae111281b092dcfacceb4c93e1",
+  "notas": "Rango del día $3,919.00–$4,052.30 (Kitco). Banxico decide tasa el jue 5 nov 13:00 CDMX."
+}
