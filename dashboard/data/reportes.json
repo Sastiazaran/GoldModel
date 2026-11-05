@@ -555,5 +555,48 @@
     "lectura": "Buen rebote, pero con una Fed dura puede seguir muy movido. Si piensan comprar, mejor en partes y sin prisa.",
     "notion_url": "https://app.notion.com/p/40ef98ae111281b092dcfacceb4c93e1",
     "notas": "Rango del día $3,919.00–$4,052.30 (Kitco). Banxico decide tasa el jue 5 nov 13:00 CDMX."
+  },
+  {
+    "fecha": "2026-11-05",
+    "sesion": "con_registro",
+    "precio_usd_oz": 4118.4,
+    "precio_aproximado": false,
+    "precio_fuente": "Kitco (bid, 8:38 AM ET / ~7:38 AM CDMX)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 4059.2,
+    "cierre_previo_aproximado": true,
+    "cambio_usd": 59.2,
+    "cambio_pct": 1.46,
+    "cambio_texto": "+$59.20 (+1.46%)",
+    "usd_mxn": 18.6285,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-11-04",
+    "usd_mxn_fuente": "Banxico FIX",
+    "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do?idioma=sp",
+    "mxn_por_gramo": 2466.6,
+    "mxn_por_gramo_aproximado": false,
+    "drivers": [
+      {
+        "titulo": "Dólar, bonos y petróleo a la baja tras las elecciones",
+        "detalle": "Oro en máximo de dos semanas (sesión alta ~$4,146); dólar y rendimientos en mínimos de varias semanas; Brent bajo $100 tras caer ~9% el miércoles por menor riesgo de escalada con Irán. Saxo (Ole Hansen): cierre de cortos especulativos.",
+        "fuente": "CNBC",
+        "url": "https://www.cnbc.com/2026/11/05/gold-hits-two-week-high-as-dollar-yields-ease-after-us-midterms.html"
+      },
+      {
+        "titulo": "Banco de Inglaterra sube a 4%",
+        "detalle": "El BoE subió 25 pb a 4% por inflación energética (prevé ~5% a mediados de 2027); el oro tuvo presión breve pero se sostuvo arriba de soportes.",
+        "fuente": "Kitco News",
+        "url": "https://www.kitco.com/news/article/2026-11-05/gold-market-holding-solid-gains-even-boe-raises-interest-rates-due-rising"
+      },
+      {
+        "titulo": "Bancos centrales y ETFs",
+        "detalle": "Bancos centrales compraron 321 t netas en el 3T (WGC) y los ETFs de oro sumaron 211 t a récord; empleo de EE.UU. el viernes 6 nov.",
+        "fuente": "Kitco News",
+        "url": "https://www.kitco.com/news/article/2026-11-04/gold-being-treated-ai-stock-which-its-not-says-peter-boockvar"
+      }
+    ],
+    "lectura": "Buen rebote, pero viene de semanas muy volátiles; mejor no perseguirlo de golpe y, si compran, hacerlo en partes.",
+    "notion_url": null,
+    "notas": "Rango del día $4,057.50–$4,148.00 (Kitco). Banxico decide tasa hoy 13:00 CDMX; empleo EE.UU. vie 6 nov 7:30 CDMX."
   }
 ]
