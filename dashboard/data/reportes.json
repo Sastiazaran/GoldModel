@@ -598,5 +598,48 @@
     "lectura": "Buen rebote, pero viene de semanas muy volátiles; mejor no perseguirlo de golpe y, si compran, hacerlo en partes.",
     "notion_url": null,
     "notas": "Rango del día $4,057.50–$4,148.00 (Kitco). Banxico decide tasa hoy 13:00 CDMX; empleo EE.UU. vie 6 nov 7:30 CDMX."
+  },
+  {
+    "fecha": "2026-11-06",
+    "sesion": "con_registro",
+    "precio_usd_oz": 4049.7,
+    "precio_aproximado": false,
+    "precio_fuente": "Kitco (bid, 8:35 AM ET / ~7:35 AM CDMX)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 4087.2,
+    "cierre_previo_aproximado": true,
+    "cambio_usd": -37.5,
+    "cambio_pct": -0.92,
+    "cambio_texto": "−$37.50 (−0.92%)",
+    "usd_mxn": 18.7147,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-11-05",
+    "usd_mxn_fuente": "Banxico FIX",
+    "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do?idioma=en",
+    "mxn_por_gramo": 2436.67,
+    "mxn_por_gramo_aproximado": false,
+    "drivers": [
+      {
+        "titulo": "NFP EE.UU. muy fuerte",
+        "detalle": "Nóminas no agrícolas +165k en octubre vs ~65k esperados; desempleo 4.1%; revisiones ago–sep +84k. Dólar al alza y oro cede pese a semana ~+5%.",
+        "fuente": "FXStreet / BLS",
+        "url": "https://www.fxstreet.com/news/us-nonfarm-payrolls-expected-to-pick-up-in-october-202611060930"
+      },
+      {
+        "titulo": "Petróleo e inflación antes del dato",
+        "detalle": "Brent cerca de $100 mantiene nervios de inflación; CME ~64% de alza Fed en diciembre antes del NFP; oro aún rumbo a mejor semana en >2 meses.",
+        "fuente": "CNBC",
+        "url": "https://www.cnbc.com/2026/11/06/gold-eases-on-inflation-worries-from-higher-oil-us-payrolls-data-in-focus.html"
+      },
+      {
+        "titulo": "Banxico recorta a 6.25%",
+        "detalle": "Ayer Banxico bajó 25 pb a 6.25% (voto 3-2), ajuste de una sola vez; Goldman recortó meta fin-2026 de oro a $4,150 desde $4,650.",
+        "fuente": "Banxico",
+        "url": "https://www.banxico.org.mx/publications-and-press/announcements-of-monetary-policy-decisions/%7B2E04D4F1-397A-2B77-F666-252D80D8EC69%7D.pdf"
+      }
+    ],
+    "lectura": "El NFP fuerte pone presión de corto plazo; si compran, mejor en partes y sin perseguir el rebote semanal.",
+    "notion_url": "https://app.notion.com/p/410f98ae1112817b993ffbef10de4d94",
+    "notas": "Rango del día $4,033.50–$4,107.90 (Kitco). NFP ya publicado 7:30 CDMX. Próximo: inflación México 9 nov; CPI EE.UU. 10 nov."
   }
 ]
