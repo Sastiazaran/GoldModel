@@ -1,0 +1,43 @@
+{
+  "fecha": "2026-11-09",
+  "sesion": "con_registro",
+  "precio_usd_oz": 4125.0,
+  "precio_aproximado": false,
+  "precio_fuente": "Kitco (spot bid, 8:31 AM ET / 7:31 AM CDMX)",
+  "precio_url": "https://www.kitco.com/charts/gold",
+  "cierre_previo_usd_oz": 4070.1,
+  "cierre_previo_aproximado": true,
+  "cambio_usd": 54.9,
+  "cambio_pct": 1.35,
+  "cambio_texto": "+$54.90 (+1.35%)",
+  "usd_mxn": 18.6297,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-11-06",
+  "usd_mxn_fuente": "Banxico FIX",
+  "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do?idioma=en",
+  "mxn_por_gramo": 2470.71,
+  "mxn_por_gramo_aproximado": false,
+  "drivers": [
+    {
+      "titulo": "Petróleo más bajo",
+      "detalle": "El petróleo cayó después de que Trump restó probabilidad a nuevos ataques a Irán; eso baja el miedo a la inflación.",
+      "fuente": "Reuters vía CNBC",
+      "url": "https://www.cnbc.com/2026/11/09/gold-gains-more-than-1percent-as-softer-oil-prices-ease-inflation-worries.html"
+    },
+    {
+      "titulo": "Dólar y bonos",
+      "detalle": "Dólar más débil y rendimientos de bonos un poco más bajos.",
+      "fuente": "Reuters vía CNBC",
+      "url": "https://www.cnbc.com/2026/11/09/gold-gains-more-than-1percent-as-softer-oil-prices-ease-inflation-worries.html"
+    },
+    {
+      "titulo": "Fed",
+      "detalle": "Tras el empleo fuerte del viernes, CME FedWatch da ~81% de probabilidad de alza en diciembre (73% antes del dato); CPI martes y PPI viernes decidirán.",
+      "fuente": "Reuters vía CNBC",
+      "url": "https://www.cnbc.com/2026/11/09/gold-gains-more-than-1percent-as-softer-oil-prices-ease-inflation-worries.html"
+    }
+  ],
+  "lectura": "Buen arranque tras subir ~5% la semana pasada, pero el CPI de mañana lo puede mover fuerte para cualquier lado; sin prisas y mejor en partes.",
+  "notion_url": null,
+  "notas": "Rango del día $4,053.40–$4,135.10 (Kitco). Hoy inflación México (INEGI); CPI EE.UU. mar 10 nov 7:30 CDMX; PPI vie 13 nov."
+}
