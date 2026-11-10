@@ -1,0 +1,49 @@
+{
+  "fecha": "2026-11-10",
+  "sesion": "con_registro",
+  "precio_usd_oz": 4054.10,
+  "precio_aproximado": false,
+  "precio_fuente": "Kitco (bid, 8:32 AM ET / ~7:32 AM CDMX)",
+  "precio_url": "https://www.kitco.com/charts/gold",
+  "cierre_previo_usd_oz": 4139.40,
+  "cierre_previo_aproximado": true,
+  "cambio_usd": -85.30,
+  "cambio_pct": -2.06,
+  "cambio_texto": "−$85.30 (−2.06%)",
+  "usd_mxn": 18.5983,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-11-09",
+  "usd_mxn_fuente": "Banxico FIX",
+  "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+  "mxn_por_gramo": 2424.15,
+  "mxn_por_gramo_aproximado": false,
+  "drivers": [
+    {
+      "titulo": "CPI de octubre más caliente",
+      "detalle": "El CPI de octubre subió 0.4% mensual, contra 0.3% esperado; el subyacente subió 0.3%, contra 0.2%.",
+      "fuente": "@DeItaone",
+      "url": "https://x.com/DeItaone/status/2120147296587251740"
+    },
+    {
+      "titulo": "Fed halcona",
+      "detalle": "Waller apoya una alza de 25 pb en diciembre y de 50 pb si el subyacente sale cerca de 0.3% o más; FedWatch descuenta +25 pb.",
+      "fuente": "FXStreet",
+      "url": "https://www.fxstreet.com/news/gold-falls-over-1-as-hawkish-fed-remarks-weigh-ahead-of-us-cpi-202611101046"
+    },
+    {
+      "titulo": "Petróleo bajo $90",
+      "detalle": "El Brent cayó 3.1% a $89.62, la primera vez bajo $90 desde agosto, por señales de salida al conflicto con Irán; eso baja la demanda de refugio.",
+      "fuente": "Moneycontrol",
+      "url": "https://www.moneycontrol.com/news/business/personal-finance/gold-slips-below-4-100-silver-at-52-as-brent-crude-falls-below-90-fed-rate-hike-bets-rise-14076373.html"
+    },
+    {
+      "titulo": "Bonos al alza",
+      "detalle": "El rendimiento a 2 años subió 7 pb a 4.62%; el de 10 años rondaba 4.89% antes del dato.",
+      "fuente": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/10/us-bonds-treasurys-yields.html"
+    }
+  ],
+  "lectura": "Cae tras un CPI más caliente de lo esperado y una Fed que apunta a subir tasas; puede seguir volátil a corto plazo, así que si compran, mejor en partes.",
+  "notion_url": "https://app.notion.com/p/414f98ae1112819f8346c6bd49e58708",
+  "notas": "Rango del día $4,040.00–$4,147.40 (Kitco). Veterans Day mié 11 nov (mercado de bonos cerrado); solicitudes de desempleo jue 12 nov 7:30 CDMX; PPI vie 13 nov 7:30 CDMX."
+}
