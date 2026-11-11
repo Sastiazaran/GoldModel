@@ -1,5 +1,5 @@
 {
-  "generado_en": "2026-11-10T13:55:58Z",
+  "generado_en": "2026-11-11T13:54:23Z",
   "aviso": "No es asesoría financiera. El pronóstico a 5 y 20 días se compara con predecir que el precio no cambia. Si no le gana, la flecha es la cuenta, no una señal.",
   "grafica_desde": "2020-01-01",
   "reportes": [
@@ -737,6 +737,49 @@
       "lectura": "Cae tras un CPI más caliente de lo esperado y una Fed que apunta a subir tasas; puede seguir volátil a corto plazo, así que si compran, mejor en partes.",
       "notion_url": "https://app.notion.com/p/414f98ae1112819f8346c6bd49e58708",
       "notas": "Rango del día $4,040.00–$4,147.40 (Kitco). Veterans Day mié 11 nov (mercado de bonos cerrado); solicitudes de desempleo jue 12 nov 7:30 CDMX; PPI vie 13 nov 7:30 CDMX."
+    },
+    {
+      "fecha": "2026-11-11",
+      "sesion": "con_registro",
+      "precio_usd_oz": 4040.72,
+      "precio_aproximado": false,
+      "precio_fuente": "OANDA XAUUSD vía TradingView (13:24 UTC / 07:24 CDMX)",
+      "precio_url": null,
+      "cierre_previo_usd_oz": 4032.52,
+      "cierre_previo_aproximado": false,
+      "cambio_usd": 8.2,
+      "cambio_pct": 0.2,
+      "cambio_texto": "+$8.20 (+0.20%)",
+      "usd_mxn": 18.6678,
+      "usd_mxn_tipo": "banxico_fix",
+      "usd_mxn_fecha": "2026-11-10",
+      "usd_mxn_fuente": "Banxico FIX",
+      "usd_mxn_url": null,
+      "mxn_por_gramo": 2424.74,
+      "mxn_por_gramo_aproximado": false,
+      "drivers": [
+        {
+          "titulo": "CPI caliente y alza de la Fed descontada",
+          "detalle": "El CPI de octubre subió 0.4% mensual, contra 0.3% esperado; el subyacente subió 0.3%, contra 0.2%. Una alza de la Fed en diciembre quedó totalmente descontada (CME FedWatch ~100% de 25 pb y ~10% de probabilidad de 50 pb). Waller, Logan, Goolsbee, Paulson y Bowman sonaron duros.",
+          "fuente": "Euronext",
+          "url": "https://live.euronext.com/en/financial-news/bonds-reel-hot-inflation-fuels-jumbo-fed-hike-fears"
+        },
+        {
+          "titulo": "Dólar y bonos más altos",
+          "detalle": "El índice del dólar ronda 102.29. El rendimiento a 2 años anda en ~4.75% (+18 pb el martes) y el de 10 años en ~5.00%.",
+          "fuente": "LiveMint",
+          "url": "https://www.livemint.com/market/gold-falls-nearly-3-as-cpi-tops-forecasts-lifting-dollar-and-yields-11794337899940.html"
+        },
+        {
+          "titulo": "Rebote tímido tras la caída del martes",
+          "detalle": "El oro cayó ~2.7% el martes y hoy rebota con modestia. El Brent ronda $92.16 y se recupera por esperanzas de una salida al conflicto con Irán. TD Securities ve un posible movimiento hacia el soporte de $3,900.",
+          "fuente": "CNBC",
+          "url": "https://www.cnbc.com/2026/11/11/gold-edges-higher-after-sharp-selloff-fed-hike-bets-weigh.html"
+        }
+      ],
+      "lectura": "Rebote tímido; mientras la Fed suene dura, el oro puede seguir presionado cerca de $4,000. Comprar en partes y sin prisa. No es asesoría financiera.",
+      "notion_url": "https://app.notion.com/p/415f98ae1112813e9747c0e202695f52",
+      "notas": "Lectura ~07:37 CDMX (13:37 UTC). Rango del día hasta ahora $4,026.60–$4,067.10. Contrastes: gold-api.com 4038.10 a las 13:36 UTC; Kitco bid 4036.80 / ask 4038.80. Solicitudes de desempleo jue 12 nov 7:30 CDMX; PPI vie 13 nov 7:30 CDMX. También: https://finance.yahoo.com/personal-finance/investing/article/gold-price-today-wednesday-november-11-2026-gold-prices-fall-back-as-inflation-concerns-broaden-121148323.html"
     }
   ],
   "relato": {
@@ -750,19 +793,19 @@
         "kicker": "Dónde está",
         "titulo": "El precio, y cómo llegó hasta aquí",
         "parrafos": [
-          "Por la mañana del 10 de noviembre de 2026 el spot del log anda en 4,054.10 dólares. Es la lectura del reporte, no el cierre del futuro.",
-          "En pesos el log lo deja en 2,424 el gramo, con el dólar a 18.5983 (9 de noviembre de 2026).",
-          "Contra el cierre previo bajó 2.1%, unos 85.30 dólares.",
-          "El futuro GC=F cerró el 10 de noviembre de 2026 en 4,051 dólares.",
-          "En los últimos 20 días de mercado el futuro bajó 3.0%: de 4,177.30 dólares el 13 de octubre de 2026 a 4,051 dólares el 10 de noviembre de 2026.",
-          "En 60 días de mercado bajó 9.4%, desde 4,473.70 dólares el 17 de agosto de 2026.",
-          "En lo que va de 2026 el futuro bajó 6.7% frente al 31 de diciembre de 2025 (4,341.10 dólares).",
+          "Por la mañana del 11 de noviembre de 2026 el spot del log anda en 4,040.72 dólares. Es la lectura del reporte, no el cierre del futuro.",
+          "En pesos el log lo deja en 2,425 el gramo, con el dólar a 18.6678 (10 de noviembre de 2026).",
+          "Contra el cierre previo subió 0.2%, unos 8.20 dólares.",
+          "El futuro GC=F cerró el 10 de noviembre de 2026 en 4,030.20 dólares.",
+          "En los últimos 20 días de mercado el futuro bajó 1.5%: de 4,107.90 dólares el 14 de octubre de 2026 a 4,045.10 dólares el 11 de noviembre de 2026.",
+          "En 60 días de mercado bajó 8.5%, desde 4,420.60 dólares el 18 de agosto de 2026.",
+          "En lo que va de 2026 el futuro bajó 6.8% frente al 31 de diciembre de 2025 (4,341.10 dólares).",
           "En 2026, dentro de esta serie, el futuro tocó 5,318.40 dólares el 29 de enero de 2026 y 3,898.90 dólares el 30 de octubre de 2026."
         ],
         "notas": [
           {
             "texto": "Cierre del futuro",
-            "valor": "4,051 dólares"
+            "valor": "4,030.20 dólares"
           }
         ],
         "enlaces": [],
@@ -770,10 +813,6 @@
           "tipo": "linea",
           "titulo": "Futuro, últimos días de mercado",
           "puntos": [
-            {
-              "fecha": "2026-08-18",
-              "valor": 4420.6
-            },
             {
               "fecha": "2026-08-19",
               "valor": 4545.3
@@ -1008,16 +1047,20 @@
             },
             {
               "fecha": "2026-11-10",
-              "valor": 4051.0
+              "valor": 4030.2
+            },
+            {
+              "fecha": "2026-11-11",
+              "valor": 4045.1
             }
           ],
           "marcas": [
             {
-              "fecha": "2026-08-18",
+              "fecha": "2026-08-19",
               "etiqueta": "inicio del tramo"
             },
             {
-              "fecha": "2026-11-10",
+              "fecha": "2026-11-11",
               "etiqueta": "último cierre"
             }
           ]
@@ -1032,7 +1075,7 @@
           "En los reportes de estos días: «Peso mexicano» sale en 6 días, la última el 28 de octubre de 2026; «Fed» sale en 5 días, la última el 9 de noviembre de 2026; «Petróleo más bajo» sale en 2 días, la última el 9 de noviembre de 2026.",
           "El día con más movimiento en el log fue el 4 de noviembre de 2026: subió 2.8%.",
           "El log lo escribió así: «+$108.50 (+2.76%)».",
-          "La lectura del 10 de noviembre de 2026, tal como quedó en el log: «Cae tras un CPI más caliente de lo esperado y una Fed que apunta a subir tasas; puede seguir volátil a corto plazo, así que si compran, mejor en partes.»."
+          "La lectura del 11 de noviembre de 2026, tal como quedó en el log: «Rebote tímido; mientras la Fed suene dura, el oro puede seguir presionado cerca de $4,000. Comprar en partes y sin prisa. No es asesoría financiera.»."
         ],
         "notas": [],
         "enlaces": [
@@ -1121,6 +1164,10 @@
             {
               "etiqueta": "11-10",
               "valor": -2.06
+            },
+            {
+              "etiqueta": "11-11",
+              "valor": 0.2
             }
           ]
         }
@@ -1131,19 +1178,19 @@
         "kicker": "Qué dice la cuenta",
         "titulo": "El valor justo, y por qué queda hueco",
         "parrafos": [
-          "El cierre del futuro está en 4,051 dólares. El valor justo titular, armado solo con lo ya conocido, queda en 2,294.52 dólares. El precio está 76.5% por encima de esa cuenta.",
-          "Ese titular no es la recta de siempre. Suma el breakeven, las compras de bancos centrales, el índice GPR y una dummie desde el 24 de febrero de 2022. La recta base, también solo con el pasado, queda en 2,835.69 dólares. Se usa como titular porque su error fuera de muestra es menor, aunque hoy la brecha sea más ancha.",
+          "El cierre del futuro está en 4,030.20 dólares. El valor justo titular, armado solo con lo ya conocido, queda en 2,227.24 dólares. El precio está 81.0% por encima de esa cuenta.",
+          "Ese titular no es la recta de siempre. Suma el breakeven, las compras de bancos centrales, el índice GPR y una dummie desde el 24 de febrero de 2022. La recta base, también solo con el pasado, queda en 2,651.14 dólares. Se usa como titular porque su error fuera de muestra es menor, aunque hoy la brecha sea más ancha.",
           "Una brecha así de ancha puede durar. No es una orden de vender ni de comprar.",
-          "El modelo base no ve las compras de bancos centrales, el oro guardado en GLD y el riesgo geopolítico. En esta corrida sí entran, y alejan la brecha de cero en 2.9 puntos. Con esas series la brecha queda en +45.7%. El valor justo ampliado queda en 2,779.65 dólares. No explican el hueco: lo dejan más lejos."
+          "El modelo base no ve las compras de bancos centrales, el oro guardado en GLD y el riesgo geopolítico. En esta corrida sí entran, y acercan la brecha a cero en 11.3 puntos. Con esas series la brecha queda en +40.7%. El valor justo ampliado queda en 2,863.73 dólares. Cierran una parte. El resto del hueco sigue ahí."
         ],
         "notas": [
           {
             "texto": "Valor justo",
-            "valor": "2,294.52 dólares"
+            "valor": "2,227.24 dólares"
           },
           {
             "texto": "Valor justo ampliado",
-            "valor": "2,779.65 dólares"
+            "valor": "2,863.73 dólares"
           }
         ],
         "enlaces": [],
@@ -1153,15 +1200,15 @@
           "puntos": [
             {
               "etiqueta": "Cierre",
-              "valor": 4051.0
+              "valor": 4030.2
             },
             {
               "etiqueta": "Valor justo",
-              "valor": 2294.52
+              "valor": 2227.24
             },
             {
               "etiqueta": "Con lo que el base no ve",
-              "valor": 2779.65
+              "valor": 2863.73
             }
           ]
         }
@@ -1172,9 +1219,9 @@
         "kicker": "Cuánto creerle",
         "titulo": "A dónde apunta, y qué tan seguido le atina",
         "parrafos": [
-          "A 5 días de mercado la cuenta apunta al alza: +1.24%, hacia 4,101.18 dólares. La banda de un error típico va de -1.0% a +3.6%. Esa banda incluye subida y bajada.",
-          "A 20 días de mercado la cuenta apunta al alza: +4.35%, hacia 4,227.12 dólares. La banda de un error típico va de -0.6% a +9.5%. Esa banda incluye subida y bajada.",
-          "A 5 días, el modelo se equivoca más que asumir que el precio no cambia: 1.70% de error contra 1.68%. El R² contra cero es -0.021: no le gana a la idea de que el precio no cambia. La dirección coincidió el 50.5%. Siempre decir que sube habría acertado el 55.6%. Ya con el precio realizado, acertó 376 de 744 (50.5%).",
+          "A 5 días de mercado la cuenta apunta al alza: +1.12%, hacia 4,075.26 dólares. La banda de un error típico va de -1.2% a +3.5%. Esa banda incluye subida y bajada.",
+          "A 20 días de mercado la cuenta apunta al alza: +4.01%, hacia 4,191.72 dólares. La banda de un error típico va de -0.9% a +9.2%. Esa banda incluye subida y bajada.",
+          "A 5 días, el modelo se equivoca más que asumir que el precio no cambia: 1.70% de error contra 1.68%. El R² contra cero es -0.021: no le gana a la idea de que el precio no cambia. La dirección coincidió el 50.5%. Siempre decir que sube habría acertado el 55.6%. Ya con el precio realizado, acertó 376 de 745 (50.5%).",
           "A 20 días, el modelo se equivoca más que asumir que el precio no cambia: 3.73% de error contra 3.66%. El R² contra cero es -0.055: no le gana a la idea de que el precio no cambia. La dirección coincidió el 53.0%. Siempre decir que sube habría acertado el 51.4%. Ya con el precio realizado, acertó 98 de 185 (53.0%).",
           "Ni a 5 ni a 20 días esta cuenta le gana a pensar que el precio no cambia. La flecha es la cuenta, no una señal para irse de lleno."
         ],
@@ -1217,24 +1264,24 @@
     "fecha": "2026-11-10",
     "instrumento": "GC=F",
     "instrumento_nota": "Futuro continuo del COMEX (Yahoo Finance). No es el spot de Kitco del reporte de la mañana, y el nivel puede diferir cerca de un 1%.",
-    "precio_usd_oz": 4051.0,
-    "usd_mxn": 18.6429,
+    "precio_usd_oz": 4030.2,
+    "usd_mxn": 18.5334,
     "usd_mxn_nota": "Tipo de cambio del panel (Yahoo MXN=X, o el respaldo que haya usado la descarga), no el FIX de Banxico del reporte diario.",
-    "mxn_por_gramo": 2428.1,
-    "valor_justo_usd": 2294.52,
-    "brecha_pct": 76.55,
+    "mxn_por_gramo": 2401.44,
+    "valor_justo_usd": 2227.24,
+    "brecha_pct": 80.95,
     "valor_justo_modelo": "ols_nuevo",
-    "valor_justo_base_usd": 2835.69,
-    "brecha_base_pct": 42.86,
-    "valor_justo_muestra_usd": 2868.79,
-    "brecha_muestra_pct": 41.21,
+    "valor_justo_base_usd": 2651.14,
+    "brecha_base_pct": 52.02,
+    "valor_justo_muestra_usd": 2680.61,
+    "brecha_muestra_pct": 50.35,
     "n": 5246,
     "inicio": "2006-01-03",
     "fin": "2026-11-10",
     "ampliado": {
-      "valor_justo_usd": 2779.65,
-      "brecha_pct": 45.74,
-      "cierre_abs_pp": -2.88,
+      "valor_justo_usd": 2863.73,
+      "brecha_pct": 40.73,
+      "cierre_abs_pp": 11.29,
       "variables": [
         "rendimiento_real_10",
         "log_dolar",
@@ -1250,25 +1297,25 @@
       "5": {
         "horizonte_dias_mercado": 5,
         "fecha": "2026-11-10",
-        "retorno_log": 0.01231,
-        "retorno_pct": 1.239,
+        "retorno_log": 0.01112,
+        "retorno_pct": 1.118,
         "direccion": "alza",
-        "nivel_objetivo_usd": 4101.18,
-        "banda_baja_pct": -1.04,
-        "banda_alta_pct": 3.57,
-        "sigma_log": 0.0227755640490259,
+        "nivel_objetivo_usd": 4075.26,
+        "banda_baja_pct": -1.16,
+        "banda_alta_pct": 3.45,
+        "sigma_log": 0.022769102207828143,
         "senal_debil": false,
         "modelo": "ridge"
       },
       "20": {
         "horizonte_dias_mercado": 20,
         "fecha": "2026-11-10",
-        "retorno_log": 0.042558,
-        "retorno_pct": 4.348,
+        "retorno_log": 0.039296,
+        "retorno_pct": 4.008,
         "direccion": "alza",
-        "nivel_objetivo_usd": 4227.12,
-        "banda_baja_pct": -0.6,
-        "banda_alta_pct": 9.54,
+        "nivel_objetivo_usd": 4191.72,
+        "banda_baja_pct": -0.92,
+        "banda_alta_pct": 9.18,
         "sigma_log": 0.04854028547629361,
         "senal_debil": false,
         "modelo": "ridge"
@@ -1278,25 +1325,25 @@
       "5": {
         "horizonte_dias_mercado": 5,
         "fecha": "2026-11-10",
-        "retorno_log": 0.01231,
-        "retorno_pct": 1.239,
+        "retorno_log": 0.01112,
+        "retorno_pct": 1.118,
         "direccion": "alza",
-        "nivel_objetivo_usd": 4101.18,
-        "banda_baja_pct": -1.04,
-        "banda_alta_pct": 3.57,
-        "sigma_log": 0.0227755640490259,
+        "nivel_objetivo_usd": 4075.26,
+        "banda_baja_pct": -1.16,
+        "banda_alta_pct": 3.45,
+        "sigma_log": 0.022769102207828143,
         "senal_debil": false,
         "modelo": "ridge"
       },
       "20": {
         "horizonte_dias_mercado": 20,
         "fecha": "2026-11-10",
-        "retorno_log": 0.042558,
-        "retorno_pct": 4.348,
+        "retorno_log": 0.039296,
+        "retorno_pct": 4.008,
         "direccion": "alza",
-        "nivel_objetivo_usd": 4227.12,
-        "banda_baja_pct": -0.6,
-        "banda_alta_pct": 9.54,
+        "nivel_objetivo_usd": 4191.72,
+        "banda_baja_pct": -0.92,
+        "banda_alta_pct": 9.18,
         "sigma_log": 0.04854028547629361,
         "senal_debil": false,
         "modelo": "ridge"
@@ -1306,56 +1353,56 @@
       "5": {
         "metricas": {
           "sin_solapar": {
-            "n": 745,
-            "r2_cero": -0.020580188904076868,
-            "r2_media": -0.01785729235251643,
-            "rmse": 0.0227755640490259,
-            "rmse_cero": 0.02254475782284777,
-            "rmse_media": 0.022574892717048697,
-            "acierto": 0.5053763440860215,
-            "acierto_siempre_alza": 0.5564516129032258,
-            "acierto_signo_media": 0.5564516129032258
+            "n": 746,
+            "r2_cero": -0.02124286468347214,
+            "r2_media": -0.0184451499909859,
+            "rmse": 0.022769102207828143,
+            "rmse_cero": 0.022531047803728856,
+            "rmse_media": 0.022561973481236362,
+            "acierto": 0.5046979865771812,
+            "acierto_siempre_alza": 0.5557046979865772,
+            "acierto_signo_media": 0.5557046979865772
           },
           "solapado": {
-            "n": 3725,
-            "r2_cero": -0.0123004423143378,
-            "r2_media": -0.009796500897490956,
-            "rmse": 0.023413826432773514,
-            "rmse_cero": 0.02327114119964578,
-            "rmse_media": 0.02329997547313576,
-            "acierto": 0.5060467616232196,
-            "acierto_siempre_alza": 0.5396398817522171,
-            "acierto_signo_media": 0.5396398817522171
+            "n": 3726,
+            "r2_cero": -0.0124995616421677,
+            "r2_media": -0.009972127534486175,
+            "rmse": 0.023411760634395887,
+            "rmse_cero": 0.023266799815062494,
+            "rmse_media": 0.023295893964310636,
+            "acierto": 0.5059108006448146,
+            "acierto_siempre_alza": 0.539494895217625,
+            "acierto_signo_media": 0.539494895217625
           }
         },
         "errores": {
           "sin_solapar": {
-            "n": 745,
-            "mae": 0.017002209956663704,
-            "rmse": 0.0227755640490259,
-            "mae_pct": 1.7002209956663703,
-            "rmse_pct": 2.27755640490259,
-            "mae_cero": 0.01681960370164803,
-            "rmse_cero": 0.02254475782284777,
-            "mae_cero_pct": 1.681960370164803,
-            "rmse_cero_pct": 2.254475782284777
+            "n": 746,
+            "mae": 0.017002604750150613,
+            "rmse": 0.022769102207828143,
+            "mae_pct": 1.7002604750150612,
+            "rmse_pct": 2.2769102207828142,
+            "mae_cero": 0.016806271166445653,
+            "rmse_cero": 0.022531047803728856,
+            "mae_cero_pct": 1.6806271166445654,
+            "rmse_cero_pct": 2.2531047803728854
           },
           "solapado": {
-            "n": 3725,
-            "mae": 0.017406521766600278,
-            "rmse": 0.023413826432773514,
-            "mae_pct": 1.7406521766600278,
-            "rmse_pct": 2.3413826432773512,
-            "mae_cero": 0.01733397477989391,
-            "rmse_cero": 0.02327114119964578,
-            "mae_cero_pct": 1.7333974779893908,
-            "rmse_cero_pct": 2.327114119964578
+            "n": 3726,
+            "mae": 0.01740511071730181,
+            "rmse": 0.023411760634395887,
+            "mae_pct": 1.740511071730181,
+            "rmse_pct": 2.3411760634395886,
+            "mae_cero": 0.017329785779315113,
+            "rmse_cero": 0.023266799815062494,
+            "mae_cero_pct": 1.7329785779315112,
+            "rmse_cero_pct": 2.3266799815062496
           }
         },
         "en_vivo": {
-          "n": 744,
+          "n": 745,
           "aciertos": 376,
-          "tasa": 0.5053763440860215,
+          "tasa": 0.5046979865771812,
           "serie": [
             {
               "fecha": "2012-01-11",
@@ -5076,21 +5123,14 @@
               "fecha": "2026-10-28",
               "n": 744,
               "tasa": 0.5053763440860215
+            },
+            {
+              "fecha": "2026-11-04",
+              "n": 745,
+              "tasa": 0.5046979865771812
             }
           ],
           "ultimos": [
-            {
-              "fecha": "2026-08-11",
-              "fecha_realizada": "2026-08-18",
-              "direccion": "baja",
-              "direccion_realizada": "baja",
-              "acierto": true,
-              "retorno_pronosticado": -0.00013126980149475603,
-              "retorno_realizado": -0.00462665992229816,
-              "precio": 4441.10009765625,
-              "nivel_objetivo": 4440.5171535903255,
-              "precio_realizado": 4420.60009765625
-            },
             {
               "fecha": "2026-08-18",
               "fecha_realizada": "2026-08-25",
@@ -5222,6 +5262,18 @@
               "precio": 4051.60009765625,
               "nivel_objetivo": 4090.9444115532124,
               "precio_realizado": 4073.0
+            },
+            {
+              "fecha": "2026-11-04",
+              "fecha_realizada": "2026-11-11",
+              "direccion": "alza",
+              "direccion_realizada": "baja",
+              "acierto": false,
+              "retorno_pronosticado": 0.010423193457220266,
+              "retorno_realizado": -0.006873532440675234,
+              "precio": 4073.0,
+              "nivel_objetivo": 4115.6756890657125,
+              "precio_realizado": 4045.10009765625
             }
           ]
         },
@@ -5243,15 +5295,15 @@
             "acierto_signo_media": 0.5135135135135135
           },
           "solapado": {
-            "n": 3695,
-            "r2_cero": -0.09045923420047441,
-            "r2_media": -0.07372522246719382,
-            "rmse": 0.04617728717469711,
-            "rmse_cero": 0.044220505018817316,
-            "rmse_media": 0.04456376114810454,
-            "acierto": 0.5144868670457623,
-            "acierto_siempre_alza": 0.5236934741402653,
-            "acierto_signo_media": 0.5236934741402653
+            "n": 3696,
+            "r2_cero": -0.09068295686723338,
+            "r2_media": -0.0738938648315417,
+            "rmse": 0.046177628918556965,
+            "rmse_cero": 0.0442162967239232,
+            "rmse_media": 0.04456059168095693,
+            "acierto": 0.5143475906876015,
+            "acierto_siempre_alza": 0.523551705468327,
+            "acierto_signo_media": 0.523551705468327
           }
         },
         "errores": {
@@ -5267,15 +5319,15 @@
             "rmse_cero_pct": 4.725851871320665
           },
           "solapado": {
-            "n": 3695,
-            "mae": 0.03574595877788442,
-            "rmse": 0.04617728717469711,
-            "mae_pct": 3.574595877788442,
-            "rmse_pct": 4.617728717469711,
-            "mae_cero": 0.0342704583352246,
-            "rmse_cero": 0.044220505018817316,
-            "mae_cero_pct": 3.42704583352246,
-            "rmse_cero_pct": 4.422050501881731
+            "n": 3696,
+            "mae": 0.035748878166116174,
+            "rmse": 0.046177628918556965,
+            "mae_pct": 3.5748878166116174,
+            "rmse_pct": 4.617762891855697,
+            "mae_cero": 0.034266747010686695,
+            "rmse_cero": 0.0442162967239232,
+            "mae_cero_pct": 3.4266747010686696,
+            "rmse_cero_pct": 4.42162967239232
           }
         },
         "en_vivo": {
@@ -6362,7 +6414,7 @@
       }
     },
     "prob_up_5d": 0.41830065359477125,
-    "prob_up_20d": 0.5075187969924813,
+    "prob_up_20d": 0.3076923076923077,
     "estudio": {
       "esquema": "Caminata expansiva. El entrenamiento de un día t solo usa filas cuya etiqueta ya cerró y deja, además, un embargo de otro horizonte. Los días que se solapan no se cuentan como pruebas distintas en la nota principal.",
       "avisos": [],
@@ -6387,24 +6439,24 @@
         "promovido": true,
         "titular": "ols_nuevo",
         "fecha": "2026-11-10",
-        "valor_ols": 2294.517815829258,
-        "brecha_ols_pct": 76.55125499803255,
-        "valor_kalman": 4259.7208916951295,
-        "brecha_kalman_pct": -4.899872479956546,
-        "valor_markov": 1970.6482438614262,
-        "brecha_markov_pct": 105.56687438353723,
+        "valor_ols": 2227.2439887909795,
+        "brecha_ols_pct": 80.95008770725647,
+        "valor_kalman": 3980.646925682121,
+        "brecha_kalman_pct": 1.2448485488640193,
+        "valor_markov": 1951.1359906895846,
+        "brecha_markov_pct": 107.3202543010137,
         "markov_ajustes": 4,
         "markov_convergio": true,
         "vif": {
-          "rendimiento_real_10": 1.6351434554945798,
-          "log_dolar": 5.915972155140961,
-          "log_brent": 3.691854935817632,
-          "vix": 2.27637299385876,
-          "cpi_anual": 2.5120977764744437,
-          "breakeven_10": 3.9125054187900328,
-          "gpr": 1.3376226819203199,
-          "compras_bc_ton": 1.2465618322004464,
-          "post_feb2022": 5.212513707787181
+          "rendimiento_real_10": 1.6353458700920427,
+          "log_dolar": 5.919657750724158,
+          "log_brent": 3.6927717576192,
+          "vix": 2.2774707809113464,
+          "cpi_anual": 2.5129902555133454,
+          "breakeven_10": 3.9121054664163792,
+          "gpr": 1.3376728595917466,
+          "compras_bc_ton": 1.2465643374218778,
+          "post_feb2022": 5.213158144991425
         },
         "nota": "La dummie vale 1 desde el 24 de febrero de 2022. El RMSE que decide el titular es el de la recta expansiva (mínimos cuadrados, solo con el pasado), una observación cada 20 sesiones. El Kalman se reporta aparte: su error de un paso persigue el precio y no compite."
       },
@@ -6415,14 +6467,14 @@
             "horizonte": 5,
             "modelo": "ridge",
             "n": 744,
-            "n_metrica": 745,
-            "rmse": 0.0227755640490259,
+            "n_metrica": 746,
+            "rmse": 0.022769102207828143,
             "rmse_mismas_fechas": 0.02356939603910873,
-            "rmse_cero": 0.02254475782284777,
-            "r2_cero": -0.020580188904076868,
-            "r2_media": -0.01785729235251643,
-            "acierto": 0.5053763440860215,
-            "acierto_siempre_alza": 0.5564516129032258,
+            "rmse_cero": 0.022531047803728856,
+            "r2_cero": -0.02124286468347214,
+            "r2_media": -0.0184451499909859,
+            "acierto": 0.5046979865771812,
+            "acierto_siempre_alza": 0.5557046979865772,
             "es_titular": true
           },
           {
@@ -6480,21 +6532,21 @@
           "5": {
             "ridge_vs_cero": {
               "solapado": {
-                "n": 3725,
-                "media_diferencial": 6.661255490192476e-06,
-                "estadistico": 0.8237949447974598,
-                "estadistico_sin_correccion": 0.8247913444648773,
-                "p": 0.4101088346610766,
+                "n": 3726,
+                "media_diferencial": 6.7665623680567245e-06,
+                "estadistico": 0.8375694339667639,
+                "estadistico_sin_correccion": 0.8385822219876315,
+                "p": 0.4023263000939802,
                 "modelo_mejor": false,
                 "rezagos": 4,
                 "perdida": "se"
               },
               "sin_solapar": {
-                "n": 745,
-                "media_diferencial": 1.04602124604252e-05,
-                "estadistico": 1.0108104158601299,
-                "estadistico_sin_correccion": 1.0169533173294805,
-                "p": 0.31243579171915375,
+                "n": 746,
+                "media_diferencial": 1.0783900216609503e-05,
+                "estadistico": 1.0429798785272162,
+                "estadistico_sin_correccion": 1.0493097319905984,
+                "p": 0.29729593079700495,
                 "modelo_mejor": false,
                 "rezagos": 0,
                 "perdida": "se"
@@ -6503,11 +6555,11 @@
             },
             "nuevo_vs_cero": {
               "solapado": {
-                "n": 3719,
-                "media_diferencial": 2.7904966395721204e-05,
-                "estadistico": 2.6792030968979685,
-                "estadistico_sin_correccion": 2.682448891542081,
-                "p": 0.007412266081411114,
+                "n": 3720,
+                "media_diferencial": 2.7931984383038723e-05,
+                "estadistico": 2.682749194149105,
+                "estadistico_sin_correccion": 2.6859984100657535,
+                "p": 0.007334278766802856,
                 "modelo_mejor": false,
                 "rezagos": 4,
                 "perdida": "se"
@@ -6526,11 +6578,11 @@
             },
             "nuevo_vs_ridge": {
               "solapado": {
-                "n": 3719,
-                "media_diferencial": 2.1120493609962323e-05,
-                "estadistico": 2.0238628038732593,
-                "estadistico_sin_correccion": 2.0263146684059765,
-                "p": 0.043055654809779555,
+                "n": 3720,
+                "media_diferencial": 2.1042067992541504e-05,
+                "estadistico": 2.0170217597818367,
+                "estadistico_sin_correccion": 2.0194646788666333,
+                "p": 0.04376496530457311,
                 "modelo_mejor": false,
                 "rezagos": 4,
                 "perdida": "se"
@@ -6551,11 +6603,11 @@
           "20": {
             "ridge_vs_cero": {
               "solapado": {
-                "n": 3695,
-                "media_diferencial": 0.00017688878669519842,
-                "estadistico": 1.4848374976216887,
-                "estadistico_sin_correccion": 1.4927151692226521,
-                "p": 0.13767220131556104,
+                "n": 3696,
+                "media_diferencial": 0.0001772925165619272,
+                "estadistico": 1.4884442096387676,
+                "estadistico_sin_correccion": 1.4963388684074526,
+                "p": 0.13671912157748478,
                 "modelo_mejor": false,
                 "rezagos": 19,
                 "perdida": "se"
@@ -6574,11 +6626,11 @@
             },
             "nuevo_vs_cero": {
               "solapado": {
-                "n": 3674,
-                "media_diferencial": 0.00035326081229227944,
-                "estadistico": 3.1453875409548475,
-                "estadistico_sin_correccion": 3.162171003865998,
-                "p": 0.0016719233063492696,
+                "n": 3675,
+                "media_diferencial": 0.0003532366916222217,
+                "estadistico": 3.1460318511396954,
+                "estadistico_sin_correccion": 3.1628141597841517,
+                "p": 0.0016682508250804404,
                 "modelo_mejor": false,
                 "rezagos": 19,
                 "perdida": "se"
@@ -6597,11 +6649,11 @@
             },
             "nuevo_vs_ridge": {
               "solapado": {
-                "n": 3674,
-                "media_diferencial": 0.0001676104834019487,
-                "estadistico": 1.1467163841288084,
-                "estadistico_sin_correccion": 1.1528351442663245,
-                "p": 0.2515735509966786,
+                "n": 3675,
+                "media_diferencial": 0.00016718270993046672,
+                "estadistico": 1.14399599487238,
+                "estadistico_sin_correccion": 1.1500985694114823,
+                "p": 0.2526998260812492,
                 "modelo_mejor": false,
                 "rezagos": 19,
                 "perdida": "se"
@@ -6629,8 +6681,8 @@
         "5": {
           "fecha": "2026-11-10",
           "prob_up": 0.41830065359477125,
-          "prob_plano": 0.30073052859560145,
-          "prob_baja": 0.2809688178096273,
+          "prob_plano": 0.29969168657217593,
+          "prob_baja": 0.28200765983305276,
           "modelo": "bosque",
           "metricas": {
             "elegido": {
@@ -6841,9 +6893,9 @@
         },
         "20": {
           "fecha": "2026-11-10",
-          "prob_up": 0.5075187969924813,
-          "prob_plano": 0.3064889103221168,
-          "prob_baja": 0.18599229268540204,
+          "prob_up": 0.3076923076923077,
+          "prob_plano": 0.43539381596532173,
+          "prob_baja": 0.25691387634237056,
           "modelo": "lightgbm",
           "metricas": {
             "elegido": {
@@ -7058,19 +7110,19 @@
           "fecha": "2026-11-10",
           "nivel": 0.8,
           "metodo": "lightgbm_cuantil_mapie",
-          "retorno_mediana": 0.006017340192579987,
-          "retorno_bajo": -0.025571435154593553,
-          "retorno_alto": 0.04411757320910263,
-          "nivel_bajo_usd": 3948.7233694505026,
-          "nivel_alto_usd": 4233.721262587183,
+          "retorno_mediana": 0.006918587643061437,
+          "retorno_bajo": -0.025874450775148123,
+          "retorno_alto": 0.03491344328134838,
+          "nivel_bajo_usd": 3927.258263846424,
+          "nivel_alto_usd": 4173.39324897748,
           "cobertura": {
             "sin_solapar": {
               "n": 744,
               "cobertura": 0.7876344086021505
             },
             "solapado": {
-              "n": 3719,
-              "cobertura": 0.7934928744286098
+              "n": 3720,
+              "cobertura": 0.7935483870967742
             }
           },
           "indice_max_entreno": 4324,
@@ -7079,12 +7131,12 @@
             "metodo": "garch11",
             "cobertura": {
               "sin_solapar": {
-                "n": 998,
-                "cobertura": 0.8246492985971944
+                "n": 999,
+                "cobertura": 0.8248248248248248
               },
               "solapado": {
-                "n": 4990,
-                "cobertura": 0.8172344689378758
+                "n": 4991,
+                "cobertura": 0.817271087958325
               }
             },
             "nivel": 0.8
@@ -7094,19 +7146,19 @@
           "fecha": "2026-11-10",
           "nivel": 0.8,
           "metodo": "lightgbm_cuantil_mapie",
-          "retorno_mediana": 0.021894423804010767,
-          "retorno_bajo": -0.03718635037162527,
-          "retorno_alto": 0.0833380154392413,
-          "nivel_bajo_usd": 3903.1246078027893,
-          "nivel_alto_usd": 4403.06892019724,
+          "retorno_mediana": 0.01344366746957471,
+          "retorno_bajo": -0.0360973201672046,
+          "retorno_alto": 0.08107055747559971,
+          "nivel_bajo_usd": 3887.3149311456345,
+          "nivel_alto_usd": 4370.539897778956,
           "cobertura": {
             "sin_solapar": {
               "n": 184,
               "cobertura": 0.7608695652173914
             },
             "solapado": {
-              "n": 3674,
-              "cobertura": 0.7640174197060424
+              "n": 3675,
+              "cobertura": 0.7635374149659864
             }
           },
           "indice_max_entreno": 4261,
@@ -7119,8 +7171,8 @@
                 "cobertura": 0.7791164658634538
               },
               "solapado": {
-                "n": 4975,
-                "cobertura": 0.807035175879397
+                "n": 4976,
+                "cobertura": 0.8070739549839229
               }
             },
             "nivel": 0.8
@@ -7138,9 +7190,9 @@
           "Oro al alza"
         ],
         "probabilidades": [
-          0.929343462647634,
-          0.03660301375165425,
-          0.03405352360071156
+          0.9613807328097633,
+          0.020101692916149657,
+          0.01851757427408711
         ],
         "metodo": "hmm_filtrado",
         "ari_kmeans": 0.01936399774195443,
@@ -7148,48 +7200,9 @@
         "nota": "El estado de hoy sale del filtro del HMM, con parámetros estimados antes de hoy. No es el suavizado, que usaría el futuro. K-means y la mezcla gaussiana se estiman igual, solo con el pasado; el ARI dice cuánto coinciden las etiquetas, no cuál acierta."
       },
       "analogos": {
-        "disponible": true,
-        "ventana": 60,
-        "reciente_desde": "2026-08-18",
-        "reciente_hasta": "2026-11-10",
-        "periodos": [
-          {
-            "desde": "2015-09-28",
-            "hasta": "2015-12-21",
-            "distancia": 0.8948913365296738,
-            "retorno_20": 0.015772863602636536,
-            "retorno_60": 0.14746020152453562
-          },
-          {
-            "desde": "2018-03-27",
-            "hasta": "2018-06-20",
-            "distancia": 0.9246030442417157,
-            "retorno_20": -0.03914513842696408,
-            "retorno_60": -0.06181511244584586
-          },
-          {
-            "desde": "2023-08-22",
-            "hasta": "2023-11-14",
-            "distancia": 0.998835645536705,
-            "retorno_20": 0.013486050038031373,
-            "retorno_60": 0.03605701298061077
-          },
-          {
-            "desde": "2013-10-16",
-            "hasta": "2014-01-10",
-            "distancia": 0.9990193682141085,
-            "retorno_20": 0.022289320660726995,
-            "retorno_60": 0.048534219566000264
-          },
-          {
-            "desde": "2022-05-19",
-            "hasta": "2022-08-15",
-            "distancia": 1.0043418814289473,
-            "retorno_20": -0.04591900480579631,
-            "retorno_60": -0.046734537211984256
-          }
-        ],
-        "nota": "La distancia es la raíz del error cuadrático medio entre puntajes. El retorno posterior es historia de ese análogo, no un pronóstico."
+        "disponible": false,
+        "periodos": [],
+        "nota": "La ventana reciente tiene huecos."
       },
       "dca": {
         "disponible": true,
@@ -27932,10 +27945,10 @@
       {
         "fecha": "2026-11-09",
         "precio": 4114.5,
-        "valor_justo": 2294.69,
-        "valor_ampliado": 2753.87,
-        "valor_nuevo": 4319.36,
-        "valor_base": 2798.19,
+        "valor_justo": 2227.12,
+        "valor_ampliado": 2822.56,
+        "valor_nuevo": 3999.57,
+        "valor_base": 2594.32,
         "pronostico_20": 4259.12,
         "intervalo_bajo": 4057.9,
         "intervalo_alto": 4531.07,
@@ -27943,15 +27956,27 @@
       },
       {
         "fecha": "2026-11-10",
-        "precio": 4051.0,
-        "valor_justo": 2294.52,
-        "valor_ampliado": 2779.65,
-        "valor_nuevo": 4259.72,
-        "valor_base": 2835.69,
+        "precio": 4030.2,
+        "valor_justo": 2227.24,
+        "valor_ampliado": 2863.73,
+        "valor_nuevo": 3980.65,
+        "valor_base": 2651.14,
         "pronostico_20": 4256.52,
         "intervalo_bajo": 4046.34,
         "intervalo_alto": 4527.64,
         "regimen": 0
+      },
+      {
+        "fecha": "2026-11-11",
+        "precio": 4045.1,
+        "valor_justo": null,
+        "valor_ampliado": null,
+        "valor_nuevo": null,
+        "valor_base": null,
+        "pronostico_20": 4216.03,
+        "intervalo_bajo": 4049.85,
+        "intervalo_alto": 4476.04,
+        "regimen": null
       }
     ],
     "fuentes": [
@@ -27959,25 +27984,25 @@
         "serie": "oro_usd",
         "etiqueta": "Yahoo Finance GC=F (futuro COMEX)",
         "url": "https://finance.yahoo.com/quote/GC=F",
-        "ultimo_dato": "2026-11-10"
+        "ultimo_dato": "2026-11-11"
       },
       {
         "serie": "dolar_index",
         "etiqueta": "Yahoo Finance DX-Y.NYB (índice dólar ICE)",
         "url": "https://finance.yahoo.com/quote/DX-Y.NYB",
-        "ultimo_dato": "2026-11-10"
+        "ultimo_dato": "2026-11-11"
       },
       {
         "serie": "rendimiento_real_10",
         "etiqueta": "FRED DFII10",
         "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/",
-        "ultimo_dato": "2026-11-06"
+        "ultimo_dato": "2026-11-09"
       },
       {
         "serie": "usd_mxn",
         "etiqueta": "Yahoo Finance MXN=X (pesos por dólar)",
         "url": "https://finance.yahoo.com/quote/MXN=X",
-        "ultimo_dato": "2026-11-10"
+        "ultimo_dato": "2026-11-11"
       }
     ],
     "avisos": [

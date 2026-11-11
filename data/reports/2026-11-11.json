@@ -1,0 +1,43 @@
+{
+  "fecha": "2026-11-11",
+  "sesion": "con_registro",
+  "precio_usd_oz": 4040.72,
+  "precio_aproximado": false,
+  "precio_fuente": "OANDA XAUUSD vía TradingView (13:24 UTC / 07:24 CDMX)",
+  "precio_url": null,
+  "cierre_previo_usd_oz": 4032.52,
+  "cierre_previo_aproximado": false,
+  "cambio_usd": 8.20,
+  "cambio_pct": 0.20,
+  "cambio_texto": "+$8.20 (+0.20%)",
+  "usd_mxn": 18.6678,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-11-10",
+  "usd_mxn_fuente": "Banxico FIX",
+  "usd_mxn_url": null,
+  "mxn_por_gramo": 2424.74,
+  "mxn_por_gramo_aproximado": false,
+  "drivers": [
+    {
+      "titulo": "CPI caliente y alza de la Fed descontada",
+      "detalle": "El CPI de octubre subió 0.4% mensual, contra 0.3% esperado; el subyacente subió 0.3%, contra 0.2%. Una alza de la Fed en diciembre quedó totalmente descontada (CME FedWatch ~100% de 25 pb y ~10% de probabilidad de 50 pb). Waller, Logan, Goolsbee, Paulson y Bowman sonaron duros.",
+      "fuente": "Euronext",
+      "url": "https://live.euronext.com/en/financial-news/bonds-reel-hot-inflation-fuels-jumbo-fed-hike-fears"
+    },
+    {
+      "titulo": "Dólar y bonos más altos",
+      "detalle": "El índice del dólar ronda 102.29. El rendimiento a 2 años anda en ~4.75% (+18 pb el martes) y el de 10 años en ~5.00%.",
+      "fuente": "LiveMint",
+      "url": "https://www.livemint.com/market/gold-falls-nearly-3-as-cpi-tops-forecasts-lifting-dollar-and-yields-11794337899940.html"
+    },
+    {
+      "titulo": "Rebote tímido tras la caída del martes",
+      "detalle": "El oro cayó ~2.7% el martes y hoy rebota con modestia. El Brent ronda $92.16 y se recupera por esperanzas de una salida al conflicto con Irán. TD Securities ve un posible movimiento hacia el soporte de $3,900.",
+      "fuente": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/11/gold-edges-higher-after-sharp-selloff-fed-hike-bets-weigh.html"
+    }
+  ],
+  "lectura": "Rebote tímido; mientras la Fed suene dura, el oro puede seguir presionado cerca de $4,000. Comprar en partes y sin prisa. No es asesoría financiera.",
+  "notion_url": "https://app.notion.com/p/415f98ae1112813e9747c0e202695f52",
+  "notas": "Lectura ~07:37 CDMX (13:37 UTC). Rango del día hasta ahora $4,026.60–$4,067.10. Contrastes: gold-api.com 4038.10 a las 13:36 UTC; Kitco bid 4036.80 / ask 4038.80. Solicitudes de desempleo jue 12 nov 7:30 CDMX; PPI vie 13 nov 7:30 CDMX. También: https://finance.yahoo.com/personal-finance/investing/article/gold-price-today-wednesday-november-11-2026-gold-prices-fall-back-as-inflation-concerns-broaden-121148323.html"
+}
