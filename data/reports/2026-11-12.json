@@ -1,0 +1,43 @@
+{
+  "fecha": "2026-11-12",
+  "sesion": "con_registro",
+  "precio_usd_oz": 3913.10,
+  "precio_aproximado": false,
+  "precio_fuente": "Kitco (bid, 8:32 AM ET / 7:32 AM CDMX)",
+  "precio_url": "https://www.kitco.com/charts/gold",
+  "cierre_previo_usd_oz": 3987.00,
+  "cierre_previo_aproximado": true,
+  "cambio_usd": -73.90,
+  "cambio_pct": -1.85,
+  "cambio_texto": "−$73.90 (−1.85%)",
+  "usd_mxn": 18.6192,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-11-11",
+  "usd_mxn_fuente": "Banxico FIX",
+  "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+  "mxn_por_gramo": 2342.46,
+  "mxn_por_gramo_aproximado": false,
+  "drivers": [
+    {
+      "titulo": "Fed halcona tras el CPI caliente",
+      "detalle": "El mercado descuenta por completo un alza de 25 pb en diciembre y algunos consideran 50 pb. Goolsbee llamó al CPI de octubre 'borderline disturbing'. El spot cayó abajo de $4,000.",
+      "fuente": "Reuters vía Investing.com",
+      "url": "https://ph.investing.com/news/commodities-news/gold-clings-below-4000-as-inflation-fears-fuel-bets-on-bigger-fed-hikes-2693783"
+    },
+    {
+      "titulo": "Dólar en máximos de 19 meses",
+      "detalle": "El índice dólar tocó máximo de 19 meses (~102.87) con el yen cerca de 160; el bono a 2 años subió a ~4.78%.",
+      "fuente": "WhyGoldMoved",
+      "url": "https://whygoldmoved.com/gold-today/2026-11-12"
+    },
+    {
+      "titulo": "Petróleo calmado, sin empuje de refugio",
+      "detalle": "El Brent ronda $91.50 con las pláticas EU–Irán atoradas y optimismo de paz en Irán y Ucrania; el oro abrió bajo $4,000 por primera vez desde la semana pasada.",
+      "fuente": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/personal-finance/investing/article/gold-prices-today-thursday-november-12-2026-prices-open-back-under-4000-as-rate-hikes-crystallize-121913089.html"
+    }
+  ],
+  "lectura": "Mientras la Fed suene dura, el oro puede seguir presionado; soporte vigilado cerca de $3,900. Comprar en partes y sin prisa. No es asesoría financiera.",
+  "notion_url": "https://app.notion.com/p/416f98ae111281ca940bebbf666c6490",
+  "notas": "Lectura ~07:32 CDMX. Rango del día $3,904.50–$4,001.20. Tercera sesión a la baja. PPI vie 13 nov 7:30 CDMX; Fed 8–9 dic."
+}
