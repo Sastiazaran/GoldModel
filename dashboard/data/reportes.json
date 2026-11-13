@@ -819,5 +819,48 @@
     "lectura": "Mientras la Fed suene dura, el oro puede seguir presionado; soporte vigilado cerca de $3,900. Comprar en partes y sin prisa. No es asesoría financiera.",
     "notion_url": "https://app.notion.com/p/416f98ae111281ca940bebbf666c6490",
     "notas": "Lectura ~07:32 CDMX. Rango del día $3,904.50–$4,001.20. Tercera sesión a la baja. PPI vie 13 nov 7:30 CDMX; Fed 8–9 dic."
+  },
+  {
+    "fecha": "2026-11-13",
+    "sesion": "con_registro",
+    "precio_usd_oz": 3894.8,
+    "precio_aproximado": false,
+    "precio_fuente": "Kitco (bid, 8:33 AM ET / 7:33 AM CDMX)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 3876.4,
+    "cierre_previo_aproximado": true,
+    "cambio_usd": 18.4,
+    "cambio_pct": 0.47,
+    "cambio_texto": "+$18.40 (+0.47%)",
+    "usd_mxn": 18.6188,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-11-12",
+    "usd_mxn_fuente": "Banxico FIX (publicado en DOF 13 nov)",
+    "usd_mxn_url": "https://dof.gob.mx/indicadores.php",
+    "mxn_por_gramo": 2331.46,
+    "mxn_por_gramo_aproximado": false,
+    "drivers": [
+      {
+        "titulo": "Fed halcona",
+        "detalle": "CME FedWatch ve ~88% de alza de 25 pb en diciembre y ~12% de 50 pb; Williams (NY Fed) dijo que más alzas son probables. El jueves el oro tocó su mínimo desde octubre 2025.",
+        "fuente": "Reuters vía MarketScreener",
+        "url": "https://uk.marketscreener.com/news/gold-rebounds-but-heads-for-weekly-fall-before-us-inflation-data-ce785ed9dc8cf226"
+      },
+      {
+        "titulo": "Dólar y bonos al alza",
+        "detalle": "Índice dólar ~103.2 cerca de máximo de 19 meses; el bono a 2 años subió 34 pb en dos sesiones (~4.86%).",
+        "fuente": "Reuters vía MarketScreener",
+        "url": "https://www.marketscreener.com/news/dollar-set-for-best-week-in-two-months-on-rate-hike-wagers-yen-tests-160-ce785ed9db81f02c"
+      },
+      {
+        "titulo": "PPI un poco más suave",
+        "detalle": "PPI de octubre +0.3% m/m vs 0.4% esperado y 6.5% a/a vs 6.6%; subyacente en línea (0.3% m/m, 5.0% a/a). El oro extendió ganancias tras el dato.",
+        "fuente": "LiveSquawk (X)",
+        "url": "https://x.com/LiveSquawk/status/2121234882382725530"
+      }
+    ],
+    "lectura": "Rebote técnico tras una semana de ~−4%; mientras la Fed suene dura y el dólar siga fuerte puede seguir volátil. Comprar en partes y sin prisa. No es asesoría financiera.",
+    "notion_url": "https://app.notion.com/p/417f98ae111281b0bce0e45bb7571ace",
+    "notas": "Lectura ~07:33 CDMX. Rango del día $3,874.30–$3,924.00. Rebote tras mínimo de más de un año (~$3,850 el 12 nov). Brent ~$96 por tensión con Irán. Minutas de la Fed mié 18 nov 13:00 CDMX; Fed 8–9 dic."
   }
 ]
