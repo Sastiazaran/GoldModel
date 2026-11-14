@@ -281,6 +281,13 @@ def _texto_pronostico(horizonte: int, info: dict) -> list[str]:
             f"Último Ridge con alpha {info['alpha_ultimo']} y "
             f"{info['n_entreno_ultimo']} filas de entrenamiento."
         )
+    lam = info.get("lambda_ultimo")
+    if lam is not None and math.isfinite(float(lam)) and float(lam) < 1.0 - 1e-12:
+        lineas.append(
+            f"Ese pronóstico se publica multiplicado por {float(lam):.2f}. "
+            "El factor sale del último tramo del entrenamiento y acerca el Ridge a "
+            "\"el precio no cambia\" cuando el tramo se equivoca menos así."
+        )
     if info["alpha_ultimo"] is not None and float(info["alpha_ultimo"]) >= 100:
         lineas.append(
             f"El alpha de Ridge quedó en {float(info['alpha_ultimo']):g}. "
@@ -949,6 +956,9 @@ def construir_informe(
         "Se reentrena más o menos cada 21 sesiones. Ridge estandariza las columnas con la media y la "
         "desviación del propio entrenamiento. En la misma caminata, con las mismas filas y el mismo embargo, "
         "se ajusta también un gradient boosting (árboles chicos). "
+        "El número de Ridge que se publica, en dólares, se multiplica por un factor "
+        "entre 0 y 1 elegido en ese mismo tramo final: 0 es decir que el precio no "
+        "cambia. El bosque no se encoge. "
         "Si llegaron, entran además el neto no comercial del COT (como fracción del interés abierto, "
         "usable el viernes en que la CFTC publica) y la tasa nominal a 2 años, como aproximación a lo que "
         "el mercado espera de la Fed. El momentum de 5, 20 y 60 días ya estaba."

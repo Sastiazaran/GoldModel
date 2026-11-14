@@ -52,6 +52,9 @@ HORIZONTES = (5, 20)
 # Penalización de Ridge. El programa elige una dentro de cada ventana,
 # mirando solo el pasado.
 ALPHAS = (0.1, 1.0, 10.0, 100.0, 1000.0)
+# Cuánto del Ridge se publica. 0 es "el precio no cambia"; 1 es el Ridge crudo.
+# El factor se elige dentro de cada ventana, nunca con el examen final.
+LAMBDAS_ENCOGIMIENTO = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
 REZAGOS_HAC = 21
 CORTE_SUBMUESTRA = "2022-01-01"
 
@@ -976,6 +979,51 @@ def elegir_alpha(x: np.ndarray, y: np.ndarray, alphas: tuple[float, ...] = ALPHA
     return mejor_alpha
 
 
+def _corte_validacion(n: int) -> int | None:
+    """Largo del último tramo, el mismo que usa `elegir_alpha`."""
+    n_val = max(60, int(round(n * 0.20)))
+    n_val = min(n_val, n // 3)
+    if n_val < 30 or n - n_val < 30:
+        return None
+    return n_val
+
+
+def elegir_encogimiento(
+    x: np.ndarray,
+    y: np.ndarray,
+    alpha: float,
+    lambdas: tuple[float, ...] = LAMBDAS_ENCOGIMIENTO,
+) -> float:
+    """Factor que acerca el pronóstico de Ridge a cero.
+
+    Se ajusta un Ridge solo con el tramo anterior de la ventana y se prueba
+    cada factor en el tramo final, cuya respuesta ya ocurrió. El factor 1
+    deja el Ridge como está. Si dos factores empatan, se queda el mayor:
+    no se encoge salvo que el error baje de verdad. No usa días posteriores
+    a esta ventana.
+    """
+    n_val = _corte_validacion(len(y))
+    if n_val is None:
+        return 1.0
+    x_fit, x_val = x[:-n_val], x[-n_val:]
+    y_fit, y_val = y[:-n_val], y[-n_val:]
+    media, desviacion = _estandarizar(x_fit)
+    modelo = Ridge(alpha=float(alpha), fit_intercept=True)
+    modelo.fit((x_fit - media) / desviacion, y_fit)
+    pred_val = modelo.predict((x_val - media) / desviacion)
+    mejor_rmse = None
+    mejor = 1.0
+    for lam in lambdas:
+        pv = float(lam) * pred_val
+        rmse = float(np.sqrt(np.mean((y_val - pv) ** 2)))
+        if mejor_rmse is None or rmse < mejor_rmse - 1e-15 or (
+            abs(rmse - mejor_rmse) <= 1e-15 and float(lam) > mejor
+        ):
+            mejor_rmse = rmse
+            mejor = float(lam)
+    return mejor
+
+
 def _tomar_no_solapadas(mascara: np.ndarray, horizonte: int) -> np.ndarray:
     """Se queda con fechas separadas por al menos `horizonte` sesiones.
 
@@ -1081,19 +1129,27 @@ def pronostico_walk_forward(
     horizonte: int,
     min_entrenamiento: int = MIN_ENTRENAMIENTO,
     paso: int = PASO_REENTRENO,
+    encoger: bool = False,
 ) -> dict:
-    """Predice cada día con un Ridge ajustado solo con el pasado ya cerrado."""
+    """Predice cada día con un Ridge ajustado solo con el pasado ya cerrado.
+
+    Con `encoger`, el número publicado es ese Ridge por un factor entre 0 y 1
+    elegido en el tramo final de la misma ventana. El 0 es "el precio no
+    cambia". El bosque no se encoge: queda como comparación.
+    """
     n = len(y)
     pred = np.full(n, np.nan)
     pred_boosting = np.full(n, np.nan)
     media_entreno = np.full(n, np.nan)
     alpha_usado = np.full(n, np.nan)
+    lam_usado = np.full(n, np.nan)
     modelo = None
     bosque = None
     media_beta = None
     desviacion_beta = None
     media_y = None
     alpha = None
+    lam = 1.0
     coef = None
     importancias = None
     siguiente = 0
@@ -1107,6 +1163,7 @@ def pronostico_walk_forward(
                 x_ent = x[idx]
                 y_ent = y[idx]
                 alpha = elegir_alpha(x_ent, y_ent)
+                lam = elegir_encogimiento(x_ent, y_ent, alpha) if encoger else 1.0
                 media_beta, desviacion_beta = _estandarizar(x_ent)
                 modelo = Ridge(alpha=float(alpha), fit_intercept=True)
                 modelo.fit((x_ent - media_beta) / desviacion_beta, y_ent)
@@ -1122,18 +1179,22 @@ def pronostico_walk_forward(
                 siguiente = t + paso
             elif modelo is None:
                 continue
-        pred[t] = float(modelo.predict(((x[t] - media_beta) / desviacion_beta).reshape(1, -1))[0])
+        bruto = float(modelo.predict(((x[t] - media_beta) / desviacion_beta).reshape(1, -1))[0])
+        pred[t] = lam * bruto
         pred_boosting[t] = float(bosque.predict(x[t].reshape(1, -1))[0])
         media_entreno[t] = media_y
         alpha_usado[t] = alpha
+        lam_usado[t] = lam
     return {
         "pred": pred,
         "pred_boosting": pred_boosting,
         "media": media_entreno,
         "alpha": alpha_usado,
+        "lambda": lam_usado,
         "coef": coef,
         "importancias": importancias,
         "alpha_ultimo": None if alpha is None else float(alpha),
+        "lambda_ultimo": None if not np.isfinite(lam) else float(lam),
         "n_entreno_ultimo": n_entreno,
     }
 
@@ -1186,6 +1247,7 @@ def _empaquetar_horizonte(
         "sigma_boosting": float(sigma_b["rmse"]) if sigma_b["rmse"] is not None else float("nan"),
         "sigma_origen": sigma_origen,
         "alpha_ultimo": corrida["alpha_ultimo"],
+        "lambda_ultimo": corrida.get("lambda_ultimo"),
         "n_entreno_ultimo": corrida["n_entreno_ultimo"],
         "pesos": pesos,
         "importancias": importancias,
@@ -1218,7 +1280,13 @@ def ajustar_pronosticos(
         y = df[columna_y].to_numpy(dtype=float)
         fila_y = np.isfinite(y)
         corrida = pronostico_walk_forward(
-            x, y, fila_x, fila_y, horizonte, min_entrenamiento=min_entrenamiento
+            x,
+            y,
+            fila_x,
+            fila_y,
+            horizonte,
+            min_entrenamiento=min_entrenamiento,
+            encoger=True,
         )
         df[f"pred_{horizonte}"] = corrida["pred"]
         df[f"pred_gb_{horizonte}"] = corrida["pred_boosting"]
