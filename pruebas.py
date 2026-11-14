@@ -32,6 +32,7 @@ from modelos import (
     ajustar_pronosticos,
     ajustar_valor_justo,
     columnas_pronostico,
+    elegir_encogimiento,
     evaluar_cointegracion,
     indices_de_entrenamiento,
     metricas_pronostico,
@@ -1059,6 +1060,57 @@ def probar_snapshot_publico_trae_probabilidades() -> None:
     assert publico["clasificacion"]["5"]["prob_up"] == 0.42
     assert modulo._prob_publica(estudio, 5) == 0.42
     assert modulo._valor_titular({"valor_justo_vf": 100.0, "brecha_vf_pct": 1.0}, estudio)[2] == "base"
+
+
+def probar_encogimiento_se_apaga_si_el_tramo_final_no_lo_quiere() -> None:
+    # En el ajuste el oro sigue a la primera columna. En el tramo final esa
+    # columna vale 2 y el retorno es 0: publicar el Ridge entero se equivoca
+    # más que publicarlo en cero.
+    azar = np.random.default_rng(1)
+    n = 300
+    x = azar.normal(size=(n, 2))
+    y = np.zeros(n)
+    y[:-60] = 3.0 * x[:-60, 0]
+    x[-60:, 0] = 2.0
+    assert elegir_encogimiento(x, y, alpha=0.1) == 0.0
+
+
+def probar_encogimiento_no_mira_una_etiqueta_que_no_cerro() -> None:
+    azar = np.random.default_rng(0)
+    n = 700
+    x = azar.normal(size=(n, 3))
+    y = azar.normal(size=n)
+    horizonte = 5
+    t = 600
+    # La etiqueta del día i se conoce en i+horizonte. En t todavía no se
+    # conoce nada desde t-horizonte+1.
+    y_futura = y.copy()
+    y_futura[t - horizonte + 1 :] += 4.0
+    fila = np.ones(n, dtype=bool)
+    base = pronostico_walk_forward(
+        x, y, fila, fila, horizonte, min_entrenamiento=180, encoger=True
+    )
+    alterada = pronostico_walk_forward(
+        x, y_futura, fila, fila, horizonte, min_entrenamiento=180, encoger=True
+    )
+    assert np.allclose(base["pred"][: t + 1], alterada["pred"][: t + 1], equal_nan=True)
+    assert np.nanmax(np.abs(base["lambda"][np.isfinite(base["pred"])])) <= 1.0
+
+
+def probar_encogimiento_no_agranda_el_ridge() -> None:
+    azar = np.random.default_rng(3)
+    n = 500
+    x = azar.normal(size=(n, 3))
+    y = 0.01 * x[:, 0] + azar.normal(scale=0.02, size=n)
+    y[-15:] = np.nan
+    fila_x = np.ones(n, dtype=bool)
+    fila_y = np.isfinite(y)
+    crudo = pronostico_walk_forward(x, y, fila_x, fila_y, 5, min_entrenamiento=160, encoger=False)
+    fino = pronostico_walk_forward(x, y, fila_x, fila_y, 5, min_entrenamiento=160, encoger=True)
+    ambos = np.isfinite(crudo["pred"]) & np.isfinite(fino["pred"])
+    assert int(ambos.sum()) > 50
+    assert np.all(np.abs(fino["pred"][ambos]) <= np.abs(crudo["pred"][ambos]) + 1e-12)
+    assert math.isfinite(fino["pred"][-1])
 
 
 def main() -> None:

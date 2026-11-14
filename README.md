@@ -343,6 +343,12 @@ La penalización se elige dentro del entrenamiento, con el último tramo de
 esa ventana. No se usa `train_test_split`: esa función baraja las filas y
 el futuro se mezclaría con el pasado.
 
+El número que se publica no es el Ridge crudo. Es ese Ridge multiplicado
+por un factor entre 0 y 1, elegido en el mismo tramo final y solo con
+respuestas que ya cerraron. El 0 significa "el precio no cambia". Si el
+tramo se equivoca menos con un número más chico, el factor baja. El oro
+en pesos no usa ese factor.
+
 **Walk-forward.** Se reentrena más o menos cada 21 sesiones. Para predecir
 el día `t`, el entrenamiento solo incluye filas `i` con `i + horizonte <= t`.
 Así la respuesta de entrenamiento ya ocurrió. Los últimos 5 o 20 días del
