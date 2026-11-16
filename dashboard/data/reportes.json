@@ -862,5 +862,48 @@
     "lectura": "Rebote técnico tras una semana de ~−4%; mientras la Fed suene dura y el dólar siga fuerte puede seguir volátil. Comprar en partes y sin prisa. No es asesoría financiera.",
     "notion_url": "https://app.notion.com/p/417f98ae111281b0bce0e45bb7571ace",
     "notas": "Lectura ~07:33 CDMX. Rango del día $3,874.30–$3,924.00. Rebote tras mínimo de más de un año (~$3,850 el 12 nov). Brent ~$96 por tensión con Irán. Minutas de la Fed mié 18 nov 13:00 CDMX; Fed 8–9 dic."
+  },
+  {
+    "fecha": "2026-11-16",
+    "sesion": "con_registro",
+    "precio_usd_oz": 3867.5,
+    "precio_aproximado": false,
+    "precio_fuente": "Kitco (bid, 8:38 AM ET / 7:38 AM CDMX)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 3883.4,
+    "cierre_previo_aproximado": true,
+    "cambio_usd": -15.9,
+    "cambio_pct": -0.41,
+    "cambio_texto": "−$15.90 (−0.41%)",
+    "usd_mxn": 18.5525,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-11-13",
+    "usd_mxn_fuente": "Banxico FIX del 13 nov (16 nov feriado, sin FIX)",
+    "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+    "mxn_por_gramo": 2306.89,
+    "mxn_por_gramo_aproximado": false,
+    "drivers": [
+      {
+        "titulo": "Fed halcona",
+        "detalle": "Schmid y Daly piden más alzas; CME FedWatch ve ~91% de alza de 25 pb en diciembre y ~9% de 50 pb. Warsh habla hoy y las minutas salen el miércoles.",
+        "fuente": "Reuters vía MarketScreener",
+        "url": "https://uk.marketscreener.com/news/gold-hits-over-one-year-low-on-resilient-dollar-as-hawkish-fed-bets-build-ce785eded08df22c"
+      },
+      {
+        "titulo": "Dólar fuerte",
+        "detalle": "El dólar cerca de su nivel más fuerte desde abril de 2025 presiona al oro.",
+        "fuente": "CNBC",
+        "url": "https://www.cnbc.com/2026/11/16/gold-holds-steady-as-investors-await-warsh-remarks-for-rate-signals.html"
+      },
+      {
+        "titulo": "Mínimo de más de un año",
+        "detalle": "Spot tocó $3,830, lo más bajo desde octubre de 2025, tras caer ~4.6% la semana pasada (peor semana desde junio).",
+        "fuente": "FirstSquawk (X)",
+        "url": "https://x.com/FirstSquawk/status/2122122213906341917"
+      }
+    ],
+    "lectura": "Mientras la Fed suene dura y el dólar siga fuerte, la presión puede seguir. Si compran, en partes y sin prisa, sin perseguir rebotes. No es asesoría financiera.",
+    "notion_url": "https://app.notion.com/p/41af98ae1112815a8307dd5899f02caa",
+    "notas": "Lectura ~07:38 CDMX. Rango del día $3,832.20–$3,902.30. Feriado en México (Día de la Revolución). Warsh habla hoy; minutas de la Fed mié 18 nov 13:00 CDMX; Fed 8–9 dic."
   }
 ]
