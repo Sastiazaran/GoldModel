@@ -905,5 +905,48 @@
     "lectura": "Mientras la Fed suene dura y el dólar siga fuerte, la presión puede seguir. Si compran, en partes y sin prisa, sin perseguir rebotes. No es asesoría financiera.",
     "notion_url": "https://app.notion.com/p/41af98ae1112815a8307dd5899f02caa",
     "notas": "Lectura ~07:38 CDMX. Rango del día $3,832.20–$3,902.30. Feriado en México (Día de la Revolución). Warsh habla hoy; minutas de la Fed mié 18 nov 13:00 CDMX; Fed 8–9 dic."
+  },
+  {
+    "fecha": "2026-11-17",
+    "sesion": "con_registro",
+    "precio_usd_oz": 3846.6,
+    "precio_aproximado": false,
+    "precio_fuente": "Kitco (bid, 8:39 AM ET / 7:39 AM CDMX)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 3855.5,
+    "cierre_previo_aproximado": true,
+    "cambio_usd": -8.9,
+    "cambio_pct": -0.23,
+    "cambio_texto": "−$8.90 (−0.23%)",
+    "usd_mxn": 18.5525,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-11-13",
+    "usd_mxn_fuente": "Banxico FIX del 13 nov (publicado en DOF el 17 nov)",
+    "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+    "mxn_por_gramo": 2294.41,
+    "mxn_por_gramo_aproximado": false,
+    "drivers": [
+      {
+        "titulo": "Fed dura",
+        "detalle": "CME FedWatch ve 96% de alza de 25 pb en diciembre y 4% de 50 pb. Hammack favorece alzas graduales. Minutas de la Fed el miércoles 18 nov a las 13:00 CDMX.",
+        "fuente": "Reuters vía MarketScreener",
+        "url": "https://www.marketscreener.com/news/gold-inches-up-from-over-one-year-low-fed-outlook-caps-gains-ce785edfd08bf423"
+      },
+      {
+        "titulo": "Dólar fuerte",
+        "detalle": "El índice dólar ronda ~103.60 tras un rally de cinco días y está en máximo de 19 meses.",
+        "fuente": "Reuters vía Investing.com",
+        "url": "https://uk.investing.com/news/commodities-news/gold-hovers-near-14month-low-as-fed-hike-bets-and-tech-selloff-weigh-4986486"
+      },
+      {
+        "titulo": "Venta en tecnológicas",
+        "detalle": "Algunos liquidaron oro para cubrir pérdidas.",
+        "fuente": "Reuters vía Investing.com",
+        "url": "https://uk.investing.com/news/commodities-news/gold-hovers-near-14month-low-as-fed-hike-bets-and-tech-selloff-weigh-4986486"
+      }
+    ],
+    "lectura": "Tendencia corta débil por Fed dura y dólar fuerte; comprar poco a poco y esperar minutas de la Fed (mié). No es asesoría financiera.",
+    "notion_url": "https://app.notion.com/p/41bf98ae11128101b1b0ec88a2d92142?pvs=204",
+    "notas": "Ayer tocó $3,830, mínimo desde oct 2025 (Reuters)."
   }
 ]
