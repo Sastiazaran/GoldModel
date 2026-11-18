@@ -948,5 +948,48 @@
     "lectura": "Tendencia corta débil por Fed dura y dólar fuerte; comprar poco a poco y esperar minutas de la Fed (mié). No es asesoría financiera.",
     "notion_url": "https://app.notion.com/p/41bf98ae11128101b1b0ec88a2d92142?pvs=204",
     "notas": "Ayer tocó $3,830, mínimo desde oct 2025 (Reuters)."
+  },
+  {
+    "fecha": "2026-11-18",
+    "sesion": "con_registro",
+    "precio_usd_oz": 3774.7,
+    "precio_aproximado": false,
+    "precio_fuente": "Kitco (bid, 8:36 AM ET / 7:36 AM CDMX)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 3848.5,
+    "cierre_previo_aproximado": false,
+    "cambio_usd": -73.8,
+    "cambio_pct": -1.92,
+    "cambio_texto": "−$73.80 (−1.92%)",
+    "usd_mxn": 18.4677,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-11-17",
+    "usd_mxn_fuente": "Banxico FIX del 17 nov (publicado en DOF el 18 nov)",
+    "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+    "mxn_por_gramo": 2241.23,
+    "mxn_por_gramo_aproximado": false,
+    "drivers": [
+      {
+        "titulo": "Fed dura",
+        "detalle": "Williams y Musalem piden más alzas; CME FedWatch 97.8% de alza de 25 pb en diciembre y ~2.2% de 50 pb. Minutas de la Fed hoy 18 nov a las 13:00 CDMX.",
+        "fuente": "CNBC (Reuters)",
+        "url": "https://www.cnbc.com/2026/11/18/gold-slides-to-over-one-year-low-on-firm-dollar-us-rate-outlook.html"
+      },
+      {
+        "titulo": "Dólar y bonos",
+        "detalle": "Índice dólar ~103.74, cerca de máximo de 19 meses; bono a 10 años cerca de su racha más larga arriba de 5% en casi dos décadas.",
+        "fuente": "Investing.com",
+        "url": "https://au.investing.com/news/commodities-news/gold-falls-toward-3800-as-fed-hawks-reinforce-ratehike-outlook-4778553"
+      },
+      {
+        "titulo": "Debajo de $3,800",
+        "detalle": "Spot tocó $3,757 según Reuters, mínimo desde septiembre de 2025.",
+        "fuente": "CNBC (Reuters)",
+        "url": "https://www.cnbc.com/2026/11/18/gold-slides-to-over-one-year-low-on-firm-dollar-us-rate-outlook.html"
+      }
+    ],
+    "lectura": "Tendencia corta a la baja por Fed dura, dólar fuerte y bonos arriba de 5%; comprar en partes pequeñas y esperar minutas de la Fed (hoy 13:00). No es asesoría financiera.",
+    "notion_url": "https://app.notion.com/p/41cf98ae1112810bb9d0d1e3aa1f24ad",
+    "notas": "Rango Kitco del día $3,742.20–$3,858.30."
   }
 ]
