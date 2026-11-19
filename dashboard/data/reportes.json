@@ -991,5 +991,48 @@
     "lectura": "Tendencia corta a la baja por Fed dura, dólar fuerte y bonos arriba de 5%; comprar en partes pequeñas y esperar minutas de la Fed (hoy 13:00). No es asesoría financiera.",
     "notion_url": "https://app.notion.com/p/41cf98ae1112810bb9d0d1e3aa1f24ad",
     "notas": "Rango Kitco del día $3,742.20–$3,858.30."
+  },
+  {
+    "fecha": "2026-11-19",
+    "sesion": "con_registro",
+    "precio_usd_oz": 3717,
+    "precio_aproximado": false,
+    "precio_fuente": "Kitco (bid, 8:37 AM ET / 7:37 AM CDMX)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 3724.1,
+    "cierre_previo_aproximado": false,
+    "cambio_usd": -7.1,
+    "cambio_pct": -0.19,
+    "cambio_texto": "−$7.10 (−0.19%)",
+    "usd_mxn": 18.6723,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-11-18",
+    "usd_mxn_fuente": "Banxico FIX del 18 nov (publicado en DOF el 19 nov)",
+    "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+    "mxn_por_gramo": 2231.42,
+    "mxn_por_gramo_aproximado": false,
+    "drivers": [
+      {
+        "titulo": "Minutas de la Fed duras",
+        "detalle": "Casi todos ven apropiada otra alza; Waller y Barr apoyan apretar más. CME FedWatch ~92% de alza de 25 pb en diciembre y ~8% de 50 pb.",
+        "fuente": "Reuters (MarketScreener)",
+        "url": "https://au.marketscreener.com/news/gold-edges-up-from-14-month-low-as-markets-assess-fed-rate-outlook-ce785eddd18df522"
+      },
+      {
+        "titulo": "Mínimo de 14 meses y rebote",
+        "detalle": "Spot cayó ~3.3% el 18 nov; hoy tocó $3,693.13 (mínimo desde sep 2025) y rebotó por cobertura de cortos.",
+        "fuente": "Kitco",
+        "url": "https://www.kitco.com/news/article/2026-11-18/gold-plunges-below-3750-silver-tumbles-hawkish-fed-minutes-pressure-metals"
+      },
+      {
+        "titulo": "Dólar fuerte",
+        "detalle": "Dólar +2% en 7 sesiones y oro −10% en el mismo periodo; índice cerca de máximo de 19 meses.",
+        "fuente": "Kitco",
+        "url": "https://www.kitco.com/opinion/2026-11-18/us-dollar-2-over-last-7-sessions-gold-down-10-same-period"
+      }
+    ],
+    "lectura": "Presión a la baja de corto plazo por Fed dura (minutas, Waller, Barr) y dólar fuerte; rebote técnico sin cambio de fondo. Comprar en partes pequeñas, sin prisa; PCE el 25 nov. No es asesoría financiera.",
+    "notion_url": "https://app.notion.com/p/41df98ae1112818096d8e0372e0d8495",
+    "notas": "Rango Kitco del día $3,693.10–$3,759.10."
   }
 ]

@@ -77,7 +77,7 @@
       "url": "https://www.spdrgoldshares.com/usa/historical-data/"
     },
     "cot_neto": {
-      "etiqueta": "COT del oro, copia guardada en data/raw",
+      "etiqueta": "CFTC COT legacy, futuros de oro COMEX (código 088691), neto no comercial, usable el viernes posterior al martes de corte",
       "url": "https://publicreporting.cftc.gov/resource/6dca-aqww.json"
     },
     "compras_bc_ton": {
@@ -90,33 +90,31 @@
     }
   },
   "fechas": {
-    "oro_usd": "2026-11-18",
-    "gld": "2026-11-17",
-    "dolar_index": "2026-11-18",
+    "oro_usd": "2026-11-19",
+    "gld": "2026-11-18",
+    "dolar_index": "2026-11-19",
     "dolar_amplio": "2026-11-13",
-    "rendimiento_real_10": "2026-11-16",
-    "rendimiento_nominal_10": "2026-11-16",
-    "rendimiento_nominal_2": "2026-11-16",
-    "breakeven_10": "2026-11-17",
-    "fed_funds": "2026-11-16",
-    "vix": "2026-11-16",
-    "gvz": "2026-11-17",
-    "brent": "2026-11-11",
-    "sp500": "2026-11-17",
-    "plata": "2026-11-18",
-    "usd_mxn": "2026-11-18",
+    "rendimiento_real_10": "2026-11-17",
+    "rendimiento_nominal_10": "2026-11-17",
+    "rendimiento_nominal_2": "2026-11-17",
+    "breakeven_10": "2026-11-18",
+    "fed_funds": "2026-11-17",
+    "vix": "2026-11-17",
+    "gvz": "2026-11-18",
+    "brent": "2026-11-17",
+    "sp500": "2026-11-18",
+    "plata": "2026-11-19",
+    "usd_mxn": "2026-11-19",
     "usd_mxn_fred": "2026-11-13",
-    "tnx_yahoo": "2026-11-18",
+    "tnx_yahoo": "2026-11-19",
     "cpi_mes": "2026-09-01",
     "cpi_fecha_publicacion": "2026-10-15",
     "gpr": "2026-11-16",
-    "gld_toneladas": "2026-11-18",
+    "gld_toneladas": "2026-11-19",
     "cot_neto": "2026-11-13",
     "compras_bc_ton": "2026-10-31"
   },
   "avisos": [
-    "El COT de la CFTC no respondió (HTTPSConnectionPool(host='publicreporting.cftc.gov', port=443): Read timed out. (read timeout=10)).",
-    "Uso la copia guardada del COT.",
     "El Excel trimestral del World Gold Council no se pudo bajar (respuesta 403). Uso la API pública del mismo sitio."
   ]
 }
