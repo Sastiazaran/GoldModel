@@ -1034,5 +1034,48 @@
     "lectura": "Presión a la baja de corto plazo por Fed dura (minutas, Waller, Barr) y dólar fuerte; rebote técnico sin cambio de fondo. Comprar en partes pequeñas, sin prisa; PCE el 25 nov. No es asesoría financiera.",
     "notion_url": "https://app.notion.com/p/41df98ae1112818096d8e0372e0d8495",
     "notas": "Rango Kitco del día $3,693.10–$3,759.10."
+  },
+  {
+    "fecha": "2026-11-20",
+    "sesion": "con_registro",
+    "precio_usd_oz": 3555.7,
+    "precio_aproximado": false,
+    "precio_fuente": "Kitco (bid, 8:35 AM ET / 7:35 AM CDMX)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 3624.2,
+    "cierre_previo_aproximado": null,
+    "cambio_usd": -68.5,
+    "cambio_pct": -1.89,
+    "cambio_texto": "−$68.50 (−1.89%)",
+    "usd_mxn": 19.027,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-11-19",
+    "usd_mxn_fuente": "Banxico FIX del 19 nov (publicado en DOF el 20 nov)",
+    "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+    "mxn_por_gramo": 2175.14,
+    "mxn_por_gramo_aproximado": null,
+    "drivers": [
+      {
+        "titulo": "Fed más dura",
+        "detalle": "Paulson (Fed Filadelfia) advierte riesgos de inflación; CME FedWatch 99.3% de alza de 25 pb en diciembre; spot tocó $3,513.54, mínimo desde 4 sep 2025; ~−8% en la semana, peor desde marzo.",
+        "fuente": "CNBC (Reuters)",
+        "url": "https://www.cnbc.com/2026/11/20/gold-federal-reserve-price-dollar-metals.html"
+      },
+      {
+        "titulo": "Bonos arriba de 5%",
+        "detalle": "El 10 años cierra arriba de 5% desde el CPI; +35 pb coincidió con −12% en el futuro del oro.",
+        "fuente": "Kitco",
+        "url": "https://www.kitco.com/opinion/2026-11-19/gold-futures-sink-below-3700-5-yields-pull-money-out-bullion"
+      },
+      {
+        "titulo": "Liquidación por caída de IA",
+        "detalle": "Ventas forzadas de oro para cubrir pérdidas en acciones; compra física en India y China.",
+        "fuente": "CNBC (Reuters)",
+        "url": "https://www.cnbc.com/2026/11/20/gold-federal-reserve-price-dollar-metals.html"
+      }
+    ],
+    "lectura": "Presión a la baja por Fed dura, bono 10a >5% y dólar fuerte; peor semana desde marzo. Comprar en partes pequeñas y escalonadas; PCE el 25 nov. No es asesoría financiera.",
+    "notion_url": "https://app.notion.com/p/41ef98ae111281ab8e28db0273e612e7",
+    "notas": "Rango Kitco del día $3,513.70–$3,652.20."
   }
 ]
