@@ -33,6 +33,7 @@ from modelos import (
     ajustar_valor_justo,
     columnas_pronostico,
     elegir_encogimiento,
+    elegir_factor_baja,
     evaluar_cointegracion,
     indices_de_entrenamiento,
     metricas_pronostico,
@@ -391,6 +392,7 @@ def probar_pronostico_usa_cot_y_boosting() -> None:
         "vix",
         "cpi_anual",
         "residuo_vf",
+        "caida_60",
         "cot_neto_oi",
         "rendimiento_nominal_2",
         "d_nominal2_20",
@@ -1175,6 +1177,93 @@ def probar_encogimiento_no_mira_una_etiqueta_que_no_cerro() -> None:
     )
     assert np.allclose(base["pred"][: t + 1], alterada["pred"][: t + 1], equal_nan=True)
     assert np.nanmax(np.abs(base["lambda"][np.isfinite(base["pred"])])) <= 1.0
+
+
+def probar_caida_60_no_usa_el_precio_de_manana() -> None:
+    azar = np.random.default_rng(7)
+    n = 80
+    indice = pd.bdate_range("2020-01-02", periods=n)
+    oro = np.linspace(100.0, 180.0, n)
+    oro[70] = 90.0
+    panel = pd.DataFrame(
+        {
+            "oro_usd": oro,
+            "rendimiento_real_10": azar.normal(1.0, 0.1, n),
+            "dolar_index": np.full(n, 100.0),
+            "brent": np.full(n, 60.0),
+            "vix": np.full(n, 18.0),
+            "cpi_anual": np.full(n, 2.0),
+            "sp500": np.full(n, 4000.0),
+            "usd_mxn": np.full(n, 18.0),
+        },
+        index=indice,
+    )
+    caida = preparar_muestra(panel)["caida_60"]
+    assert pd.isna(caida.iloc[58])
+    esperado = np.log(oro[59] / np.max(oro[:60]))
+    assert abs(caida.iloc[59] - esperado) < 1e-12
+    assert np.nanmax(caida.to_numpy(dtype=float)) <= 1e-12
+    oro_shock = oro.copy()
+    oro_shock[-10:] = oro[-10:] * 0.5
+    shock = panel.copy()
+    shock["oro_usd"] = oro_shock
+    caida_shock = preparar_muestra(shock)["caida_60"]
+    # Un precio futuro no mueve la caída de los días anteriores.
+    assert np.allclose(caida.iloc[:-10].to_numpy(dtype=float), caida_shock.iloc[:-10].to_numpy(dtype=float), equal_nan=True)
+    # El último día sí ve su propio cierre, así que la serie shockeada no queda igual.
+    assert abs(caida_shock.iloc[-1] - caida.iloc[-1]) > 1e-6
+
+
+def probar_factor_baja_se_queda_en_el_global_si_casi_no_hay_correccion() -> None:
+    azar = np.random.default_rng(1)
+    n = 300
+    x = azar.normal(size=(n, 2))
+    y = np.zeros(n)
+    y[:-60] = 3.0 * x[:-60, 0]
+    x[-60:, 0] = 2.0
+    assert elegir_factor_baja(x, y, 0.1, np.zeros(n, dtype=bool), lam=0.4) == 0.4
+
+
+def probar_factor_baja_apaga_el_rebote_si_el_tramo_lo_pide() -> None:
+    # En el tramo final la columna vale 2, el retorno es 0 y todos esos días
+    # son corrección. Publicar el Ridge positivo se equivoca más que el cero.
+    azar = np.random.default_rng(1)
+    n = 300
+    x = azar.normal(size=(n, 2))
+    y = np.zeros(n)
+    y[:-60] = 3.0 * x[:-60, 0]
+    x[-60:, 0] = 2.0
+    baja = np.zeros(n, dtype=bool)
+    baja[-60:] = True
+    assert elegir_factor_baja(x, y, 0.1, baja, lam=1.0) == 0.0
+
+
+def probar_factor_baja_no_mira_una_correccion_ni_una_etiqueta_futura() -> None:
+    azar = np.random.default_rng(0)
+    n = 700
+    x = azar.normal(size=(n, 3))
+    y = azar.normal(scale=0.01, size=n)
+    baja = azar.random(n) < 0.35
+    horizonte = 5
+    t = 600
+    y_futura = y.copy()
+    y_futura[t - horizonte + 1 :] += 4.0
+    baja_futura = baja.copy()
+    baja_futura[t + 1 :] = ~baja_futura[t + 1 :]
+    fila = np.ones(n, dtype=bool)
+    base = pronostico_walk_forward(
+        x, y, fila, fila, horizonte, min_entrenamiento=180, encoger=True, baja=baja
+    )
+    con_etiqueta = pronostico_walk_forward(
+        x, y_futura, fila, fila, horizonte, min_entrenamiento=180, encoger=True, baja=baja
+    )
+    con_marca = pronostico_walk_forward(
+        x, y, fila, fila, horizonte, min_entrenamiento=180, encoger=True, baja=baja_futura
+    )
+    assert np.allclose(base["pred"][: t + 1], con_etiqueta["pred"][: t + 1], equal_nan=True)
+    assert np.allclose(base["pred"][: t + 1], con_marca["pred"][: t + 1], equal_nan=True)
+    assert np.nanmax(np.abs(base["lambda_baja"][np.isfinite(base["pred"])])) <= 1.0
+    assert np.nanmin(base["lambda_baja"][np.isfinite(base["pred"])]) >= 0.0
 
 
 def probar_encogimiento_no_agranda_el_ridge() -> None:

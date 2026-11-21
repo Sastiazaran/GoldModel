@@ -328,6 +328,8 @@ y **solo** se usa como respuesta. Nunca como dato de entrada.
 Los datos de entrada, todos conocidos en `t`, son:
 
 - retorno del oro a 5, 20 y 60 días (lo que ya pasó);
+- caída desde el máximo de las últimas 60 sesiones (0 en un máximo, negativa
+  en una corrección; solo usa cierres hasta hoy);
 - cambio a 20 días de la tasa real, del dólar, del petróleo y del S&P 500;
 - cambio a 5 días del VIX;
 - nivel de la tasa real, del VIX y de la inflación conocida;
@@ -346,8 +348,10 @@ el futuro se mezclaría con el pasado.
 El número que se publica no es el Ridge crudo. Es ese Ridge multiplicado
 por un factor entre 0 y 1, elegido en el mismo tramo final y solo con
 respuestas que ya cerraron. El 0 significa "el precio no cambia". Si el
-tramo se equivoca menos con un número más chico, el factor baja. El oro
-en pesos no usa ese factor.
+tramo se equivoca menos con un número más chico, el factor baja. Si el
+oro está más de un 8% bajo su máximo de 60 sesiones y el Ridge es positivo,
+hay un segundo factor, elegido en ese mismo tramo, que puede acercarlo más
+a cero. No voltea el signo. El oro en pesos no usa ese factor.
 
 **Walk-forward.** Se reentrena más o menos cada 21 sesiones. Para predecir
 el día `t`, el entrenamiento solo incluye filas `i` con `i + horizonte <= t`.

@@ -55,6 +55,11 @@ ALPHAS = (0.1, 1.0, 10.0, 100.0, 1000.0)
 # Cuánto del Ridge se publica. 0 es "el precio no cambia"; 1 es el Ridge crudo.
 # El factor se elige dentro de cada ventana, nunca con el examen final.
 LAMBDAS_ENCOGIMIENTO = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
+# Caída desde el máximo de 60 sesiones, en log. 0.08 es un 8% por debajo
+# de ese máximo: una corrección, no una semana roja cualquiera. El segundo
+# factor solo se usa si el tramo final del entrenamiento baja el error.
+UMBRAL_CAIDA = 0.08
+MIN_DIAS_BAJA = 20
 REZAGOS_HAC = 21
 CORTE_SUBMUESTRA = "2022-01-01"
 
@@ -86,6 +91,7 @@ FEATURES_PRONOSTICO = [
     "ret_5",
     "ret_20",
     "ret_60",
+    "caida_60",
     "d_real_20",
     "d_dolar_20",
     "d_brent_20",
@@ -101,6 +107,7 @@ ETIQUETAS_PRONOSTICO = {
     "ret_5": "retorno del oro, 5 días",
     "ret_20": "retorno del oro, 20 días",
     "ret_60": "retorno del oro, 60 días",
+    "caida_60": "caída desde el máximo de 60 sesiones",
     "d_real_20": "cambio de la tasa real, 20 días",
     "d_dolar_20": "cambio del dólar, 20 días",
     "d_brent_20": "cambio del petróleo, 20 días",
@@ -198,6 +205,10 @@ def preparar_muestra(panel: pd.DataFrame) -> pd.DataFrame:
     df["ret_5"] = retorno_log_pasado(oro, 5)
     df["ret_20"] = retorno_log_pasado(oro, 20)
     df["ret_60"] = retorno_log_pasado(oro, 60)
+    # Log(cierre de hoy) − log(máximo de las últimas 60 sesiones, hoy incluido).
+    # Es ≤ 0 y no usa un precio posterior a hoy.
+    log_oro = pd.Series(np.log(oro.to_numpy(dtype=float)), index=df.index)
+    df["caida_60"] = log_oro - log_oro.rolling(60, min_periods=60).max()
     df["y_5"] = retorno_log_adelante(oro, 5)
     df["y_20"] = retorno_log_adelante(oro, 20)
     df["d_real_20"] = df["rendimiento_real_10"] - df["rendimiento_real_10"].shift(20)
@@ -1024,6 +1035,52 @@ def elegir_encogimiento(
     return mejor
 
 
+def elegir_factor_baja(
+    x: np.ndarray,
+    y: np.ndarray,
+    alpha: float,
+    baja: np.ndarray,
+    lam: float,
+    lambdas: tuple[float, ...] = LAMBDAS_ENCOGIMIENTO,
+    min_dias: int = MIN_DIAS_BAJA,
+) -> float:
+    """Segundo factor, solo para un Ridge positivo en una corrección.
+
+    `baja` va alineado con `x` y `y`, que ya son filas de entrenamiento.
+    Se prueba en el mismo tramo final que `elegir_encogimiento`. Si ahí hay
+    menos de `min_dias` correcciones, devuelve `lam`: no inventa un segundo
+    factor. En un empate se queda el factor más grande, o sea el que menos
+    encoge. No mira días posteriores a esta ventana.
+    """
+    n_val = _corte_validacion(len(y))
+    if n_val is None:
+        return float(lam)
+    baja_val = np.asarray(baja[-n_val:], dtype=bool)
+    if int(baja_val.sum()) < int(min_dias):
+        return float(lam)
+    x_fit, x_val = x[:-n_val], x[-n_val:]
+    y_fit, y_val = y[:-n_val], y[-n_val:]
+    media, desviacion = _estandarizar(x_fit)
+    modelo = Ridge(alpha=float(alpha), fit_intercept=True)
+    modelo.fit((x_fit - media) / desviacion, y_fit)
+    pred_val = modelo.predict((x_val - media) / desviacion)
+    mejor_rmse = None
+    mejor = float(lam)
+    for lam_baja in lambdas:
+        publicado = np.where(
+            baja_val & (pred_val > 0),
+            float(lam_baja) * pred_val,
+            float(lam) * pred_val,
+        )
+        rmse = float(np.sqrt(np.mean((y_val - publicado) ** 2)))
+        if mejor_rmse is None or rmse < mejor_rmse - 1e-15 or (
+            abs(rmse - mejor_rmse) <= 1e-15 and float(lam_baja) > mejor
+        ):
+            mejor_rmse = rmse
+            mejor = float(lam_baja)
+    return mejor
+
+
 def _tomar_no_solapadas(mascara: np.ndarray, horizonte: int) -> np.ndarray:
     """Se queda con fechas separadas por al menos `horizonte` sesiones.
 
@@ -1130,19 +1187,26 @@ def pronostico_walk_forward(
     min_entrenamiento: int = MIN_ENTRENAMIENTO,
     paso: int = PASO_REENTRENO,
     encoger: bool = False,
+    baja: np.ndarray | None = None,
 ) -> dict:
     """Predice cada día con un Ridge ajustado solo con el pasado ya cerrado.
 
     Con `encoger`, el número publicado es ese Ridge por un factor entre 0 y 1
     elegido en el tramo final de la misma ventana. El 0 es "el precio no
-    cambia". El bosque no se encoge: queda como comparación.
+    cambia". Si `baja` marca una corrección ya conocida en t y el Ridge crudo
+    es positivo, se usa un segundo factor, elegido en ese mismo tramo. No
+    voltea el signo: solo puede acercar ese pronóstico a cero. El bosque no
+    se encoge: queda como comparación.
     """
     n = len(y)
+    if baja is not None and len(baja) != n:
+        raise RuntimeError("La marca de corrección tiene que medir lo mismo que el pronóstico.")
     pred = np.full(n, np.nan)
     pred_boosting = np.full(n, np.nan)
     media_entreno = np.full(n, np.nan)
     alpha_usado = np.full(n, np.nan)
     lam_usado = np.full(n, np.nan)
+    lam_baja_usado = np.full(n, np.nan)
     modelo = None
     bosque = None
     media_beta = None
@@ -1150,6 +1214,7 @@ def pronostico_walk_forward(
     media_y = None
     alpha = None
     lam = 1.0
+    lam_baja = 1.0
     coef = None
     importancias = None
     siguiente = 0
@@ -1164,6 +1229,9 @@ def pronostico_walk_forward(
                 y_ent = y[idx]
                 alpha = elegir_alpha(x_ent, y_ent)
                 lam = elegir_encogimiento(x_ent, y_ent, alpha) if encoger else 1.0
+                lam_baja = lam
+                if encoger and baja is not None:
+                    lam_baja = elegir_factor_baja(x_ent, y_ent, alpha, np.asarray(baja)[idx], lam)
                 media_beta, desviacion_beta = _estandarizar(x_ent)
                 modelo = Ridge(alpha=float(alpha), fit_intercept=True)
                 modelo.fit((x_ent - media_beta) / desviacion_beta, y_ent)
@@ -1180,21 +1248,25 @@ def pronostico_walk_forward(
             elif modelo is None:
                 continue
         bruto = float(modelo.predict(((x[t] - media_beta) / desviacion_beta).reshape(1, -1))[0])
-        pred[t] = lam * bruto
+        en_correccion = baja is not None and bool(baja[t]) and bruto > 0
+        pred[t] = (lam_baja if en_correccion else lam) * bruto
         pred_boosting[t] = float(bosque.predict(x[t].reshape(1, -1))[0])
         media_entreno[t] = media_y
         alpha_usado[t] = alpha
-        lam_usado[t] = lam
+        lam_usado[t] = lam_baja if en_correccion else lam
+        lam_baja_usado[t] = lam_baja
     return {
         "pred": pred,
         "pred_boosting": pred_boosting,
         "media": media_entreno,
         "alpha": alpha_usado,
         "lambda": lam_usado,
+        "lambda_baja": lam_baja_usado,
         "coef": coef,
         "importancias": importancias,
         "alpha_ultimo": None if alpha is None else float(alpha),
         "lambda_ultimo": None if not np.isfinite(lam) else float(lam),
+        "lambda_baja_ultimo": None if not np.isfinite(lam_baja) else float(lam_baja),
         "n_entreno_ultimo": n_entreno,
     }
 
@@ -1248,6 +1320,7 @@ def _empaquetar_horizonte(
         "sigma_origen": sigma_origen,
         "alpha_ultimo": corrida["alpha_ultimo"],
         "lambda_ultimo": corrida.get("lambda_ultimo"),
+        "lambda_baja_ultimo": corrida.get("lambda_baja_ultimo"),
         "n_entreno_ultimo": corrida["n_entreno_ultimo"],
         "pesos": pesos,
         "importancias": importancias,
@@ -1273,6 +1346,12 @@ def ajustar_pronosticos(
     fila_x = np.isfinite(x).all(axis=1)
     if int(fila_x.sum()) < min_entrenamiento + 40:
         raise RuntimeError("No hay historia suficiente para el pronóstico fuera de muestra.")
+    # La corrección es el cierre de hoy contra su máximo de 60 sesiones.
+    # Un hueco no cuenta como corrección: sin la caída no hay segundo factor.
+    baja = None
+    if "caida_60" in df.columns:
+        caida = df["caida_60"].to_numpy(dtype=float)
+        baja = np.isfinite(caida) & (caida <= -UMBRAL_CAIDA)
 
     resultados = {}
     for horizonte in HORIZONTES:
@@ -1287,6 +1366,7 @@ def ajustar_pronosticos(
             horizonte,
             min_entrenamiento=min_entrenamiento,
             encoger=True,
+            baja=baja,
         )
         df[f"pred_{horizonte}"] = corrida["pred"]
         df[f"pred_gb_{horizonte}"] = corrida["pred_boosting"]

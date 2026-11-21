@@ -288,6 +288,18 @@ def _texto_pronostico(horizonte: int, info: dict) -> list[str]:
             "El factor sale del último tramo del entrenamiento y acerca el Ridge a "
             "\"el precio no cambia\" cuando el tramo se equivoca menos así."
         )
+    lam_baja = info.get("lambda_baja_ultimo")
+    if (
+        lam is not None
+        and lam_baja is not None
+        and math.isfinite(float(lam_baja))
+        and abs(float(lam_baja) - float(lam)) > 1e-12
+    ):
+        lineas.append(
+            f"Con el oro más de un 8% bajo su máximo de 60 sesiones, un pronóstico "
+            f"positivo usa {float(lam_baja):.2f} en lugar de {float(lam):.2f}. "
+            "Ese segundo factor sale del mismo tramo y no cambia el signo."
+        )
     if info["alpha_ultimo"] is not None and float(info["alpha_ultimo"]) >= 100:
         lineas.append(
             f"El alpha de Ridge quedó en {float(info['alpha_ultimo']):g}. "
@@ -961,7 +973,11 @@ def construir_informe(
         "cambia. El bosque no se encoge. "
         "Si llegaron, entran además el neto no comercial del COT (como fracción del interés abierto, "
         "usable el viernes en que la CFTC publica) y la tasa nominal a 2 años, como aproximación a lo que "
-        "el mercado espera de la Fed. El momentum de 5, 20 y 60 días ya estaba."
+        "el mercado espera de la Fed. El momentum de 5, 20 y 60 días ya estaba. "
+        "También entra la caída desde el máximo de las últimas 60 sesiones, que es cero "
+        "en un máximo y negativa en una corrección. Si esa caída pasa de 8% y el Ridge "
+        "crudo es positivo, un segundo factor —elegido en el mismo tramo, sin ver el futuro— "
+        "puede acercar ese pronóstico a cero. No le da la vuelta al signo."
     )
     lineas.append(
         "Baseline cero: predecir que el retorno logarítmico es 0 (caminata aleatoria, sin deriva). "
