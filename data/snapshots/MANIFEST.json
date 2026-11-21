@@ -1,6 +1,6 @@
 {
   "nota": "Copias de series que a veces no responden (GPR, GLD, COT, bancos centrales). No son datos inventados: salen de la descarga de esta corrida. La fecha de cada fila es fecha_disponible, no la fecha de corte.",
-  "generado_en": "2026-11-20",
+  "generado_en": "2026-11-21",
   "fuentes": {
     "gpr": {
       "etiqueta": "GPR diario de Caldara-Iacoviello (GPRD), usable el mismo día",
@@ -11,7 +11,7 @@
       "url": "https://www.spdrgoldshares.com/usa/historical-data/"
     },
     "cot_neto": {
-      "etiqueta": "COT del oro, copia guardada en data/raw",
+      "etiqueta": "CFTC COT legacy, futuros de oro COMEX (código 088691), neto no comercial, usable el viernes posterior al martes de corte",
       "url": "https://publicreporting.cftc.gov/resource/6dca-aqww.json"
     },
     "compras_bc_ton": {
