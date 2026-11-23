@@ -1,0 +1,49 @@
+{
+  "fecha": "2026-11-23",
+  "sesion": "con_registro",
+  "precio_usd_oz": 3624.10,
+  "precio_aproximado": false,
+  "precio_fuente": "Kitco (spot bid, 8:31 AM ET / 7:31 AM CDMX)",
+  "precio_url": "https://www.kitco.com/charts/gold",
+  "cierre_previo_usd_oz": 3537.90,
+  "cierre_previo_aproximado": null,
+  "cambio_usd": 86.20,
+  "cambio_pct": 2.44,
+  "cambio_texto": "+$86.20 (+2.44%) vs cierre del viernes $3,537.90; rebote tras caer ~9% la semana pasada (peor semana desde marzo)",
+  "usd_mxn": 19.0228,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-11-20",
+  "usd_mxn_fuente": "Banxico FIX del 20 nov (publicado en DOF el 23 nov)",
+  "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+  "mxn_por_gramo": 2216.49,
+  "mxn_por_gramo_aproximado": null,
+  "drivers": [
+    {
+      "titulo": "Rebote tras la peor semana desde marzo",
+      "detalle": "Spot +2.1% a $3,604.79 a las 08:25 GMT desde su mínimo desde sep 2025; la semana pasada cayó 9%. UBS (Staunovo): estabilización con el dólar más débil.",
+      "fuente": "Reuters vía CNBC",
+      "url": "https://www.cnbc.com/2026/11/23/gold-rises-from-14-month-low-as-markets-await-us-inflation-data.html"
+    },
+    {
+      "titulo": "Dólar y Fed",
+      "detalle": "Índice del dólar ~103.7, desde máximo de 19 meses; ~93% de probabilidad de alza de 25 pb en diciembre, apuestas de 50 pb casi eliminadas; Bessent advirtió que apretar de más pone en riesgo la economía.",
+      "fuente": "Trading Economics",
+      "url": "https://tradingeconomics.com/united-states/currency/news/603368"
+    },
+    {
+      "titulo": "Inflación PCE",
+      "detalle": "El PCE de octubre sale el miércoles 25 nov (7:30 AM CDMX); Ebury: un core de 0.3% sellaría el alza de diciembre.",
+      "fuente": "FXStreet (Ebury)",
+      "url": "https://www.fxstreet.com/analysis/dollars-safe-haven-rally-rests-on-a-shaky-foundation-as-markets-pare-back-expectations-202611231216"
+    },
+    {
+      "titulo": "Peso mexicano",
+      "detalle": "FIX 19.0228 (20 nov) → ~2,216 pesos por gramo.",
+      "fuente": "Banxico",
+      "url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do"
+    }
+  ],
+  "lectura": "Respiro tras la caída, todavía no cambio de tendencia; volatilidad hasta el PCE del 25 nov. Comprar en partes pequeñas y escalonadas.",
+  "notion_url": "https://app.notion.com/p/421f98ae1112813082fbf5d80e31b82f",
+  "notas": "Rango Kitco del día $3,539.80–$3,637.90."
+}
