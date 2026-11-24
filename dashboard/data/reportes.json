@@ -1126,5 +1126,48 @@
     "lectura": "Respiro tras la caída, todavía no cambio de tendencia; volatilidad hasta el PCE del 25 nov. Comprar en partes pequeñas y escalonadas.",
     "notion_url": "https://app.notion.com/p/421f98ae1112813082fbf5d80e31b82f",
     "notas": "Rango Kitco del día $3,539.80–$3,637.90."
+  },
+  {
+    "fecha": "2026-11-24",
+    "sesion": "con_registro",
+    "precio_usd_oz": 3620.5,
+    "precio_aproximado": false,
+    "precio_fuente": "Kitco bid, 7:40 AM CDMX (8:40 AM ET)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 3634.2,
+    "cierre_previo_aproximado": false,
+    "cambio_usd": -13.7,
+    "cambio_pct": -0.38,
+    "cambio_texto": "−$13.70 (−0.38%) vs cierre previo $3,634.20; rango $3,606.80–$3,679.00",
+    "usd_mxn": 19.1648,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-11-23",
+    "usd_mxn_fuente": "Banxico FIX",
+    "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+    "mxn_por_gramo": 2230.82,
+    "mxn_por_gramo_aproximado": false,
+    "drivers": [
+      {
+        "titulo": "Fed y PCE",
+        "detalle": "Pausa tras el rebote de ~3% del lunes. CME FedWatch: 96% alza de 25 pb en diciembre, 4% de 50 pb. Williams (Fed NY) apunta a política más restrictiva. El PCE del mié 25 es el último dato clave antes de la Fed.",
+        "fuente": "CNBC/Reuters",
+        "url": "https://www.cnbc.com/2026/11/24/gold-bargain-buying-us-inflation-data.html"
+      },
+      {
+        "titulo": "Dólar",
+        "detalle": "Índice del dólar en máximo de 19 meses (104.53 el lunes, 104.26 hoy); el regreso de Jensen Huang a Nvidia reanimó el rally de IA y las apuestas de alzas.",
+        "fuente": "CNBC/Reuters",
+        "url": "https://www.cnbc.com/2026/11/24/dollar-renewed-ai-euphoria-fuels-fed-hike-bets.html"
+      },
+      {
+        "titulo": "Rebote y riesgo",
+        "detalle": "El lunes subió ~3% por compras de oportunidad; Natixis advierte que la recuperación puede ser breve y ve caída a $3,340.",
+        "fuente": "Kitco",
+        "url": "https://www.kitco.com/news/article/2026-11-23/golds-recovery-may-be-short-lived-natixis-warns-drop-3340"
+      }
+    ],
+    "lectura": "Pausa esperando el PCE del mié 25; puede moverse fuerte. Comprar en partes pequeñas, sin prisa. No es asesoría financiera.",
+    "notion_url": "https://app.notion.com/p/422f98ae111281dc82a0d9aef4c15739",
+    "notas": "Verificación del modelo: vence hoy 5d con datos del 17 nov; objetivo 3904.86 USD; real 3620.5 USD; error −284.36 USD (−7.28%); dirección correcta: no; conteo en vivo 5/13."
   }
 ]
