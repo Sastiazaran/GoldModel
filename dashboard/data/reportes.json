@@ -1169,5 +1169,54 @@
     "lectura": "Pausa esperando el PCE del mié 25; puede moverse fuerte. Comprar en partes pequeñas, sin prisa. No es asesoría financiera.",
     "notion_url": "https://app.notion.com/p/422f98ae111281dc82a0d9aef4c15739",
     "notas": "Verificación del modelo: vence hoy 5d con datos del 17 nov; objetivo 3904.86 USD; real 3620.5 USD; error −284.36 USD (−7.28%); dirección correcta: no; conteo en vivo 5/13."
+  },
+  {
+    "fecha": "2026-11-25",
+    "sesion": "con_registro",
+    "precio_usd_oz": 3492.7,
+    "precio_aproximado": false,
+    "precio_fuente": "Kitco spot bid, 7:36 AM CDMX (8:36 AM ET)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 3555.1,
+    "cierre_previo_aproximado": false,
+    "cambio_usd": -62.4,
+    "cambio_pct": -1.76,
+    "cambio_texto": "−$62.40 (−1.76%) vs cierre previo $3,555.10",
+    "usd_mxn": 19.3668,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-11-24",
+    "usd_mxn_fuente": "Banxico FIX",
+    "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+    "mxn_por_gramo": 2174.75,
+    "mxn_por_gramo_aproximado": false,
+    "drivers": [
+      {
+        "titulo": "Aranceles y Fed",
+        "detalle": "Nuevas amenazas de aranceles de EE.UU. tumbaron bolsas; dólar +0.2%; CME FedWatch descuenta por completo alza de 25 pb en diciembre.",
+        "fuente": "CNBC (Reuters)",
+        "url": "https://www.cnbc.com/2026/11/25/gold-metals-federal-reserve-inflation.html"
+      },
+      {
+        "titulo": "Martes",
+        "detalle": "Confianza del consumidor 103.3 vs ~92.5 esperado y venta de tecnológicas; spot cerró ~3,552.50 (−2.25%); ~95% de alza de 25 pb el 8-9 dic.",
+        "fuente": "Kitco",
+        "url": "https://www.kitco.com/news/article/2026-11-24/gold-silver-extend-losses-tech-stocks-slide-fed-inflation-test-looms-kitco"
+      },
+      {
+        "titulo": "Dólar y técnico",
+        "detalle": "10 años 4.85%, DXY ~104 cerca del máximo de 104.59; RSI 29, soporte $3,500.",
+        "fuente": "FXStreet",
+        "url": "https://www.fxstreet.com/news/gold-hovers-near-14-month-low-as-traders-brace-for-us-pce-inflation-data-202611251104"
+      },
+      {
+        "titulo": "PCE subyacente",
+        "detalle": "PCE subyacente de octubre 0.3% m/m, igual al pronóstico.",
+        "fuente": "Investing.com",
+        "url": "https://ng.investing.com/economic-calendar/pce-core---indice-des-prix--la-consommation-des-mnages-61"
+      }
+    ],
+    "lectura": "Debajo de $3,500 (mínimo de más de un año) por aranceles, dólar fuerte y alza de la Fed descontada; PCE en línea. Sin piso claro; comprar en partes pequeñas. No es asesoría financiera.",
+    "notion_url": "https://app.notion.com/p/423f98ae1112811bac87d8ba26ad9b51",
+    "notas": "Rango Kitco del día $3,485.60–$3,575.60. Verificación del modelo: vence hoy el pronóstico a 5 días con datos del 18 nov 2026; objetivo 3841.51 USD; real 3492.70 USD; error −348.81 USD (−9.08%); dirección correcta: no; ocho fallos seguidos; conteo en vivo 5/14 (35.7%). El siguiente vence el 2026-11-26; objetivo 3782.96 USD (datos del 19 nov)."
   }
 ]
