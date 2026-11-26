@@ -1218,5 +1218,54 @@
     "lectura": "Debajo de $3,500 (mínimo de más de un año) por aranceles, dólar fuerte y alza de la Fed descontada; PCE en línea. Sin piso claro; comprar en partes pequeñas. No es asesoría financiera.",
     "notion_url": "https://app.notion.com/p/423f98ae1112811bac87d8ba26ad9b51",
     "notas": "Rango Kitco del día $3,485.60–$3,575.60. Verificación del modelo: vence hoy el pronóstico a 5 días con datos del 18 nov 2026; objetivo 3841.51 USD; real 3492.70 USD; error −348.81 USD (−9.08%); dirección correcta: no; ocho fallos seguidos; conteo en vivo 5/14 (35.7%). El siguiente vence el 2026-11-26; objetivo 3782.96 USD (datos del 19 nov)."
+  },
+  {
+    "fecha": "2026-11-26",
+    "sesion": "con_registro",
+    "precio_usd_oz": 3571.5,
+    "precio_aproximado": false,
+    "precio_fuente": "Kitco spot bid, 7:36 AM CDMX (8:36 AM ET)",
+    "precio_url": "https://www.kitco.com/charts/gold",
+    "cierre_previo_usd_oz": 3588.0,
+    "cierre_previo_aproximado": false,
+    "cambio_usd": -16.5,
+    "cambio_pct": -0.46,
+    "cambio_texto": "−$16.50 (−0.46%) vs cierre previo $3,588.00",
+    "usd_mxn": 19.704,
+    "usd_mxn_tipo": "banxico_fix",
+    "usd_mxn_fecha": "2026-11-25",
+    "usd_mxn_fuente": "Banxico FIX",
+    "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+    "mxn_por_gramo": 2262.54,
+    "mxn_por_gramo_aproximado": false,
+    "drivers": [
+      {
+        "titulo": "Datos fuertes y Fed",
+        "detalle": "PCE de octubre +0.3% m/m y 3.8% a/a; subyacente +0.3% m/m y 3.3% a/a. PIB del 3T revisado a 4.3% (vs ~3.6% esperado). Más de 95% de probabilidad de alza de 25 pb el 8-9 dic. El oro tocó 3,426.40 el miércoles y recuperó cerca de 3,576.30.",
+        "fuente": "Kitco",
+        "url": "https://www.kitco.com/news/article/2026-11-25/gold-silver-reverse-early-losses-wall-street-rebounds-ahead-thanksgiving"
+      },
+      {
+        "titulo": "Jueves",
+        "detalle": "Spot −0.5% a 3,564.06 a las 11:11 GMT; futuro de diciembre +0.8% a 3,562.60. Han Tan (Bybit) no ve rebote sostenido hasta que la Fed se acerque al final de las alzas.",
+        "fuente": "Reuters vía MSN",
+        "url": "https://www.msn.com/en-us/money/economy/gold-drifts-lower-as-fed-rate-hike-fears-loom/ar-AA2igZiQ"
+      },
+      {
+        "titulo": "Asia / cobertura de cortos",
+        "detalle": "Spot casi sin cambio en 3,580.87 a las 03:17 GMT; cobertura de cortos antes del feriado (Ilya Spivak, Tastylive).",
+        "fuente": "CNBC (Reuters)",
+        "url": "https://www.cnbc.com/2026/11/26/gold-federal-reserve-interest-rate-metals.html"
+      },
+      {
+        "titulo": "Thanksgiving",
+        "detalle": "Operación delgada; el oro no logra sostenerse por encima de 3,600.",
+        "fuente": "FXStreet",
+        "url": "https://www.fxstreet.com/analysis/gold-price-forecast-xau-usd-struggles-below-3-600-amid-thanksgiving-light-trading-202611260426"
+      }
+    ],
+    "lectura": "Rebotó desde debajo de $3,500 pero sigue presionado por la Fed; Thanksgiving con poco volumen. Peso a 19.70 sube el oro en pesos. Comprar en partes pequeñas. No es asesoría financiera.",
+    "notion_url": "https://app.notion.com/p/424f98ae111281d5a5f0dee8457cdfc4",
+    "notas": "Rango Kitco del día $3,551.40–$3,607.90. Verificación del modelo: vence hoy el pronóstico a 5 días con datos del 19 nov 2026; objetivo 3782.96 USD; real 3571.50 USD; error −211.46 USD (−5.59%); dirección correcta: no; nueve fallos seguidos; conteo en vivo 5/15 (33.3%)."
   }
 ]
