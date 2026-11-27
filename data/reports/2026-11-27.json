@@ -1,0 +1,49 @@
+{
+  "fecha": "2026-11-27",
+  "sesion": "con_registro",
+  "precio_usd_oz": 3643.20,
+  "precio_aproximado": false,
+  "precio_fuente": "Kitco spot bid, 7:39 AM CDMX (8:39 AM ET)",
+  "precio_url": "https://www.kitco.com/charts/gold",
+  "cierre_previo_usd_oz": 3565.50,
+  "cierre_previo_aproximado": false,
+  "cambio_usd": 77.70,
+  "cambio_pct": 2.18,
+  "cambio_texto": "+$77.70 (+2.18%) vs cierre previo $3,565.50",
+  "usd_mxn": 19.7203,
+  "usd_mxn_tipo": "banxico_fix",
+  "usd_mxn_fecha": "2026-11-26",
+  "usd_mxn_fuente": "Banxico FIX",
+  "usd_mxn_url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do",
+  "mxn_por_gramo": 2309.90,
+  "mxn_por_gramo_aproximado": false,
+  "drivers": [
+    {
+      "titulo": "Rebote y dólar",
+      "detalle": "El oro sube casi 3% el viernes, recuperándose de su nivel más bajo en más de un año, por una pausa en el avance del dólar y bolsas más tranquilas.",
+      "fuente": "Reuters vía GoldCFD",
+      "url": "https://www.goldcfd.com/news/gold-gains-nearly-3-as-dollar-rally-stalls-equities-stabilise-10kd8g017nmj67"
+    },
+    {
+      "titulo": "Compradores defienden $3,500",
+      "detalle": "James Stanley (StoneX) dice que los compradores defendieron $3,500 y que el mercado empieza a descontar recesión y a dudar de que la Fed siga subiendo.",
+      "fuente": "Kitco",
+      "url": "https://www.kitco.com/news/article/2026-11-26/golds-rebound-shows-markets-fear-recession-and-doubt-fed-rate-follow"
+    },
+    {
+      "titulo": "Fed",
+      "detalle": "Se espera alza de la Fed en diciembre y otra a inicios de 2027 tras PIB y PCE fuertes.",
+      "fuente": "CNBC/Reuters",
+      "url": "https://www.cnbc.com/2026/11/27/gold-metals-silver-markets-federal-reserve.html"
+    },
+    {
+      "titulo": "Metales en rally",
+      "detalle": "Futuros del oro +3.8% a $3,669 y plata +9% a $43.72; David Morrison (Trade Nation) lo liga al rally tecnológico del miércoles.",
+      "fuente": "Barron's",
+      "url": "https://www.barrons.com/livecoverage/stock-market-news-today-112726/card/gold-and-silver-prices-rally-is-the-bottom-in--6yTZcjg8E5O8IfYLVqOM"
+    }
+  ],
+  "lectura": "Rebote fuerte (+2.2%) desde mínimos de 15 meses: el dólar frenó su subida y las bolsas se calmaron. La Fed igual se espera que suba en diciembre, así que todavía no hay piso confirmado. Comprar en partes pequeñas. No es asesoría financiera.",
+  "notion_url": null,
+  "notas": "Black Friday, sesión corta en EE.UU. Rango Kitco del día $3,569.60–$3,686.00. Verificación del modelo: vence hoy el pronóstico a 5 días con datos del 20 nov 2026 (+0.18% desde GC=F 3515.40, dirección alza); objetivo 3521.74 USD; real 3643.20 USD; error +121.46 USD (+3.45%); dirección correcta: sí; conteo en vivo 6/16 (37.5%). Próximos: empleo EE.UU. 2026-12-04 07:30 CDMX; inflación México (INEGI) 2026-12-09 06:00; decisión de la Fed 2026-12-09 13:00; inflación EE.UU. (CPI) 2026-12-10 07:30."
+}

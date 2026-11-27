@@ -468,6 +468,7 @@ def probar_reportes_de_octubre_no_inventan_huecos() -> None:
         "2026-11-24",
         "2026-11-25",
         "2026-11-26",
+        "2026-11-27",
     ]
     hoy = por_fecha["2026-10-28"]
     assert hoy["precio_usd_oz"] == 4047
@@ -805,6 +806,26 @@ def probar_reportes_de_octubre_no_inventan_huecos() -> None:
     assert "3782.96" in hoy26["notas"]
     assert "−211.46" in hoy26["notas"]
     assert "5/15" in hoy26["notas"]
+    hoy27 = por_fecha["2026-11-27"]
+    assert hoy27["sesion"] == "con_registro"
+    assert hoy27["precio_usd_oz"] == 3643.20
+    assert hoy27["precio_aproximado"] is False
+    assert hoy27["cierre_previo_usd_oz"] == 3565.50
+    assert hoy27["cierre_previo_aproximado"] is False
+    assert hoy27["cambio_usd"] == 77.70
+    assert hoy27["cambio_pct"] == 2.18
+    assert hoy27["usd_mxn"] == 19.7203
+    assert hoy27["usd_mxn_fecha"] == "2026-11-26"
+    assert hoy27["mxn_por_gramo"] == 2309.90
+    assert hoy27["mxn_por_gramo_aproximado"] is False
+    assert hoy27["notion_url"] is None
+    assert hoy27["lectura"]
+    assert hoy27["drivers"][0]["url"].startswith("https://")
+    assert "3,569.60" in hoy27["notas"]
+    assert "3,686.00" in hoy27["notas"]
+    assert "3521.74" in hoy27["notas"]
+    assert "+121.46" in hoy27["notas"]
+    assert "6/16" in hoy27["notas"]
     for fecha in ("2026-10-24", "2026-10-25"):
         vacio = por_fecha[fecha]
         assert vacio["sesion"] == "sin_registro"
